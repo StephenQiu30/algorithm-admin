@@ -1,0 +1,105 @@
+.markdown-editor-container {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.markdown-editor-container:hover {
+  border-color: #40a9ff;
+}
+
+.markdown-editor-container:focus-within {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.markdown-viewer .admde-preview-content,
+.markdown-viewer .admde-editor-content {
+  padding: 0 16px;
+}
+
+.markdown-viewer h1,
+.markdown-viewer h2,
+.markdown-viewer h3,
+.markdown-viewer h4,
+.markdown-viewer h5,
+.markdown-viewer h6 {
+  margin-top: 24px !important;
+  margin-bottom: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: #1a1a1a !important;
+}
+
+.markdown-viewer h1 { font-size: 2em !important; border-bottom: 1px solid #eaecef !important; padding-bottom: 0.3em !important; }
+.markdown-viewer h2 { font-size: 1.5em !important; border-bottom: 1px solid #eaecef !important; padding-bottom: 0.3em !important; }
+.markdown-viewer h3 { font-size: 1.25em !important; }
+
+.markdown-viewer p {
+  margin-bottom: 16px !important;
+}
+
+.markdown-viewer blockquote {
+  padding: 0 1em !important;
+  color: #6a737d !important;
+  border-left: 0.25em solid #dfe2e5 !important;
+  margin-bottom: 16px !important;
+  background-color: #fcfcfc !important;
+}
+
+.markdown-viewer code {
+  padding: 0.2em 0.4em !important;
+  margin: 0 !important;
+  font-size: 85% !important;
+  background-color: rgba(27, 31, 35, 0.05) !important;
+  border-radius: 3px !important;
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace !important;
+}
+
+.markdown-viewer pre {
+  padding: 16px !important;
+  overflow: auto !important;
+  font-size: 85% !important;
+  line-height: 1.45 !important;
+  background-color: #f6f8fa !important;
+  border-radius: 6px !important;
+  margin-bottom: 16px !important;
+}
+
+.markdown-viewer pre code {
+  background-color: transparent !important;
+  padding: 0 !important;
+  font-size: 100% !important;
+}
+
+.markdown-viewer ul,
+.markdown-viewer ol {
+  padding-left: 2em !important;
+  margin-bottom: 16px !important;
+}
+
+.markdown-viewer img {
+  max-width: 100% !important;
+  border-radius: 8px !important;
+  margin: 16px 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Override Ant Design MD Editor default toolbar and border if needed */
+.markdown-viewer .admde-editor {
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  min-height: 400px !important;
+}
+
+.markdown-viewer .admde-editor-content {
+  min-height: 350px !important;
+}
+
+
+.markdown-viewer .admde-readonly .admde-editor {
+  border: none !important;
+}
+
