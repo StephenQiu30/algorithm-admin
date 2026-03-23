@@ -5,49 +5,47 @@ import {
   ProForm,
   ProFormSelect,
   ProFormText,
+  ProFormTextArea,
 } from '@ant-design/pro-components';
-import { MarkdownEditor } from '@/components';
-import { updatePost } from '@/services/post/postController';
+import { updateKnowledgeBase } from '@/services/ai/knowledgeBaseController';
+import { KnowledgeBaseStatusEnumMap } from '@/enums/KnowledgeBaseStatusEnum';
 
 interface Props {
-  oldData?: API.PostVO;
+  oldData?: API.KnowledgeBaseVO;
   onCancel: () => void;
   visible: boolean;
   onSubmit: () => void;
 }
 
 /**
- * 更新算法知识弹窗
+ * 更新知识库弹窗
  * @param props
  * @constructor
  */
 const UpdateKnowledgeModal: React.FC<Props> = (props) => {
   const { oldData, visible, onCancel, onSubmit } = props;
-  const [form] = ProForm.useForm<API.PostUpdateRequest>();
+  const [form] = ProForm.useForm<API.KnowledgeBaseUpdateRequest>();
 
   // 当 oldData 改变时重置表单
   React.useEffect(() => {
     if (visible && oldData) {
-      const tags = typeof oldData.tags === 'string' ? JSON.parse(oldData.tags || '[]') : oldData.tags || [];
       form.setFieldsValue({
         ...oldData,
-        tags,
-      } as any);
+      });
     }
   }, [visible, oldData, form]);
 
   return (
-    <ModalForm<API.PostUpdateRequest>
-      title="更新算法知识"
+    <ModalForm<API.KnowledgeBaseUpdateRequest>
+      title="更新算法知识库"
       open={visible}
       form={form}
       onFinish={async (values) => {
         try {
-          const res = await updatePost({
+          const res = await updateKnowledgeBase({
             ...values,
             id: oldData?.id,
-            contentType: 1,
-          } as any);
+          });
           if (res.code === 0) {
             message.success('更新成功');
             onSubmit?.();
@@ -72,22 +70,20 @@ const UpdateKnowledgeModal: React.FC<Props> = (props) => {
       }}
     >
       <ProFormText
-        name="title"
-        label="标题"
-        rules={[{ required: true, message: '请输入标题' }]}
-        placeholder="请输入标题"
+        name="name"
+        label="知识库名称"
+        rules={[{ required: true, message: '请输入知识库名称' }]}
+        placeholder="请输入知识库名称"
       />
-      <ProForm.Item name="content" label="内容" rules={[{ required: true, message: '请输入内容' }]}>
-        <MarkdownEditor />
-      </ProForm.Item>
+      <ProFormTextArea
+        name="description"
+        label="描述"
+        placeholder="请输入描述"
+      />
       <ProFormSelect
-        name="tags"
-        label="标签"
-        mode="tags"
-        placeholder="请输入标签"
-        fieldProps={{
-          suffixIcon: null,
-        }}
+        name="status"
+        label="状态"
+        valueEnum={KnowledgeBaseStatusEnumMap}
       />
     </ModalForm>
   );

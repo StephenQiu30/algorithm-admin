@@ -74,22 +74,43 @@ export async function updateDocument(
   });
 }
 
-/** 上传文档 上传二进制文件至特定知识库，并加入背景异步解析队列。 POST /ai/knowledge/document/upload */
+/** 上传文档 上传知识库文档并触发异步解析。 POST /ai/knowledge/document/upload */
 export async function uploadDocument(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.uploadDocumentParams,
   body: {},
+  file?: File,
   options?: { [key: string]: any },
 ) {
+  const formData = new FormData();
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele];
+
+    if (item !== undefined && item !== null) {
+      if (typeof item === 'object' && !(item instanceof File)) {
+        if (item instanceof Array) {
+          item.forEach((f) => formData.append(ele, f || ''));
+        } else {
+          formData.append(ele, new Blob([JSON.stringify(item)], { type: 'application/json' }));
+        }
+      } else {
+        formData.append(ele, item);
+      }
+    }
+  });
+
   return request<API.BaseResponseLong>('/ai/knowledge/document/upload', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     params: {
       ...params,
     },
-    data: body,
+    data: formData,
+    requestType: 'form',
     ...(options || {}),
   });
 }
