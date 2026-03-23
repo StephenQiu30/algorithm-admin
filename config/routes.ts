@@ -15,10 +15,17 @@ export default [
     access: 'canAdmin',
   },
   {
-    name: '算法知识管理',
+    name: '知识库管理',
     path: '/admin/algorithm/knowledge',
-    component: './Admin/AlgorithmKnowledge',
     icon: 'BookOutlined',
+    access: 'canAdmin',
+    component: './Admin/AlgorithmKnowledge/KnowledgeBaseList',
+  },
+  {
+    name: '文档管理',
+    path: '/admin/algorithm/knowledge/document/:id',
+    component: './Admin/AlgorithmKnowledge/DocumentManagement',
+    hideInMenu: true,
     access: 'canAdmin',
   },
   {

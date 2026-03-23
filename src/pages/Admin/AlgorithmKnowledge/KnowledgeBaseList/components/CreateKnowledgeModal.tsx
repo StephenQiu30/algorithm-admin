@@ -3,11 +3,10 @@ import React from 'react';
 import {
   ModalForm,
   ProForm,
-  ProFormSelect,
   ProFormText,
+  ProFormTextArea,
 } from '@ant-design/pro-components';
-import { MarkdownEditor } from '@/components';
-import { add } from '@/services/post/algorithmKnowledgeController';
+import { addKnowledgeBase } from '@/services/ai/knowledgeBaseController';
 
 interface Props {
   onCancel: () => void;
@@ -16,22 +15,22 @@ interface Props {
 }
 
 /**
- * 新建算法知识弹窗
+ * 新建知识库弹窗
  * @param props
  * @constructor
  */
 const CreateKnowledgeModal: React.FC<Props> = (props) => {
   const { visible, onCancel, onSubmit } = props;
-  const [form] = ProForm.useForm<API.PostAddRequest>();
+  const [form] = ProForm.useForm<API.KnowledgeBaseAddRequest>();
 
   return (
-    <ModalForm<API.PostAddRequest>
-      title="新建算法知识"
+    <ModalForm<API.KnowledgeBaseAddRequest>
+      title="新建算法知识库"
       open={visible}
       form={form}
       onFinish={async (values) => {
         try {
-          const res = await add({
+          const res = await addKnowledgeBase({
             ...values,
           });
           if (res.code === 0) {
@@ -58,22 +57,15 @@ const CreateKnowledgeModal: React.FC<Props> = (props) => {
       }}
     >
       <ProFormText
-        name="title"
-        label="标题"
-        rules={[{ required: true, message: '请输入标题' }]}
-        placeholder="请输入标题"
+        name="name"
+        label="知识库名称"
+        rules={[{ required: true, message: '请输入知识库名称' }]}
+        placeholder="请输入知识库名称"
       />
-      <ProForm.Item name="content" label="内容" rules={[{ required: true, message: '请输入内容' }]}>
-        <MarkdownEditor />
-      </ProForm.Item>
-      <ProFormSelect
-        name="tags"
-        label="标签"
-        mode="tags"
-        placeholder="请输入标签"
-        fieldProps={{
-          suffixIcon: null,
-        }}
+      <ProFormTextArea
+        name="description"
+        label="描述"
+        placeholder="请输入描述"
       />
     </ModalForm>
   );

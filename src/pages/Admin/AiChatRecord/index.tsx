@@ -1,7 +1,7 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef } from 'react';
-import { deleteAiChatRecord, listAiChatRecordByPage } from '@/services/ai/aiChatRecordController';
+import { deleteAiChatRecord, listAiChatRecordVoByPage } from '@/services/ai/aiChatRecordController';
 
 /**
  * AI 对话记录管理
@@ -14,7 +14,7 @@ const AiChatRecordList: React.FC = () => {
    * 删除节点
    * @param row
    */
-  const handleDelete = async (row: API.AiChatRecord) => {
+  const handleDelete = async (row: API.AiChatRecordVO) => {
     if (!row?.id) return;
     const hide = message.loading('正在删除');
     try {
@@ -35,7 +35,7 @@ const AiChatRecordList: React.FC = () => {
   /**
    * 表格列定义
    */
-  const columns: ProColumns<API.AiChatRecord>[] = [
+  const columns: ProColumns<API.AiChatRecordVO>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -94,7 +94,7 @@ const AiChatRecordList: React.FC = () => {
   ];
 
   return (
-    <ProTable<API.AiChatRecord, API.AiChatRecordQueryRequest>
+    <ProTable<API.AiChatRecordVO, API.AiChatRecordQueryRequest>
       headerTitle="AI 对话记录"
       actionRef={actionRef}
       rowKey="id"
@@ -103,7 +103,7 @@ const AiChatRecordList: React.FC = () => {
         const sortField = Object.keys(sort)?.[0] || 'createTime';
         const sortOrder = sort?.[sortField] ?? 'descend';
 
-        const { data, code } = await listAiChatRecordByPage({
+        const { data, code } = await listAiChatRecordVoByPage({
           ...params,
           ...filter,
           sortField,
