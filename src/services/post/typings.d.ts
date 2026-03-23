@@ -76,10 +76,6 @@ declare namespace API {
     id: number;
   };
 
-  type getVoParams = {
-    id: number;
-  };
-
   type OrderItem = {
     column?: string;
     asc?: boolean;
@@ -122,8 +118,6 @@ declare namespace API {
     cover?: string;
     /** 标签列表 */
     tags?: string[];
-    /** 内容类型(0-帖子 1-算法知识库) */
-    contentType?: number;
   };
 
   type PostCommentAddRequest = {
@@ -201,8 +195,6 @@ declare namespace API {
     cover?: string;
     /** 标签列表 */
     tags?: string[];
-    /** 内容类型(0-帖子 1-算法知识库) */
-    contentType?: number;
   };
 
   type PostFavourQueryRequest = {
@@ -255,8 +247,6 @@ declare namespace API {
     reviewStatus?: number;
     /** 审核信息 */
     reviewMessage?: string;
-    /** 内容类型(0-帖子 1-算法知识库) */
-    contentType?: number;
   };
 
   type PostReviewRequest = {
@@ -284,8 +274,6 @@ declare namespace API {
     cover?: string;
     /** 标签列表 */
     tags?: string[];
-    /** 内容类型(0-帖子 1-算法知识库) */
-    contentType?: number;
   };
 
   type PostVO = {
@@ -303,8 +291,6 @@ declare namespace API {
     favourNum?: number;
     /** 用户ID */
     userId?: number;
-    /** 内容类型(0-帖子 1-算法知识库) */
-    contentType?: number;
     /** 创建时间 */
     createTime?: string;
     /** 更新时间 */

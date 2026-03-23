@@ -93,15 +93,6 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponseLong = {
-    /** 状态码 */
-    code?: number;
-    /** 数据 */
-    data?: number;
-    /** 消息 */
-    message?: string;
-  };
-
   type BaseResponsePageApiAccessLogVO = {
     /** 状态码 */
     code?: number;
@@ -203,15 +194,6 @@ declare namespace API {
     status?: string;
     /** 搜索文本 */
     searchText?: string;
-  };
-
-  type EmailRecordUpdateStatusRequest = {
-    /** 记录ID */
-    id: number;
-    /** 发送状态 */
-    status: string;
-    /** 错误信息 */
-    errorMessage?: string;
   };
 
   type EmailRecordVO = {
