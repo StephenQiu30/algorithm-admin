@@ -69,7 +69,6 @@ declare namespace API {
     thumbNum?: number;
     favourNum?: number;
     userId?: number;
-    contentType?: number;
     reviewStatus?: number;
     reviewMessage?: string;
     userVO?: UserVO;
@@ -106,8 +105,6 @@ declare namespace API {
     reviewStatus?: number;
     /** 审核信息 */
     reviewMessage?: string;
-    /** 内容类型(0-帖子 1-算法知识库) */
-    contentType?: number;
   };
 
   type SearchRequest = {
