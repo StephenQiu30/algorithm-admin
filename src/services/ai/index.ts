@@ -2,12 +2,14 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
-import * as knowledgeRetrievalController from './knowledgeRetrievalController';
-import * as knowledgeController from './knowledgeController';
 import * as aiChatRecordController from './aiChatRecordController';
+import * as knowledgeBaseController from './knowledgeBaseController';
+import * as knowledgeDocumentController from './knowledgeDocumentController';
+import * as documentChunkController from './documentChunkController';
 
 export default {
-  knowledgeRetrievalController,
-  knowledgeController,
   aiChatRecordController,
+  knowledgeBaseController,
+  knowledgeDocumentController,
+  documentChunkController,
 };
