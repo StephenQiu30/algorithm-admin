@@ -9,7 +9,7 @@ export enum FileUploadStatusEnum {
   /**
    * 上传失败
    */
-  FAILURE = 'FAILURE',
+  FAILED = 'FAILED',
 }
 
 /**
@@ -20,7 +20,7 @@ export const FileUploadStatusEnumMap = {
     text: '成功',
     status: 'Success',
   },
-  [FileUploadStatusEnum.FAILURE]: {
+  [FileUploadStatusEnum.FAILED]: {
     text: '失败',
     status: 'Error',
   },

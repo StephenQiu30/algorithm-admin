@@ -15,7 +15,7 @@ const Settings: ProLayoutProps & {
   fixedHeader: true,
   fixSiderbar: true,
   colorWeak: false,
-  title: 'Stephen Admin',
+  title: '面向排序算法的RAG增强交互式系统',
   pwa: true,
   logo: 'https://butterfly-1318299170.cos.ap-shanghai.myqcloud.com/logo/stephen/logo.svg',
   iconfontUrl: '',

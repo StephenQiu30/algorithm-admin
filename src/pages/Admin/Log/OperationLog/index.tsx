@@ -68,6 +68,13 @@ const OperationLog: React.FC = () => {
     },
     { title: '请求路径', dataIndex: 'path', ellipsis: true },
     { title: 'IP地址', dataIndex: 'clientIp', width: 120 },
+    { title: '地点', dataIndex: 'location', width: 120, hideInSearch: true },
+    {
+      title: '状态码',
+      dataIndex: 'responseStatus',
+      width: 100,
+      render: (status) => status && <Tag>{status}</Tag>,
+    },
     {
       title: '状态',
       dataIndex: 'success',

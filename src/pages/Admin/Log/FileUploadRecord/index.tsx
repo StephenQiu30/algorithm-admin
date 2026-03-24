@@ -118,12 +118,6 @@ const FileUploadRecord: React.FC = () => {
       dataIndex: 'status',
       width: 100,
       valueEnum: FileUploadStatusEnumMap,
-      render: (status) => {
-        const s = status as string;
-        if (s === 'SUCCESS') return <Badge status="success" text="成功" />;
-        if (s === 'FAILED') return <Badge status="error" text="失败" />;
-        return <Badge status="processing" text="上传中" />;
-      },
     },
     { title: '存储', dataIndex: 'storageType', width: 100, hideInSearch: true },
     {

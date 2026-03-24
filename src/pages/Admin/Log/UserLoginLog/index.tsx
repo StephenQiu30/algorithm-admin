@@ -64,7 +64,9 @@ const UserLoginLog: React.FC = () => {
       width: 120,
     },
     { title: '地点', dataIndex: 'location', width: 120, hideInSearch: true },
+    { title: 'User-Agent', dataIndex: 'userAgent', ellipsis: true, hideInSearch: true },
     { title: '登录类型', dataIndex: 'loginType', width: 100 },
+    { title: '失败原因', dataIndex: 'failReason', width: 120, ellipsis: true, hideInSearch: true },
     {
       title: '状态',
       dataIndex: 'status',

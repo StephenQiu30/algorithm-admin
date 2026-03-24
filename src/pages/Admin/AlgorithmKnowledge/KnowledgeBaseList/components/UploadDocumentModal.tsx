@@ -66,9 +66,10 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
         name="file"
         rules={[{ required: true, message: '请选择文件' }]}
         max={1}
-        description="支持单次上传一个文件，点击或拖拽文件至此区域上传"
+        description="支持单次上传一个文件，仅限 PDF、Markdown、Text、Word 等格式"
         fieldProps={{
           beforeUpload: () => false, // 阻止自动上传
+          accept: '.pdf,.md,.txt,.docx,.doc',
         }}
       />
     </ModalForm>

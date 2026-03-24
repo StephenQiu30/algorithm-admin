@@ -12,7 +12,9 @@ import { DocumentParseStatusEnum, DocumentParseStatusEnumMap } from '@/enums/Doc
 import {
   CloudUploadOutlined,
   DeleteOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons';
+import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
 
 /**
  * 文档管理页面
@@ -26,7 +28,7 @@ const DocumentManagement: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.DocumentVO>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
-  const [shouldPoll, setShouldPoll] = useState<boolean>(false);
+  const [chunkDrawerVisible, setChunkDrawerVisible] = useState<boolean>(false);
 
 
   /**
@@ -42,20 +44,6 @@ const DocumentManagement: React.FC = () => {
     }
   }, [knowledgeBaseId]);
 
-  /**
-   * 轮询处理中的文档
-   */
-  useEffect(() => {
-    let timer: any;
-    if (shouldPoll) {
-      timer = setInterval(() => {
-        actionRef.current?.reload();
-      }, 5000);
-    }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [shouldPoll]);
 
   /**
    * 删除文档
@@ -110,6 +98,7 @@ const DocumentManagement: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInSearch: true,
+      hideInTable: true,
       width: 60,
     },
     {
@@ -139,30 +128,24 @@ const DocumentManagement: React.FC = () => {
       dataIndex: 'chunkCount',
       valueType: 'digit',
       hideInSearch: true,
-      width: 80,
+      sorter: true,
+      align: 'center',
+      width: 100,
+      render: (count) => (
+        <Badge
+          count={count}
+          showZero
+          color={Number(count) > 0 ? '#1677ff' : '#d9d9d9'}
+        />
+      ),
     },
     {
       title: '解析状态',
       dataIndex: 'status',
       valueType: 'select',
       valueEnum: DocumentParseStatusEnumMap,
-      width: 100,
-      render: (status: any, record) => {
-        const config = DocumentParseStatusEnumMap[status as keyof typeof DocumentParseStatusEnumMap] || {
-          text: '未知',
-          status: 'default',
-        };
-        return (
-          <Space direction="vertical" size={0}>
-            <Badge status={config.status.toLowerCase() as any} text={config.text} />
-            {Number(status) === DocumentParseStatusEnum.FAILED && record.errorMessage && (
-              <Typography.Text type="danger" style={{ fontSize: 12 }}>
-                {record.errorMessage}
-              </Typography.Text>
-            )}
-          </Space>
-        );
-      },
+      width: 120,
+      sorter: true,
     },
     {
       title: '上传者',
@@ -180,18 +163,36 @@ const DocumentManagement: React.FC = () => {
       ),
     },
     {
-      title: '创建时间',
+      title: '上传时间',
       dataIndex: 'uploadTime',
       valueType: 'dateTime',
       hideInSearch: true,
-      width: 150,
+      width: 160,
+      sorter: true,
+    },
+    {
+      title: '完成时间',
+      dataIndex: 'processEndTime',
+      valueType: 'dateTime',
+      hideInSearch: true,
+      width: 160,
+      sorter: true,
     },
     {
       title: '操作',
       valueType: 'option',
-      width: 120,
+      width: 180,
       render: (_, record) => (
         <Space size="middle" wrap>
+          <Typography.Link
+            onClick={() => {
+              setCurrentRow(record);
+              setChunkDrawerVisible(true);
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+          >
+            <FileSearchOutlined /> 分片
+          </Typography.Link>
           <Popconfirm
             title="确定删除此文档及关联分片吗？"
             description="删除后将无法恢复。"
@@ -278,13 +279,6 @@ const DocumentManagement: React.FC = () => {
             knowledgeBaseId: knowledgeBaseId as any,
           } as API.DocumentQueryRequest);
 
-          // 检查是否有正在处理中的文档
-          const hasProcessing = data?.records?.some(
-            (r) =>
-              Number(r.status) === DocumentParseStatusEnum.PENDING ||
-              Number(r.status) === DocumentParseStatusEnum.PROCESSING,
-          );
-          setShouldPoll(!!hasProcessing);
 
           return {
             success: code === 0,
@@ -302,6 +296,15 @@ const DocumentManagement: React.FC = () => {
         onSubmit={() => {
           setUploadModalVisible(false);
           actionRef.current?.reload();
+        }}
+      />
+
+      <DocumentChunkDrawer
+        documentId={currentRow?.id}
+        visible={chunkDrawerVisible}
+        onClose={() => {
+          setChunkDrawerVisible(false);
+          setCurrentRow(undefined);
         }}
       />
     </PageContainer>

@@ -5,19 +5,23 @@ export enum DocumentParseStatusEnum {
   /**
    * 待解析
    */
-  PENDING = 0,
+  PENDING = 'PENDING',
   /**
    * 解析中
    */
-  PROCESSING = 1,
+  PROCESSING = 'PROCESSING',
   /**
-   * 解析成功
+   * 解析完成
    */
-  SUCCESS = 2,
+  COMPLETED = 'COMPLETED',
   /**
    * 解析失败
    */
-  FAILED = 3,
+  FAILED = 'FAILED',
+  /**
+   * 解析超时
+   */
+  TIMEOUT = 'TIMEOUT',
 }
 
 /**
@@ -32,12 +36,16 @@ export const DocumentParseStatusEnumMap = {
     text: '解析中',
     status: 'Processing',
   },
-  [DocumentParseStatusEnum.SUCCESS]: {
-    text: '解析成功',
+  [DocumentParseStatusEnum.COMPLETED]: {
+    text: '解析完成',
     status: 'Success',
   },
   [DocumentParseStatusEnum.FAILED]: {
     text: '解析失败',
     status: 'Error',
+  },
+  [DocumentParseStatusEnum.TIMEOUT]: {
+    text: '解析超时',
+    status: 'Warning',
   },
 };

@@ -136,6 +136,8 @@ declare namespace API {
     sourceType?: string;
     /** 命中原因 */
     matchReason?: string;
+    /** 创建时间 */
+    createTime?: string;
   };
 
   type DeleteRequest = {
