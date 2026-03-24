@@ -1,5 +1,5 @@
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Typography, Avatar } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
 import { useParams, history } from '@umijs/max';
 import {
@@ -20,7 +20,7 @@ import {
  */
 const DocumentManagement: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const knowledgeBaseId = Number(id);
+  const knowledgeBaseId = id as any;
   const actionRef = useRef<ActionType>();
   const [uploadModalVisible, setUploadModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.DocumentVO>();
@@ -61,7 +61,7 @@ const DocumentManagement: React.FC = () => {
    * 删除文档
    * @param id
    */
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: any) => {
     const hide = message.loading('正在删除...');
     try {
       const res = await deleteDocument({ id });
@@ -82,7 +82,7 @@ const DocumentManagement: React.FC = () => {
    * 批量删除文档
    * @param ids
    */
-  const handleBatchDelete = async (ids: number[]) => {
+  const handleBatchDelete = async (ids: any[]) => {
     const hide = message.loading('正在批量删除...');
     try {
       const results = await Promise.all(ids.map((id) => deleteDocument({ id })));
@@ -165,21 +165,19 @@ const DocumentManagement: React.FC = () => {
       },
     },
     {
-      title: '发布者',
+      title: '上传者',
       dataIndex: 'userVO',
       valueType: 'text',
       hideInSearch: true,
-      width: 120,
-      render: (_, record) => (
-        <Typography.Text>{record.userVO?.userName || '-'}</Typography.Text>
-      ),
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'uploadTime',
-      valueType: 'dateTime',
-      hideInSearch: true,
       width: 150,
+      render: (_, record) => (
+        <Space>
+          <Avatar src={record.userVO?.userAvatar} size="small">
+            {record.userVO?.userName?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography.Text ellipsis>{record.userVO?.userName || '未知'}</Typography.Text>
+        </Space>
+      ),
     },
     {
       title: '创建时间',

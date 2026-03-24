@@ -1,4 +1,10 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
@@ -6,7 +12,6 @@ import {
   deleteNotification,
   listNotificationByPage,
 } from '@/services/notification/notificationController';
-import { PlusOutlined } from '@ant-design/icons';
 import UpdateNotificationModal from '@/pages/Admin/NotificationList/components/UpdateNotificationModal';
 import CreateNotificationModal from '@/pages/Admin/NotificationList/components/CreateNotificationModal';
 import ViewNotificationModal from '@/pages/Admin/NotificationList/components/ViewNotificationModal';
@@ -124,6 +129,10 @@ const NotificationList: React.FC = () => {
       valueType: 'select',
       valueEnum: NotificationReadStatusEnumMap,
       width: 110,
+      render: (isRead) => {
+        if (isRead === 1) return <Badge status="success" text="已读" />;
+        return <Badge status="processing" text="未读" />;
+      },
     },
     {
       title: '关联信息',
@@ -147,28 +156,37 @@ const NotificationList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 120,
+      width: 200,
       render: (_, record) => (
         <Space size="middle">
           <ViewNotificationModal notification={record}>
-            <Typography.Link key="view">查看</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 查看
+            </Typography.Link>
           </ViewNotificationModal>
           <Typography.Link
             key="update"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               setCurrentRow(record);
               setUpdateModalVisible(true);
             }}
           >
-            修改
+            <EditOutlined /> 修改
           </Typography.Link>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此通知吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

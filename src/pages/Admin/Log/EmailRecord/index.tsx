@@ -1,5 +1,6 @@
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deleteEmailRecord, listRecordByPage1 } from '@/services/log/emailRecordController';
 import { EmailStatusEnumMap } from '@/enums/EmailStatusEnum';
@@ -55,10 +56,9 @@ const EmailRecord: React.FC = () => {
 
   const columns: ProColumns<API.EmailRecordVO>[] = [
     { title: '记录ID', dataIndex: 'id', width: 120, copyable: true },
-    { title: '消息ID', dataIndex: 'msgId', width: 120, ellipsis: true },
     { title: '业务ID', dataIndex: 'bizId', width: 120, ellipsis: true },
     { title: '收件人', dataIndex: 'toEmail', width: 180, copyable: true },
-    { title: '主题', dataIndex: 'subject', ellipsis: true, width: 200, hideInSearch: true },
+    { title: '主题', dataIndex: 'subject', ellipsis: true, width: 200 },
     {
       title: '业务类型',
       dataIndex: 'bizType',
@@ -68,16 +68,25 @@ const EmailRecord: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'status',
-      width: 120,
+      width: 100,
       valueEnum: EmailStatusEnumMap,
+      render: (status) => {
+        const s = status as string;
+        if (s === 'SUCCESS') return <Badge status="success" text="成功" />;
+        if (s === 'FAILED') return <Badge status="error" text="失败" />;
+        return <Badge status="processing" text="正在发送" />;
+      },
     },
     {
       title: '重试',
       dataIndex: 'retryCount',
       width: 60,
       hideInSearch: true,
-      render: (count) => <Tag color={Number(count) > 0 ? 'warning' : 'default'}>{count}</Tag>,
+      render: (count) => (
+        <Tag color={Number(count) > 0 ? 'warning' : 'default'}>{count}</Tag>
+      ),
     },
+    { title: '发送渠道', dataIndex: 'provider', width: 100, hideInSearch: true },
     {
       title: '发送时间',
       dataIndex: 'sendTime',
@@ -90,19 +99,28 @@ const EmailRecord: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 100,
+      width: 160,
+      fixed: 'right',
       render: (_, record) => (
         <Space size="middle">
           <ViewEmailRecordModal record={record}>
-            <Typography.Link key="view">详情</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 详情
+            </Typography.Link>
           </ViewEmailRecordModal>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此记录吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

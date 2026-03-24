@@ -1,5 +1,6 @@
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Typography, Image } from 'antd';
+import { Button, message, Popconfirm, Space, Typography, Image, Tag, Badge } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
   deleteFileUploadRecord,
@@ -64,13 +65,15 @@ const FileUploadRecord: React.FC = () => {
       title: '业务类型',
       dataIndex: 'bizType',
       width: 120,
-      valueEnum: {
-        [FileUploadBiz.USER_AVATAR]: { text: '用户头像', status: 'Default' },
-        [FileUploadBiz.POST_COVER]: { text: '帖子封面', status: 'Default' },
-        [FileUploadBiz.POST_IMAGE_COVER]: { text: '图片帖子封面', status: 'Default' },
+      render: (bizType) => {
+        const type = bizType as string;
+        if (type === FileUploadBiz.USER_AVATAR) return <Tag>用户头像</Tag>;
+        if (type === FileUploadBiz.POST_COVER) return <Tag>帖子封面</Tag>;
+        if (type === FileUploadBiz.POST_IMAGE_COVER) return <Tag>图片帖子封面</Tag>;
+        return <Tag>{type}</Tag>;
       },
     },
-    { title: '文件名', dataIndex: 'fileName', ellipsis: true },
+    { title: '文件名', dataIndex: 'fileName', ellipsis: true, minWidth: 150 },
     {
       title: '大小',
       dataIndex: 'fileSize',
@@ -83,7 +86,13 @@ const FileUploadRecord: React.FC = () => {
         return `${((s as number) / (1024 * 1024)).toFixed(2)} MB`;
       },
     },
-    { title: '后缀', dataIndex: 'fileSuffix', width: 80, hideInSearch: true },
+    {
+      title: '后缀',
+      dataIndex: 'fileSuffix',
+      width: 80,
+      hideInSearch: true,
+      render: (suffix) => suffix && <Tag color="blue">{suffix}</Tag>,
+    },
     {
       title: '预览',
       dataIndex: 'url',
@@ -94,7 +103,7 @@ const FileUploadRecord: React.FC = () => {
         const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url as string);
         if (isImage) {
           return (
-            <Image src={url as string} width={40} height={40} style={{ objectFit: 'cover' }} />
+            <Image src={url as string} width={40} height={40} style={{ objectFit: 'cover', borderRadius: 4 }} />
           );
         }
         return (
@@ -109,11 +118,16 @@ const FileUploadRecord: React.FC = () => {
       dataIndex: 'status',
       width: 100,
       valueEnum: FileUploadStatusEnumMap,
+      render: (status) => {
+        const s = status as string;
+        if (s === 'SUCCESS') return <Badge status="success" text="成功" />;
+        if (s === 'FAILED') return <Badge status="error" text="失败" />;
+        return <Badge status="processing" text="上传中" />;
+      },
     },
-    { title: 'MD5', dataIndex: 'md5', hideInTable: true, hideInSearch: true },
-    { title: 'IP地址', dataIndex: 'clientIp', hideInTable: true, hideInSearch: true },
+    { title: '存储', dataIndex: 'storageType', width: 100, hideInSearch: true },
     {
-      title: '时间',
+      title: '上传时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
       width: 160,
@@ -124,19 +138,28 @@ const FileUploadRecord: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 120,
+      width: 160,
+      fixed: 'right',
       render: (_, record) => (
         <Space size="middle">
           <ViewFileUploadRecordModal record={record}>
-            <Typography.Link key="view">详情</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 详情
+            </Typography.Link>
           </ViewFileUploadRecordModal>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此上传记录吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

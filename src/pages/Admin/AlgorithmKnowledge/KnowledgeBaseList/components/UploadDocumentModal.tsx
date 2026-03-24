@@ -4,7 +4,7 @@ import React from 'react';
 import { addDocument as uploadDocument } from '@/services/ai/documentController';
 
 interface Props {
-  knowledgeBaseId?: number;
+  knowledgeBaseId?: any;
   visible: boolean;
   onCancel: () => void;
   onSubmit: () => void;
@@ -43,7 +43,8 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
           // 这里我们遵循 API 定义，如果后端确实是 /doc/add 且接受文件，通常是通过 params 传递 knowledgeBaseId
           const res = await uploadDocument(
             { knowledgeBaseId },
-            file // 这里假定 request 能够处理 file 或者我们需要特殊处理
+            {},
+            file
           );
           if (res.code === 0) {
             message.success('上传成功');

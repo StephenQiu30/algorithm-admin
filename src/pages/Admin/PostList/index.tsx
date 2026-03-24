@@ -1,8 +1,13 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-
-import { Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
-import React, { useRef, useState } from 'react';
-import { LikeOutlined, PlusOutlined, StarOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  LikeOutlined,
+  PlusOutlined,
+  StarOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import { TAG_EMPTY } from '@/constants';
 import { deletePost, listPostByPage } from '@/services/post/postController';
 import { reviewStatus } from '@/enums/ReviewStatusEnum';
@@ -12,6 +17,8 @@ import ViewPostModal from '@/pages/Admin/PostList/components/ViewPostModal';
 import ReviewPostModal from '@/pages/Admin/PostList/components/ReviewPostModal';
 import BatchReviewPostModal from '@/pages/Admin/PostList/components/BatchReviewPostModal';
 import { batchUpsertPost } from '@/services/search/searchController';
+import { Avatar, Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import React, { useRef, useState } from 'react';
 
 /**
  * 用户管理列表
@@ -114,13 +121,19 @@ const PostList: React.FC = () => {
       width: 120,
     },
     {
-      title: '用户 ID',
-      dataIndex: 'userId',
+      title: '作者',
+      dataIndex: 'userVO',
       valueType: 'text',
-      hideInForm: true,
-      copyable: true,
-      ellipsis: true,
-      width: 120,
+      hideInSearch: true,
+      width: 150,
+      render: (_, record) => (
+        <Space>
+          <Avatar src={record.userVO?.userAvatar} size="small">
+            {record.userVO?.userName?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography.Text ellipsis>{record.userVO?.userName || '未知用户'}</Typography.Text>
+        </Space>
+      ),
     },
     {
       title: '标题',
@@ -200,6 +213,13 @@ const PostList: React.FC = () => {
       valueType: 'select',
       valueEnum: reviewStatus,
       width: 100,
+      render: (_, record) => {
+        const status = record.reviewStatus;
+        if (status === 0) return <Badge status="default" text="待审核" />;
+        if (status === 1) return <Badge status="success" text="通过" />;
+        if (status === 2) return <Badge status="error" text="驳回" />;
+        return <Badge status="default" text="未知" />;
+      },
     },
 
     {
@@ -214,37 +234,47 @@ const PostList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 200,
+      width: 260,
       render: (_, record) => (
         <Space size="middle">
           <ViewPostModal post={record}>
-            <Typography.Link key="view">查看</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 查看
+            </Typography.Link>
           </ViewPostModal>
           <Typography.Link
             key="review"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               setCurrentRow(record);
               setReviewModalVisible(true);
             }}
           >
-            审核
+            <CheckCircleOutlined /> 审核
           </Typography.Link>
           <Typography.Link
             key="update"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               setCurrentRow(record);
               setUpdateModalVisible(true);
             }}
           >
-            修改
+            <EditOutlined /> 修改
           </Typography.Link>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此帖子吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

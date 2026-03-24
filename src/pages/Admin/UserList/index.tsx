@@ -1,14 +1,19 @@
-import { PlusOutlined } from '@ant-design/icons';
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-
-import { Button, message, Popconfirm, Space, Typography } from 'antd';
+import { deleteUser, listUserByPage } from '@/services/user/userController';
+import { batchUpsertUser } from '@/services/search/searchController';
+import { Avatar, Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
 import { userRole } from '@/enums/UserRoleEnum';
 import CreateUserModal from '@/pages/Admin/UserList/components/CreateUserModal';
 import UpdateUserModal from '@/pages/Admin/UserList/components/UpdateUserModal';
 import ViewUserModal from '@/pages/Admin/UserList/components/ViewUserModal';
-import { deleteUser, listUserByPage } from '@/services/user/userController';
-import { batchUpsertUser } from '@/services/search/searchController';
 
 
 /**
@@ -111,14 +116,14 @@ const UserList: React.FC = () => {
       valueType: 'text',
       copyable: true,
       ellipsis: true,
-    },
-    {
-      title: '头像',
-      dataIndex: 'userAvatar',
-      valueType: 'image',
-      fieldProps: { width: 48 },
-      hideInSearch: true,
-      width: 80,
+      render: (text, record) => (
+        <Space>
+          <Avatar src={record.userAvatar} size="small">
+            {record.userName?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography.Text strong>{text}</Typography.Text>
+        </Space>
+      ),
     },
     {
       title: '邮箱',
@@ -132,6 +137,7 @@ const UserList: React.FC = () => {
       dataIndex: 'userPhone',
       valueType: 'text',
       copyable: true,
+      hideInSearch: true,
     },
     {
       title: '简介',
@@ -158,6 +164,13 @@ const UserList: React.FC = () => {
       dataIndex: 'userRole',
       valueType: 'select',
       valueEnum: userRole,
+      render: (_, record) => {
+        const role = record.userRole;
+        if (role === 'admin') {
+          return <Badge status="error" text="管理员" />;
+        }
+        return <Badge status="default" text="普通用户" />;
+      },
     },
     {
       title: '创建时间',
@@ -171,28 +184,37 @@ const UserList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 180,
+      width: 200,
       render: (_, record) => (
         <Space size="middle">
           <ViewUserModal user={record}>
-            <Typography.Link key="view">详情</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 详情
+            </Typography.Link>
           </ViewUserModal>
           <Typography.Link
             key="update"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               setCurrentRow(record);
               setUpdateModalVisible(true);
             }}
           >
-            修改
+            <EditOutlined /> 修改
           </Typography.Link>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此用户吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>
