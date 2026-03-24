@@ -6,7 +6,7 @@ import {
 } from '@ant-design/icons';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
-import { Button, message, Popconfirm, Space, Typography, Avatar } from 'antd';
+import { Button, message, Popconfirm, Space, Typography, Avatar, Badge } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
   deleteKnowledgeBase,
@@ -60,6 +60,8 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
+      hideInTable: true,
+      hideInSearch: true,
       copyable: true,
       ellipsis: true,
       width: 60,
@@ -97,7 +99,17 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'documentCount',
       valueType: 'digit',
       hideInSearch: true,
-      width: 80,
+      hideInTable: true,
+      sorter: true,
+      align: 'center',
+      width: 100,
+      render: (count) => (
+        <Badge
+          count={count}
+          showZero
+          color={Number(count) > 0 ? '#1677ff' : '#d9d9d9'}
+        />
+      ),
     },
 
     {

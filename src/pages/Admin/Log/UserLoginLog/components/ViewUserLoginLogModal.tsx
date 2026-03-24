@@ -33,6 +33,7 @@ const ViewUserLoginLogModal: React.FC<Props> = (props) => {
       render: (text) => <span style={{ color: 'red' }}>{text}</span>,
     },
     { title: '客户端IP', dataIndex: 'clientIp' },
+    { title: '归属地', dataIndex: 'location' },
     { title: 'User-Agent', dataIndex: 'userAgent' },
     { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
   ];

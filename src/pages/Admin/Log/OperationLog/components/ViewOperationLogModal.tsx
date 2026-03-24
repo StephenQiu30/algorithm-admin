@@ -41,6 +41,7 @@ const ViewOperationLogModal: React.FC<Props> = (props) => {
       valueEnum: OperationStatusEnumMap,
     },
     { title: '客户端IP', dataIndex: 'clientIp' },
+    { title: '归属地', dataIndex: 'location' },
     { title: '创建时间', dataIndex: 'createTime', span: 1, valueType: 'dateTime' },
     {
       title: '错误信息',
