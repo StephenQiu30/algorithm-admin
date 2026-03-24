@@ -132,17 +132,23 @@ const UserList: React.FC = () => {
       dataIndex: 'userPhone',
       valueType: 'text',
       copyable: true,
+    },
+    {
+      title: '简介',
+      dataIndex: 'userProfile',
+      valueType: 'textarea',
+      ellipsis: true,
       hideInSearch: true,
     },
     {
-      title: 'GitHub 账号',
+      title: 'GitHub',
       dataIndex: 'githubLogin',
       hideInSearch: true,
       render: (_, record) =>
         record.githubLogin ? (
-          <a href={record.githubUrl} target="_blank" rel="noreferrer">
+          <Typography.Link href={record.githubUrl} target="_blank" rel="noreferrer">
             {record.githubLogin}
-          </a>
+          </Typography.Link>
         ) : (
           '-'
         ),

@@ -2,7 +2,7 @@ import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro
 
 import { Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import { LikeOutlined, PlusOutlined, StarOutlined } from '@ant-design/icons';
 import { TAG_EMPTY } from '@/constants';
 import { deletePost, listPostByPage } from '@/services/post/postController';
 import { reviewStatus } from '@/enums/ReviewStatusEnum';
@@ -109,12 +109,19 @@ const PostList: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
-      hideInTable: true,
       copyable: true,
       ellipsis: true,
       width: 120,
     },
-
+    {
+      title: '用户 ID',
+      dataIndex: 'userId',
+      valueType: 'text',
+      hideInForm: true,
+      copyable: true,
+      ellipsis: true,
+      width: 120,
+    },
     {
       title: '标题',
       dataIndex: 'title',
@@ -141,6 +148,32 @@ const PostList: React.FC = () => {
       fieldProps: { width: 48 },
       hideInSearch: true,
       width: 80,
+    },
+    {
+      title: '点赞数',
+      dataIndex: 'thumbNum',
+      valueType: 'digit',
+      hideInSearch: true,
+      width: 80,
+      render: (text) => (
+        <Space size={4}>
+          <LikeOutlined style={{ color: '#ff4d4f' }} />
+          {text}
+        </Space>
+      ),
+    },
+    {
+      title: '收藏数',
+      dataIndex: 'favourNum',
+      valueType: 'digit',
+      hideInSearch: true,
+      width: 80,
+      render: (text) => (
+        <Space size={4}>
+          <StarOutlined style={{ color: '#faad14' }} />
+          {text}
+        </Space>
+      ),
     },
     {
       title: '标签',

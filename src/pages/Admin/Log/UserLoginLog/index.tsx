@@ -61,8 +61,8 @@ const UserLoginLog: React.FC = () => {
       title: 'IP地址',
       dataIndex: 'clientIp',
       width: 120,
-      render: (ip) => <Typography.Text copyable>{ip}</Typography.Text>,
     },
+    { title: '地点', dataIndex: 'location', width: 120, hideInSearch: true },
     { title: '登录类型', dataIndex: 'loginType', width: 100 },
     {
       title: '状态',
@@ -71,11 +71,18 @@ const UserLoginLog: React.FC = () => {
       valueEnum: LoginStatusEnumMap,
     },
     {
+      title: 'User-Agent',
+      dataIndex: 'userAgent',
+      hideInTable: true,
+      hideInSearch: true,
+    },
+    {
       title: '登录时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
       width: 160,
       sorter: true,
+      hideInSearch: true,
     },
     {
       title: '操作',

@@ -59,6 +59,8 @@ const OperationLog: React.FC = () => {
     { title: '操作人', dataIndex: 'operatorName', width: 120 },
     { title: '模块', dataIndex: 'module', width: 120 },
     { title: '操作类型', dataIndex: 'action', width: 100 },
+    { title: 'IP地址', dataIndex: 'clientIp', width: 120 },
+    { title: '地点', dataIndex: 'location', width: 120, hideInSearch: true },
     {
       title: '状态',
       dataIndex: 'success',
@@ -71,6 +73,7 @@ const OperationLog: React.FC = () => {
       valueType: 'dateTime',
       width: 160,
       sorter: true,
+      hideInSearch: true,
     },
     {
       title: '操作',

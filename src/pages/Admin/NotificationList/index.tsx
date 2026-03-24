@@ -86,9 +86,15 @@ const NotificationList: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
-      hideInTable: true,
       copyable: true,
       ellipsis: true,
+      width: 120,
+    },
+    {
+      title: '用户 ID',
+      dataIndex: 'userId',
+      valueType: 'text',
+      copyable: true,
       width: 120,
     },
     {
@@ -102,9 +108,9 @@ const NotificationList: React.FC = () => {
       title: '内容',
       dataIndex: 'content',
       valueType: 'text',
+      ellipsis: true,
+      hideInSearch: true,
     },
-
-
     {
       title: '通知类型',
       dataIndex: 'type',
@@ -119,17 +125,14 @@ const NotificationList: React.FC = () => {
       valueEnum: NotificationReadStatusEnumMap,
       width: 110,
     },
-
     {
       title: '关联信息',
       dataIndex: 'related',
       hideInSearch: true,
       render: (_, record) => {
-
         if (!record.relatedType) return '-';
         return <Tag color="processing">{record.relatedType}</Tag>;
       },
-
     },
     {
       title: '创建时间',
@@ -138,6 +141,7 @@ const NotificationList: React.FC = () => {
       hideInForm: true,
       width: 160,
       sorter: true,
+      hideInSearch: true,
     },
     {
       title: '操作',
