@@ -5,6 +5,7 @@ import { useParams, history } from '@umijs/max';
 import {
   deleteDocument,
   listDocumentVoByPage as listKnowledgeDocumentVoByPage,
+  retryIngest,
 } from '@/services/ai/knowledgeDocumentController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
 import UploadDocumentModal from '../KnowledgeBaseList/components/UploadDocumentModal';
@@ -18,6 +19,7 @@ import {
   EditOutlined,
   FileSearchOutlined,
   ProfileOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -35,6 +37,7 @@ const DocumentManagement: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.KnowledgeDocumentVO>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
+  const [shouldPoll, setShouldPoll] = useState<boolean>(false);
 
   /**
    * 获取知识库详情
@@ -48,6 +51,42 @@ const DocumentManagement: React.FC = () => {
       });
     }
   }, [knowledgeBaseId]);
+
+  /**
+   * 轮询处理中的文档
+   */
+  useEffect(() => {
+    let timer: any;
+    if (shouldPoll) {
+      timer = setInterval(() => {
+        actionRef.current?.reload();
+      }, 5000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [shouldPoll]);
+
+  /**
+   * 重试文档解析
+   * @param documentId
+   */
+  const handleRetry = async (documentId: number) => {
+    const hide = message.loading('正在重新提交解析请求...');
+    try {
+      const res = await retryIngest({ documentId });
+      if (res.code === 0) {
+        message.success('已重新提交解析请求');
+        actionRef.current?.reload();
+      } else {
+        message.error(`重试失败: ${res.message}`);
+      }
+    } catch (error: any) {
+      message.error(`重试报错: ${error.message}`);
+    } finally {
+      hide();
+    }
+  };
 
   /**
    * 删除文档
@@ -133,14 +172,15 @@ const DocumentManagement: React.FC = () => {
       valueEnum: DocumentParseStatusEnumMap,
       width: 100,
       render: (status: any, record) => {
-        const config = DocumentParseStatusEnumMap[status] || {
+        const statusValue = Number(status);
+        const config = DocumentParseStatusEnumMap[statusValue as keyof typeof DocumentParseStatusEnumMap] || {
           text: '未知',
           status: 'default',
         };
         return (
           <Space direction="vertical" size={0}>
-            <Badge status={config.status as any} text={config.text} />
-            {status === DocumentParseStatusEnum.FAILED && record.errorMsg && (
+            <Badge status={config.status.toLowerCase() as any} text={config.text} />
+            {statusValue === DocumentParseStatusEnum.FAILED && record.errorMsg && (
               <Typography.Text type="danger" style={{ fontSize: 12 }}>
                 {record.errorMsg}
               </Typography.Text>
@@ -171,6 +211,14 @@ const DocumentManagement: React.FC = () => {
           >
             <EditOutlined /> 编辑
           </Typography.Link>
+          {record.parseStatus === DocumentParseStatusEnum.FAILED && (
+            <Typography.Link
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+              onClick={() => handleRetry(record.id as any)}
+            >
+              <ReloadOutlined /> 重试
+            </Typography.Link>
+          )}
           <Typography.Link
             style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
@@ -277,6 +325,15 @@ const DocumentManagement: React.FC = () => {
             ...params,
             knowledgeBaseId: knowledgeBaseId as any,
           } as API.KnowledgeDocumentQueryRequest);
+
+          // 检查是否有正在处理中的文档
+          const hasProcessing = data?.records?.some(
+            (r) =>
+              r.parseStatus === DocumentParseStatusEnum.PENDING ||
+              r.parseStatus === DocumentParseStatusEnum.PROCESSING,
+          );
+          setShouldPoll(!!hasProcessing);
+
           return {
             success: code === 0,
             data: data?.records || [],

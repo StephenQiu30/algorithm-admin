@@ -3,11 +3,8 @@ import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd
 import React, { useRef, useState } from 'react';
 import {
   batchDeleteNotification,
-  batchMarkNotificationRead,
   deleteNotification,
   listNotificationByPage,
-  markAllNotificationRead,
-  markNotificationRead,
 } from '@/services/notification/notificationController';
 import { PlusOutlined } from '@ant-design/icons';
 import UpdateNotificationModal from '@/pages/Admin/NotificationList/components/UpdateNotificationModal';
@@ -72,72 +69,6 @@ const NotificationList: React.FC = () => {
     }
   };
 
-  /**
-   * 标记已读
-   * @param row
-   */
-  const handleMarkRead = async (row: API.Notification) => {
-    if (!row?.id) return;
-    const hide = message.loading('正在标记');
-    try {
-      const res = await markNotificationRead({ id: row.id });
-      if (res.code === 0) {
-        message.success('已标记为已读');
-        actionRef.current?.reload();
-      } else {
-        message.error(`标记失败: ${res.message}`);
-      }
-    } catch (error: any) {
-      message.error(`标记报错: ${error.message}`);
-    } finally {
-      hide();
-    }
-  };
-
-  /**
-   * 批量标记已读
-   * @param selectedRows
-   */
-  const handleBatchMarkRead = async (selectedRows: API.Notification[]) => {
-    if (!selectedRows?.length) return;
-    const hide = message.loading('正在标记');
-    try {
-      const res = await batchMarkNotificationRead({
-        ids: selectedRows.map((row) => row.id!),
-      });
-      if (res.code === 0) {
-        message.success('批量标记成功');
-        actionRef.current?.reloadAndRest?.();
-        setSelectedRows([]);
-      } else {
-        message.error(`批量标记失败: ${res.message}`);
-      }
-    } catch (error: any) {
-      message.error(`批量标记报错: ${error.message}`);
-    } finally {
-      hide();
-    }
-  };
-
-  /**
-   * 全部标记已读
-   */
-  const handleMarkAllRead = async () => {
-    const hide = message.loading('正在标记');
-    try {
-      const res = await markAllNotificationRead();
-      if (res.code === 0) {
-        message.success('全部标记成功');
-        actionRef.current?.reload();
-      } else {
-        message.error(`全部标记失败: ${res.message}`);
-      }
-    } catch (error: any) {
-      message.error(`全部标记报错: ${error.message}`);
-    } finally {
-      hide();
-    }
-  };
 
   /**
    * 表格列定义
@@ -218,11 +149,6 @@ const NotificationList: React.FC = () => {
           <ViewNotificationModal notification={record}>
             <Typography.Link key="view">查看</Typography.Link>
           </ViewNotificationModal>
-          {record.isRead === 0 && (
-            <Typography.Link key="markRead" onClick={() => handleMarkRead(record)}>
-              标记已读
-            </Typography.Link>
-          )}
           <Typography.Link
             key="update"
             onClick={() => {
@@ -254,12 +180,6 @@ const NotificationList: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 100 }}
         toolBarRender={() => [
-          <Button
-            key="markAllRead"
-            onClick={() => handleMarkAllRead()}
-          >
-            全部标记已读
-          </Button>,
           <Button
             key="create"
             type="primary"
@@ -301,12 +221,6 @@ const NotificationList: React.FC = () => {
           }
         >
           <Space>
-            <Button
-              key="batchRead"
-              onClick={() => handleBatchMarkRead(selectedRowsState)}
-            >
-              批量已读
-            </Button>
             <Popconfirm
               key="batchDelete"
               title="确定批量删除？"

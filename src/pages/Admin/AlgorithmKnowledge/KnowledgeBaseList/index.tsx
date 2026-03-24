@@ -1,5 +1,5 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Typography } from 'antd';
+import { Button, message, Popconfirm, Space, Switch, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateKnowledgeModal from './components/CreateKnowledgeModal';
 import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
@@ -12,7 +12,11 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import { history } from '@umijs/max';
-import { deleteKnowledgeBase, listMyKnowledgeBaseVoByPage } from '@/services/ai/knowledgeBaseController';
+import {
+  deleteKnowledgeBase,
+  listMyKnowledgeBaseVoByPage,
+  updateKnowledgeBase,
+} from '@/services/ai/knowledgeBaseController';
 import { KnowledgeBaseStatusEnumMap } from '@/enums/KnowledgeBaseStatusEnum';
 
 /**
@@ -81,7 +85,33 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'status',
       valueType: 'select',
       valueEnum: KnowledgeBaseStatusEnumMap,
-      width: 80,
+      width: 100,
+      render: (dom, record) => {
+        return (
+          <Switch
+            checked={record.status === 0}
+            onChange={async (checked) => {
+              const hide = message.loading('正在更新状态...');
+              try {
+                const res = await updateKnowledgeBase({
+                  id: record.id,
+                  status: checked ? 0 : 1,
+                });
+                if (res.code === 0) {
+                  message.success('状态更新成功');
+                  actionRef.current?.reload();
+                } else {
+                  message.error(`状态更新失败: ${res.message}`);
+                }
+              } catch (error: any) {
+                message.error(`状态更新报错: ${error.message}`);
+              } finally {
+                hide();
+              }
+            }}
+          />
+        );
+      },
     },
     {
       title: '创建时间',
