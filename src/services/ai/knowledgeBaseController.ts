@@ -92,7 +92,7 @@ export async function search(
   });
 }
 
-/** 诊断双路召回 返回 kNN、BM25 和 RRF 融合三路结果，便于调参校准。 POST /ai/knowledge/search/diagnose */
+/** 诊断双路召回 返回 kNN、BM25 和 RRF 融合三路结果，用于调参优化。 POST /ai/knowledge/search/diagnose */
 export async function diagnoseSearch(
   body: API.KnowledgeRetrievalRequest,
   options?: { [key: string]: any },

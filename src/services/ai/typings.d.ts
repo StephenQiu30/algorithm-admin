@@ -1,28 +1,4 @@
 declare namespace API {
-  type AiChatRecordAddRequest = {
-    /** 会话 id */
-    sessionId?: string;
-    /** 对话消息 */
-    message?: string;
-    /** AI 响应内容 */
-    response?: string;
-    /** 模型类型 */
-    modelType?: string;
-  };
-
-  type AiChatRecordEditRequest = {
-    /** 主键 ID */
-    id?: number;
-    /** 会话 ID */
-    sessionId?: string;
-    /** 对话消息 */
-    message?: string;
-    /** AI 响应内容 */
-    response?: string;
-    /** 模型类型 */
-    modelType?: string;
-  };
-
   type AiChatRecordQueryRequest = {
     /** 当前页号 */
     current?: number;
@@ -42,19 +18,6 @@ declare namespace API {
     modelType?: string;
     /** 搜索关键词 */
     searchText?: string;
-  };
-
-  type AiChatRecordUpdateRequest = {
-    /** 主键 ID */
-    id?: number;
-    /** 会话 ID */
-    sessionId?: string;
-    /** 对话消息 */
-    message?: string;
-    /** AI 响应内容 */
-    response?: string;
-    /** 模型类型 */
-    modelType?: string;
   };
 
   type AiChatRecordVO = {
@@ -196,6 +159,10 @@ declare namespace API {
     documentName?: string;
     /** 相似度分数 */
     score?: number;
+    /** 标签列表 */
+    tags?: string;
+    /** 是否包含代码 */
+    hasCode?: boolean;
   };
 
   type DeleteRequest = {
@@ -209,21 +176,12 @@ declare namespace API {
     knowledgeBaseId?: number;
     chunkIndex?: number;
     content?: string;
+    tags?: string;
+    metadataJson?: string;
     tokenEstimate?: number;
+    charCount?: number;
+    hasCode?: number;
     createTime?: string;
-  };
-
-  type DocumentChunkAddRequest = {
-    /** 所属文档 ID */
-    documentId?: number;
-    /** 所属知识库 ID */
-    knowledgeBaseId?: number;
-    /** 分片序号 */
-    chunkIndex?: number;
-    /** 分片正文内容 */
-    content?: string;
-    /** 分片 Token 估算值 */
-    tokenEstimate?: number;
   };
 
   type DocumentChunkQueryRequest = {
@@ -241,6 +199,10 @@ declare namespace API {
     knowledgeBaseId?: number;
     /** 分片序号 */
     chunkIndex?: number;
+    /** 标签过滤 */
+    tags?: string;
+    /** 是否包含代码 */
+    hasCode?: boolean;
   };
 
   type getAiChatRecordVOByIdParams = {
@@ -272,6 +234,14 @@ declare namespace API {
     name?: string;
     /** 知识库描述 */
     description?: string;
+    /** 向量相似度模式 */
+    similarityMode?: string;
+    /** 分片策略 */
+    chunkStrategy?: string;
+    /** 分片大小 */
+    chunkSize?: number;
+    /** 分片重叠 */
+    chunkOverlap?: number;
   };
 
   type KnowledgeBaseQueryRequest = {
@@ -300,6 +270,14 @@ declare namespace API {
     description?: string;
     /** 状态 (0-启用, 1-禁用等) */
     status?: number;
+    /** 向量相似度模式 */
+    similarityMode?: string;
+    /** 分片策略 */
+    chunkStrategy?: string;
+    /** 分片大小 */
+    chunkSize?: number;
+    /** 分片重叠 */
+    chunkOverlap?: number;
   };
 
   type KnowledgeBaseVO = {
@@ -313,6 +291,18 @@ declare namespace API {
     description?: string;
     /** 状态 */
     status?: number;
+    /** 文档总数 */
+    documentCount?: number;
+    /** 分片总数 */
+    chunkCount?: number;
+    /** 向量相似度模式 */
+    similarityMode?: string;
+    /** 分片策略 */
+    chunkStrategy?: string;
+    /** 分片大小 */
+    chunkSize?: number;
+    /** 分片重叠 */
+    chunkOverlap?: number;
     /** 创建时间 */
     createTime?: string;
     userVO?: UserVO;
@@ -353,6 +343,10 @@ declare namespace API {
     parseStatus?: number;
     /** 错误信息 */
     errorMsg?: string;
+    /** 文档标签 */
+    tags?: string;
+    /** 是否包含代码 */
+    hasCode?: boolean;
   };
 
   type KnowledgeDocumentVO = {
@@ -370,6 +364,14 @@ declare namespace API {
     errorMsg?: string;
     /** 文件大小 (字节) */
     sizeBytes?: number;
+    /** 分片总数 */
+    chunkCount?: number;
+    /** 字符总数 */
+    totalChars?: number;
+    /** 文档标签 */
+    tags?: string;
+    /** 是否包含代码 */
+    hasCode?: boolean;
     /** 创建时间 */
     createTime?: string;
   };
@@ -381,8 +383,6 @@ declare namespace API {
     query?: string;
     /** 检索数量 */
     topK?: number;
-    /** 相似度模式 */
-    similarityMode?: string;
   };
 
   type OrderItem = {

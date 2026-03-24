@@ -2,22 +2,7 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 创建分片 手动新增一个文本分片（通常由后台或离线脚本使用）。 POST /ai/chunk/add */
-export async function addDocumentChunk(
-  body: API.DocumentChunkAddRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponseLong>('/ai/chunk/add', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** 删除分片 手动删除指定的文本分片记录。 POST /ai/chunk/delete */
+/** 删除分片 管理员手动删除指定分片，通常用于清理异常数据。 POST /ai/chunk/delete */
 export async function deleteDocumentChunk(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
@@ -32,7 +17,7 @@ export async function deleteDocumentChunk(
   });
 }
 
-/** 按文档删除分片 删除特定文档下的所有分片记录。 POST /ai/chunk/delete/by/document */
+/** 按文档删除分片 管理员批量删除特定文档的所有分片，用于数据清理。 POST /ai/chunk/delete/by/document */
 export async function deleteByDocumentId(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
@@ -47,7 +32,7 @@ export async function deleteByDocumentId(
   });
 }
 
-/** 获取文档分片详情 根据主键 ID 查询分片的内容及元数据。 GET /ai/chunk/get/vo */
+/** 获取文档分片详情 管理员查看分片内容，用于调试和质量检查。 GET /ai/chunk/get/vo */
 export async function getById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getByIdParams,
@@ -62,7 +47,7 @@ export async function getById(
   });
 }
 
-/** 分页获取文档分片 管理员视角分页检索所有分块，支持完整字段返回。 POST /ai/chunk/list/page */
+/** 分页获取文档分片 管理员查看分片列表，用于质量检查和调试。 POST /ai/chunk/list/page */
 export async function listDocumentChunkByPage(
   body: API.DocumentChunkQueryRequest,
   options?: { [key: string]: any },
