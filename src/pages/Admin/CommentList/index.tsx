@@ -1,5 +1,10 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Avatar, Button, message, Popconfirm, Space, Typography } from 'antd';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+} from '@ant-design/icons';
+import { Avatar, Button, message, Popconfirm, Space, Typography, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deletePostComment, listPostCommentByPage } from '@/services/post/postCommentController';
 import UpdateCommentModal from '@/pages/Admin/CommentList/components/UpdateCommentModal';
@@ -75,7 +80,7 @@ const CommentList: React.FC = () => {
       hideInForm: true,
       copyable: true,
       ellipsis: true,
-      width: 140,
+      width: 120,
     },
     {
       title: '评论内容',
@@ -84,13 +89,15 @@ const CommentList: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '发布者 ID',
-      dataIndex: 'userId',
+      title: '作者',
+      dataIndex: 'userVO',
       valueType: 'text',
-      copyable: true,
+      width: 150,
       render: (_, record) => (
         <Space>
-          {record.userVO?.userAvatar && <Avatar src={record.userVO.userAvatar} size="small" />}
+          <Avatar src={record.userVO?.userAvatar} size="small">
+            {record.userVO?.userName?.charAt(0).toUpperCase()}
+          </Avatar>
           <Typography.Text strong>{record.userVO?.userName || record.userId}</Typography.Text>
         </Space>
       ),
@@ -102,6 +109,15 @@ const CommentList: React.FC = () => {
       copyable: true,
       ellipsis: true,
       width: 120,
+    },
+    {
+      title: '父评论 ID',
+      dataIndex: 'parentId',
+      valueType: 'text',
+      copyable: true,
+      ellipsis: true,
+      width: 120,
+      render: (id) => id || '-',
     },
     {
       title: '创建时间',
@@ -116,28 +132,37 @@ const CommentList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 160,
+      width: 200,
       render: (_, record) => (
         <Space size="middle">
           <ViewCommentModal comment={record}>
-            <Typography.Link key="view">详情</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 详情
+            </Typography.Link>
           </ViewCommentModal>
           <Typography.Link
             key="update"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               setCurrentRow(record);
               setUpdateModalVisible(true);
             }}
           >
-            编辑
+            <EditOutlined /> 编辑
           </Typography.Link>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此评论吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

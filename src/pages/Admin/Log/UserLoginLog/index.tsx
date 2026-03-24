@@ -1,5 +1,6 @@
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Typography } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { listLogByPage1 } from '@/services/log/userLoginLogController';
 import { deleteUserLoginLog } from '@/services/log/userLoginLogController';
@@ -55,7 +56,7 @@ const UserLoginLog: React.FC = () => {
   };
 
   const columns: ProColumns<API.UserLoginLogVO>[] = [
-    { title: '用户ID', dataIndex: 'userId', width: 120, copyable: true },
+    { title: '用户ID', dataIndex: 'userId', width: 120, copyable: true, hideInTable: true },
     { title: '用户账号', dataIndex: 'account', width: 120, copyable: true },
     {
       title: 'IP地址',
@@ -69,12 +70,12 @@ const UserLoginLog: React.FC = () => {
       dataIndex: 'status',
       width: 100,
       valueEnum: LoginStatusEnumMap,
-    },
-    {
-      title: 'User-Agent',
-      dataIndex: 'userAgent',
-      hideInTable: true,
-      hideInSearch: true,
+      render: (status) => {
+        const s = status as string;
+        if (s === 'SUCCESS') return <Badge status="success" text="成功" />;
+        if (s === 'FAILED') return <Badge status="error" text="失败" />;
+        return <Badge status="processing" text={s} />;
+      },
     },
     {
       title: '登录时间',
@@ -93,15 +94,23 @@ const UserLoginLog: React.FC = () => {
       render: (_, record) => (
         <Space size="middle">
           <ViewUserLoginLogModal record={record}>
-            <Typography.Link key="view">详情</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 详情
+            </Typography.Link>
           </ViewUserLoginLogModal>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此登录日志吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

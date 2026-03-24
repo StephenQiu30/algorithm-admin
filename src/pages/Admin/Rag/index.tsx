@@ -1,13 +1,14 @@
+import { EyeOutlined } from '@ant-design/icons';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { message, Popconfirm, Space, Tag, Typography } from 'antd';
+import { message, Space, Tag, Typography, Tooltip } from 'antd';
 import React, { useRef } from 'react';
 import { listHistoryByPage } from '@/services/ai/ragController';
 
 /**
- * AI 对话记录管理 (RAG 历史)
+ * RAG 对话记录管理
  * @constructor
  */
-const AiChatRecordList: React.FC = () => {
+const Rag: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
   /**
@@ -15,13 +16,32 @@ const AiChatRecordList: React.FC = () => {
    */
   const columns: ProColumns<API.RAGHistoryVO>[] = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      valueType: 'text',
-      hideInForm: true,
-      copyable: true,
-      ellipsis: true,
-      width: 120,
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'index',
+      width: 64,
+    },
+    {
+      title: '问题',
+      dataIndex: 'question',
+      valueType: 'textarea',
+      width: 200,
+      render: (text) => (
+        <Typography.Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}>
+          {text as string}
+        </Typography.Paragraph>
+      ),
+    },
+    {
+      title: '答案',
+      dataIndex: 'answer',
+      valueType: 'textarea',
+      width: 300,
+      render: (text) => (
+        <Typography.Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}>
+          {text as string}
+        </Typography.Paragraph>
+      ),
     },
     {
       title: '用户 ID',
@@ -38,23 +58,17 @@ const AiChatRecordList: React.FC = () => {
       width: 120,
     },
     {
-      title: '问题',
-      dataIndex: 'question',
-      valueType: 'textarea',
-      ellipsis: true,
-    },
-    {
-      title: '回答',
-      dataIndex: 'answer',
-      valueType: 'textarea',
-      ellipsis: true,
-    },
-    {
       title: '响应时间',
       dataIndex: 'responseTime',
       width: 100,
       hideInSearch: true,
-      render: (time) => <Tag color="blue">{time}ms</Tag>,
+      render: (time) => {
+        const t = time as number;
+        let color = 'green';
+        if (t > 1000) color = 'orange';
+        if (t > 3000) color = 'red';
+        return <Tag color={color}>{t}ms</Tag>;
+      },
     },
     {
       title: '创建时间',
@@ -68,11 +82,15 @@ const AiChatRecordList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 80,
+      width: 100,
       render: (_, record) => (
         <Space size="middle">
-          <Typography.Link key="view" onClick={() => message.info('详情功能开发中')}>
-            详情
+          <Typography.Link
+            key="view"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            onClick={() => message.info('详情功能开发中')}
+          >
+            <EyeOutlined /> 详情
           </Typography.Link>
         </Space>
       ),
@@ -81,7 +99,7 @@ const AiChatRecordList: React.FC = () => {
 
   return (
     <ProTable<API.RAGHistoryVO, API.RAGHistoryQueryRequest>
-      headerTitle="AI 对话记录"
+      headerTitle="RAG 对话记录"
       actionRef={actionRef}
       rowKey="id"
       search={{ labelWidth: 100 }}
@@ -108,4 +126,5 @@ const AiChatRecordList: React.FC = () => {
   );
 };
 
-export default AiChatRecordList;
+export default Rag;
+

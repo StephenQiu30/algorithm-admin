@@ -1,20 +1,20 @@
-import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Switch, Typography } from 'antd';
-import React, { useRef, useState } from 'react';
-import CreateKnowledgeModal from './components/CreateKnowledgeModal';
-import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
 import {
   DeleteOutlined,
   EditOutlined,
   FileTextOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
+import { Button, message, Popconfirm, Space, Typography, Avatar } from 'antd';
+import React, { useRef, useState } from 'react';
 import {
   deleteKnowledgeBase,
   listMyKnowledgeBaseVoByPage,
   updateKnowledgeBase,
 } from '@/services/ai/knowledgeBaseController';
+import CreateKnowledgeModal from './components/CreateKnowledgeModal';
+import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
 
 
 /**
@@ -76,6 +76,21 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'description',
       valueType: 'textarea',
       ellipsis: true,
+    },
+    {
+      title: '创建者',
+      dataIndex: 'userVO',
+      valueType: 'text',
+      hideInSearch: true,
+      width: 150,
+      render: (_, record) => (
+        <Space>
+          <Avatar src={record.userVO?.userAvatar} size="small">
+            {record.userVO?.userName?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography.Text ellipsis>{record.userVO?.userName || '未知'}</Typography.Text>
+        </Space>
+      ),
     },
     {
       title: '文档数',

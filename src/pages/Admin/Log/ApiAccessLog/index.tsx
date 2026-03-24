@@ -1,5 +1,6 @@
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { listLogByPage2 } from '@/services/log/apiAccessLogController';
 import { deleteApiAccessLog } from '@/services/log/apiAccessLogController';
@@ -68,18 +69,52 @@ const ApiAccessLog: React.FC = () => {
           PUT: 'orange',
           DELETE: 'red',
         };
-        return <Tag color={colors[record.method!] || 'default'}>{record.method}</Tag>;
+        return (
+          <Tag color={colors[record.method!] || 'default'} style={{ fontWeight: 'bold' }}>
+            {record.method}
+          </Tag>
+        );
       },
     },
-    { title: '请求路径', dataIndex: 'path', ellipsis: true },
+    { title: '请求路径', dataIndex: 'path', ellipsis: true, minWidth: 200 },
     {
       title: '响应状态',
       dataIndex: 'status',
       width: 100,
       valueEnum: ApiAccessStatusEnumMap,
+      render: (status) => {
+        const s = Number(status);
+        if (s >= 200 && s < 300) return <Badge status="success" text={s} />;
+        if (s >= 400) return <Badge status="error" text={s} />;
+        return <Badge status="default" text={s} />;
+      },
     },
-    { title: '耗时 (ms)', dataIndex: 'latencyMs', width: 100, hideInSearch: true, sorter: true },
+    {
+      title: '耗时',
+      dataIndex: 'latencyMs',
+      width: 100,
+      hideInSearch: true,
+      sorter: true,
+      render: (latency) => {
+        const l = Number(latency);
+        let color = 'green';
+        if (l > 500) color = 'orange';
+        if (l > 1000) color = 'red';
+        return <Tag color={color}>{l}ms</Tag>;
+      },
+    },
     { title: 'IP地址', dataIndex: 'clientIp', width: 120 },
+    {
+      title: '请求大小',
+      dataIndex: 'requestSize',
+      width: 100,
+      hideInSearch: true,
+      render: (size) => {
+        const s = Number(size);
+        if (!s) return '0 B';
+        return (s / 1024).toFixed(2) + ' KB';
+      },
+    },
     {
       title: '时间',
       dataIndex: 'createTime',
@@ -97,15 +132,23 @@ const ApiAccessLog: React.FC = () => {
       render: (_, record) => (
         <Space size="middle">
           <ViewApiAccessLogModal record={record}>
-            <Typography.Link key="view">详情</Typography.Link>
+            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <EyeOutlined /> 详情
+            </Typography.Link>
           </ViewApiAccessLogModal>
           <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
+            title="确定删除此日志吗？"
+            description="删除后将无法恢复。"
             onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
           >
-            <Typography.Link key="delete" type="danger">
-              删除
+            <Typography.Link
+              key="delete"
+              type="danger"
+              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
         </Space>

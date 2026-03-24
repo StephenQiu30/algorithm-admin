@@ -31,7 +31,7 @@ export default [
   {
     name: 'AI 对话记录',
     path: '/admin/ai/record',
-    component: './Admin/AiChatRecord',
+    component: './Admin/Rag',
     icon: 'RobotOutlined',
     access: 'canAdmin',
   },
@@ -84,6 +84,8 @@ export default [
       },
     ],
   },
+
+
 
   {
     path: '/user',
