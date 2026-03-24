@@ -36,6 +36,12 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       ),
     },
     {
+      title: 'Token 估值',
+      dataIndex: 'tokenEstimate',
+      valueType: 'digit',
+      width: 100,
+    },
+    {
       title: '创建时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',

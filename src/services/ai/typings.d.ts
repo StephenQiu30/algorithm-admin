@@ -381,6 +381,8 @@ declare namespace API {
     query?: string;
     /** 检索数量 */
     topK?: number;
+    /** 相似度模式 */
+    similarityMode?: string;
   };
 
   type OrderItem = {

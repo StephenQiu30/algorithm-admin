@@ -83,7 +83,10 @@ const UpdateKnowledgeModal: React.FC<Props> = (props) => {
       <ProFormSelect
         name="status"
         label="状态"
-        valueEnum={KnowledgeBaseStatusEnumMap}
+        options={Object.keys(KnowledgeBaseStatusEnumMap).map((key) => ({
+          label: KnowledgeBaseStatusEnumMap[key as unknown as keyof typeof KnowledgeBaseStatusEnumMap].text,
+          value: Number(key),
+        }))}
       />
     </ModalForm>
   );
