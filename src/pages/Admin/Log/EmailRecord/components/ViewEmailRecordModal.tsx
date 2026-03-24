@@ -1,6 +1,6 @@
-import { Modal, Tag, Button } from 'antd';
-import React, { useState } from 'react';
-import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { ModalForm, ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { Tag, Button } from 'antd';
+import React from 'react';
 import { EmailStatusEnumMap } from '@/enums/EmailStatusEnum';
 
 interface Props {
@@ -10,11 +10,10 @@ interface Props {
 }
 
 /**
- * 邮件发送记录详情 Modal
+ * 邮件发送记录详情
  */
 const ViewEmailRecordModal: React.FC<Props> = (props) => {
   const { record, children, columns } = props;
-  const [visible, setVisible] = useState(false);
 
   const defaultColumns: ProDescriptionsItemProps<API.EmailRecordVO>[] = [
     { title: '记录ID', dataIndex: 'id' },
@@ -47,12 +46,11 @@ const ViewEmailRecordModal: React.FC<Props> = (props) => {
       render: (text) => (
         <div
           style={{
-            padding: 16,
+            padding: 12,
             border: '1px solid #f0f0f0',
             borderRadius: 4,
             maxHeight: 400,
             overflow: 'auto',
-            background: '#fafafa',
           }}
           dangerouslySetInnerHTML={{ __html: (text as string) || '-' }}
         />
@@ -70,30 +68,27 @@ const ViewEmailRecordModal: React.FC<Props> = (props) => {
   ];
 
   return (
-    <>
-      {children &&
-        React.cloneElement(children, {
-          onClick: () => setVisible(true),
-        })}
-      <Modal
-        title="邮件发送记录详情"
-        open={visible}
-        onCancel={() => setVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setVisible(false)}>
+    <ModalForm
+      title="邮件发送记录详情"
+      trigger={children}
+      submitter={{
+        render: (_, doms) => [
+          <Button key="close" onClick={() => (doms[0] as any).props.onCancel?.()}>
             关闭
           </Button>,
-        ]}
-        width={1000}
-        destroyOnClose
-      >
-        <ProDescriptions<API.EmailRecordVO>
-          column={2}
-          dataSource={record}
-          columns={columns || defaultColumns}
-        />
-      </Modal>
-    </>
+        ],
+      }}
+      width={1000}
+      modalProps={{
+        destroyOnClose: true,
+      }}
+    >
+      <ProDescriptions<API.EmailRecordVO>
+        column={2}
+        dataSource={record}
+        columns={columns || defaultColumns}
+      />
+    </ModalForm>
   );
 };
 

@@ -1,6 +1,6 @@
-import { Modal, Button, Image } from 'antd';
-import React, { useState } from 'react';
-import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { ModalForm, ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { Button, Image } from 'antd';
+import React from 'react';
 import { FileUploadStatusEnumMap } from '@/enums/FileUploadStatusEnum';
 
 interface Props {
@@ -10,11 +10,10 @@ interface Props {
 }
 
 /**
- * 文件上传记录详情 Modal
+ * 文件上传记录详情
  */
 const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
   const { record, children, columns } = props;
-  const [visible, setVisible] = useState(false);
 
   const defaultColumns: ProDescriptionsItemProps<API.FileUploadRecordVO>[] = [
     { title: '记录ID', dataIndex: 'id' },
@@ -77,30 +76,27 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
   ];
 
   return (
-    <>
-      {children &&
-        React.cloneElement(children, {
-          onClick: () => setVisible(true),
-        })}
-      <Modal
-        title="文件上传记录详情"
-        open={visible}
-        onCancel={() => setVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setVisible(false)}>
+    <ModalForm
+      title="文件上传记录详情"
+      trigger={children}
+      submitter={{
+        render: (_, doms) => [
+          <Button key="close" onClick={() => (doms[0] as any).props.onCancel?.()}>
             关闭
           </Button>,
-        ]}
-        width={800}
-        destroyOnClose
-      >
-        <ProDescriptions<API.FileUploadRecordVO>
-          column={2}
-          dataSource={record}
-          columns={columns || defaultColumns}
-        />
-      </Modal>
-    </>
+        ],
+      }}
+      width={800}
+      modalProps={{
+        destroyOnClose: true,
+      }}
+    >
+      <ProDescriptions<API.FileUploadRecordVO>
+        column={2}
+        dataSource={record}
+        columns={columns || defaultColumns}
+      />
+    </ModalForm>
   );
 };
 
