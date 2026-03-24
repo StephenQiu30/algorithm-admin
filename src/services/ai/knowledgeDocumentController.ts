@@ -59,6 +59,36 @@ export async function listDocumentVoByPage(
   });
 }
 
+/** 重试文档解析 将失败或待处理文档重新投递到异步入库队列。 POST /ai/knowledge/document/retry */
+export async function retryIngest(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.retryIngestParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean>('/ai/knowledge/document/retry', {
+    method: 'POST',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 查询文档解析状态 用于上传后轮询查看解析状态与失败原因。 GET /ai/knowledge/document/status */
+export async function getIngestStatus(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getIngestStatusParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseKnowledgeDocumentVO>('/ai/knowledge/document/status', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 更新知识库文档(管理员) 管理员强制覆盖更新文档的基本元数据。 POST /ai/knowledge/document/update */
 export async function updateDocument(
   body: API.KnowledgeDocumentUpdateRequest,

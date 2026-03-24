@@ -136,6 +136,15 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseMapStringListChunkSourceVO = {
+    /** 状态码 */
+    code?: number;
+    /** 数据 */
+    data?: Record<string, any>;
+    /** 消息 */
+    message?: string;
+  };
+
   type BaseResponsePageAiChatRecordVO = {
     /** 状态码 */
     code?: number;
@@ -248,6 +257,11 @@ declare namespace API {
     id: number;
   };
 
+  type getIngestStatusParams = {
+    /** 文档 ID */
+    documentId: number;
+  };
+
   type getKnowledgeBaseVOByIdParams = {
     /** 知识库 ID */
     id: number;
@@ -350,6 +364,8 @@ declare namespace API {
     originalName?: string;
     /** 解析状态 (0-待解析, 1-解析中, 2-解析成功, 3-解析失败等) */
     parseStatus?: number;
+    /** 解析状态文案 */
+    parseStatusText?: string;
     /** 错误信息 */
     errorMsg?: string;
     /** 文件大小 (字节) */
@@ -444,6 +460,11 @@ declare namespace API {
     answer?: string;
     /** 参考资料源 */
     sources?: ChunkSourceVO[];
+  };
+
+  type retryIngestParams = {
+    /** 文档 ID */
+    documentId: number;
   };
 
   type uploadDocumentParams = {
