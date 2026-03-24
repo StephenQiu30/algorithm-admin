@@ -1,5 +1,6 @@
 declare namespace API {
   type addDocumentParams = {
+    /** 知识库 ID */
     knowledgeBaseId: number;
   };
 
