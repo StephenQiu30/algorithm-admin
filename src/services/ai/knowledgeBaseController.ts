@@ -92,6 +92,21 @@ export async function search(
   });
 }
 
+/** 诊断双路召回 返回 kNN、BM25 和 RRF 融合三路结果，便于调参校准。 POST /ai/knowledge/search/diagnose */
+export async function diagnoseSearch(
+  body: API.KnowledgeRetrievalRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseMapStringListChunkSourceVO>('/ai/knowledge/search/diagnose', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 管理员更新知识库 系统管理员全量更新指定的知识库详情。 POST /ai/knowledge/update */
 export async function updateKnowledgeBase(
   body: API.KnowledgeBaseUpdateRequest,
