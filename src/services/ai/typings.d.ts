@@ -13,6 +13,14 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseChunkVO = {
+    /** 状态码 */
+    code?: number;
+    data?: ChunkVO;
+    /** 消息 */
+    message?: string;
+  };
+
   type BaseResponseDocumentVO = {
     /** 状态码 */
     code?: number;
@@ -29,11 +37,28 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListChunkVO = {
+    /** 状态码 */
+    code?: number;
+    /** 数据 */
+    data?: ChunkVO[];
+    /** 消息 */
+    message?: string;
+  };
+
   type BaseResponseLong = {
     /** 状态码 */
     code?: number;
     /** 数据 */
     data?: number;
+    /** 消息 */
+    message?: string;
+  };
+
+  type BaseResponsePageChunkVO = {
+    /** 状态码 */
+    code?: number;
+    data?: PageChunkVO;
     /** 消息 */
     message?: string;
   };
@@ -60,6 +85,57 @@ declare namespace API {
     data?: PageRAGHistoryVO;
     /** 消息 */
     message?: string;
+  };
+
+  type ChunkQueryRequest = {
+    /** 当前页号 */
+    current?: number;
+    /** 页面大小 */
+    pageSize?: number;
+    /** 排序字段 */
+    sortField?: string;
+    /** 排序顺序（默认升序） */
+    sortOrder?: string;
+    /** 文档ID */
+    documentId?: number;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+  };
+
+  type ChunkSearchRequest = {
+    /** 检索内容 */
+    query?: string;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+    /** 文档ID */
+    documentId?: number;
+    /** 返回数量 */
+    topK?: number;
+    /** 相似度阈值 */
+    similarityThreshold?: number;
+  };
+
+  type ChunkVO = {
+    /** 分片ID（ES文档ID） */
+    id?: string;
+    /** 文档ID */
+    documentId?: number;
+    /** 文档名称 */
+    documentName?: string;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+    /** 分片索引 */
+    chunkIndex?: number;
+    /** 分片内容 */
+    content?: string;
+    /** 字符数 */
+    wordCount?: number;
+    /** 检索分数 */
+    score?: number;
+    /** 来源类型 */
+    sourceType?: string;
+    /** 命中原因 */
+    matchReason?: string;
   };
 
   type DeleteRequest = {
@@ -110,6 +186,10 @@ declare namespace API {
     uploadTime?: string;
     /** 处理完成时间 */
     processEndTime?: string;
+  };
+
+  type getChunkVOByIdParams = {
+    id: number;
   };
 
   type getDocumentVOByIdParams = {
@@ -183,6 +263,20 @@ declare namespace API {
   type OrderItem = {
     column?: string;
     asc?: boolean;
+  };
+
+  type PageChunkVO = {
+    records?: ChunkVO[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageChunkVO;
+    searchCount?: PageChunkVO;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
   };
 
   type PageDocumentVO = {
