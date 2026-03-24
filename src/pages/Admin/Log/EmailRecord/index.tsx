@@ -54,10 +54,11 @@ const EmailRecord: React.FC = () => {
   };
 
   const columns: ProColumns<API.EmailRecordVO>[] = [
-    { title: '记录ID', dataIndex: 'id', width: 120, copyable: true, hideInSearch: true },
+    { title: '记录ID', dataIndex: 'id', width: 120, copyable: true },
     { title: '消息ID', dataIndex: 'msgId', width: 120, ellipsis: true },
+    { title: '业务ID', dataIndex: 'bizId', width: 120, ellipsis: true },
     { title: '收件人', dataIndex: 'toEmail', width: 180, copyable: true },
-    { title: '主题', dataIndex: 'subject', ellipsis: true, width: 200 },
+    { title: '主题', dataIndex: 'subject', ellipsis: true, width: 200, hideInSearch: true },
     {
       title: '业务类型',
       dataIndex: 'bizType',

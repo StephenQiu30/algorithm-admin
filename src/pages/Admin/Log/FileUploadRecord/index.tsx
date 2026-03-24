@@ -58,6 +58,7 @@ const FileUploadRecord: React.FC = () => {
   };
 
   const columns: ProColumns<API.FileUploadRecordVO>[] = [
+    { title: '记录ID', dataIndex: 'id', width: 120, copyable: true, hideInTable: true },
     { title: '用户ID', dataIndex: 'userId', width: 120, copyable: true },
     {
       title: '业务类型',
@@ -109,6 +110,8 @@ const FileUploadRecord: React.FC = () => {
       width: 100,
       valueEnum: FileUploadStatusEnumMap,
     },
+    { title: 'MD5', dataIndex: 'md5', hideInTable: true, hideInSearch: true },
+    { title: 'IP地址', dataIndex: 'clientIp', hideInTable: true, hideInSearch: true },
     {
       title: '时间',
       dataIndex: 'createTime',

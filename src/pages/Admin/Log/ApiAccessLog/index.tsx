@@ -55,6 +55,7 @@ const ApiAccessLog: React.FC = () => {
   };
 
   const columns: ProColumns<API.ApiAccessLogVO>[] = [
+    { title: '链路追踪ID', dataIndex: 'traceId', width: 150, copyable: true, ellipsis: true },
     { title: '用户ID', dataIndex: 'userId', width: 120, copyable: true },
     {
       title: '请求方式',
@@ -78,13 +79,14 @@ const ApiAccessLog: React.FC = () => {
       valueEnum: ApiAccessStatusEnumMap,
     },
     { title: '耗时 (ms)', dataIndex: 'latencyMs', width: 100, hideInSearch: true, sorter: true },
-    { title: 'IP地址', dataIndex: 'clientIp', width: 120, hideInSearch: true },
+    { title: 'IP地址', dataIndex: 'clientIp', width: 120 },
     {
       title: '时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
       width: 160,
       sorter: true,
+      hideInSearch: true,
     },
     {
       title: '操作',

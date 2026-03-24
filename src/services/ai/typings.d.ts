@@ -1,51 +1,6 @@
 declare namespace API {
-  type AiChatRecordQueryRequest = {
-    /** 当前页号 */
-    current?: number;
-    /** 页面大小 */
-    pageSize?: number;
-    /** 排序字段 */
-    sortField?: string;
-    /** 排序顺序（默认升序） */
-    sortOrder?: string;
-    /** id */
-    id?: number;
-    /** 用户 id */
-    userId?: number;
-    /** 会话 id */
-    sessionId?: string;
-    /** 模型类型 */
-    modelType?: string;
-    /** 搜索关键词 */
-    searchText?: string;
-  };
-
-  type AiChatRecordVO = {
-    /** 主键 ID */
-    id?: number;
-    /** 用户 ID */
-    userId?: number;
-    /** 会话 ID */
-    sessionId?: string;
-    /** 对话消息 */
-    message?: string;
-    /** AI 响应内容 */
-    response?: string;
-    /** 模型类型 */
-    modelType?: string;
-    /** 创建时间 */
-    createTime?: string;
-    /** 更新时间 */
-    updateTime?: string;
-    userVO?: UserVO;
-  };
-
-  type BaseResponseAiChatRecordVO = {
-    /** 状态码 */
-    code?: number;
-    data?: AiChatRecordVO;
-    /** 消息 */
-    message?: string;
+  type addDocumentParams = {
+    knowledgeBaseId: number;
   };
 
   type BaseResponseBoolean = {
@@ -57,10 +12,10 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponseDocumentChunk = {
+  type BaseResponseDocumentVO = {
     /** 状态码 */
     code?: number;
-    data?: DocumentChunk;
+    data?: DocumentVO;
     /** 消息 */
     message?: string;
   };
@@ -69,23 +24,6 @@ declare namespace API {
     /** 状态码 */
     code?: number;
     data?: KnowledgeBaseVO;
-    /** 消息 */
-    message?: string;
-  };
-
-  type BaseResponseKnowledgeDocumentVO = {
-    /** 状态码 */
-    code?: number;
-    data?: KnowledgeDocumentVO;
-    /** 消息 */
-    message?: string;
-  };
-
-  type BaseResponseListChunkSourceVO = {
-    /** 状态码 */
-    code?: number;
-    /** 数据 */
-    data?: ChunkSourceVO[];
     /** 消息 */
     message?: string;
   };
@@ -99,27 +37,10 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponseMapStringListChunkSourceVO = {
+  type BaseResponsePageDocumentVO = {
     /** 状态码 */
     code?: number;
-    /** 数据 */
-    data?: Record<string, any>;
-    /** 消息 */
-    message?: string;
-  };
-
-  type BaseResponsePageAiChatRecordVO = {
-    /** 状态码 */
-    code?: number;
-    data?: PageAiChatRecordVO;
-    /** 消息 */
-    message?: string;
-  };
-
-  type BaseResponsePageDocumentChunk = {
-    /** 状态码 */
-    code?: number;
-    data?: PageDocumentChunk;
+    data?: PageDocumentVO;
     /** 消息 */
     message?: string;
   };
@@ -132,37 +53,12 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePageKnowledgeDocumentVO = {
+  type BaseResponsePageRAGHistoryVO = {
     /** 状态码 */
     code?: number;
-    data?: PageKnowledgeDocumentVO;
+    data?: PageRAGHistoryVO;
     /** 消息 */
     message?: string;
-  };
-
-  type BaseResponseRagChatResponseVO = {
-    /** 状态码 */
-    code?: number;
-    data?: RagChatResponseVO;
-    /** 消息 */
-    message?: string;
-  };
-
-  type ChunkSourceVO = {
-    /** 切片 ID */
-    chunkId?: number;
-    /** 切片内容 */
-    content?: string;
-    /** 文档 ID */
-    documentId?: number;
-    /** 文档名称 */
-    documentName?: string;
-    /** 相似度分数 */
-    score?: number;
-    /** 标签列表 */
-    tags?: string;
-    /** 是否包含代码 */
-    hasCode?: boolean;
   };
 
   type DeleteRequest = {
@@ -170,21 +66,7 @@ declare namespace API {
     id: number;
   };
 
-  type DocumentChunk = {
-    id?: number;
-    documentId?: number;
-    knowledgeBaseId?: number;
-    chunkIndex?: number;
-    content?: string;
-    tags?: string;
-    metadataJson?: string;
-    tokenEstimate?: number;
-    charCount?: number;
-    hasCode?: number;
-    createTime?: string;
-  };
-
-  type DocumentChunkQueryRequest = {
+  type DocumentQueryRequest = {
     /** 当前页号 */
     current?: number;
     /** 页面大小 */
@@ -193,39 +75,47 @@ declare namespace API {
     sortField?: string;
     /** 排序顺序（默认升序） */
     sortOrder?: string;
-    /** 文档 ID */
-    documentId?: number;
-    /** 知识库 ID */
+    /** 文档ID */
+    id?: number;
+    /** 知识库ID */
     knowledgeBaseId?: number;
-    /** 分片序号 */
-    chunkIndex?: number;
-    /** 标签过滤 */
-    tags?: string;
-    /** 是否包含代码 */
-    hasCode?: boolean;
+    /** 文档名称 */
+    name?: string;
+    /** 处理状态 */
+    status?: string;
+    /** 上传用户ID */
+    userId?: number;
   };
 
-  type getAiChatRecordVOByIdParams = {
-    id: number;
-  };
-
-  type getByIdParams = {
-    /** 分片 ID */
-    id: number;
+  type DocumentVO = {
+    /** 文档ID */
+    id?: number;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+    /** 文档名称 */
+    name?: string;
+    /** 文件大小 */
+    fileSize?: number;
+    /** 文件扩展名 */
+    fileExtension?: string;
+    /** 处理状态 */
+    status?: string;
+    /** 错误信息 */
+    errorMessage?: string;
+    /** 分片数量 */
+    chunkCount?: number;
+    userVO?: UserVO;
+    /** 上传时间 */
+    uploadTime?: string;
+    /** 处理完成时间 */
+    processEndTime?: string;
   };
 
   type getDocumentVOByIdParams = {
-    /** 文档 ID */
     id: number;
   };
 
-  type getIngestStatusParams = {
-    /** 文档 ID */
-    documentId: number;
-  };
-
   type getKnowledgeBaseVOByIdParams = {
-    /** 知识库 ID */
     id: number;
   };
 
@@ -234,14 +124,15 @@ declare namespace API {
     name?: string;
     /** 知识库描述 */
     description?: string;
-    /** 向量相似度模式 */
-    similarityMode?: string;
-    /** 分片策略 */
-    chunkStrategy?: string;
-    /** 分片大小 */
-    chunkSize?: number;
-    /** 分片重叠 */
-    chunkOverlap?: number;
+  };
+
+  type KnowledgeBaseEditRequest = {
+    /** 知识库ID */
+    id?: number;
+    /** 知识库名称 */
+    name?: string;
+    /** 知识库描述 */
+    description?: string;
   };
 
   type KnowledgeBaseQueryRequest = {
@@ -253,136 +144,39 @@ declare namespace API {
     sortField?: string;
     /** 排序顺序（默认升序） */
     sortOrder?: string;
-    /** 主键 ID */
+    /** 知识库ID */
     id?: number;
     /** 知识库名称 */
     name?: string;
-    /** 用户 ID */
+    /** 搜索词 */
+    searchText?: string;
+    /** 创建用户ID */
     userId?: number;
   };
 
   type KnowledgeBaseUpdateRequest = {
-    /** 主键 ID */
+    /** 知识库ID */
     id?: number;
     /** 知识库名称 */
     name?: string;
     /** 知识库描述 */
     description?: string;
-    /** 状态 (0-启用, 1-禁用等) */
-    status?: number;
-    /** 向量相似度模式 */
-    similarityMode?: string;
-    /** 分片策略 */
-    chunkStrategy?: string;
-    /** 分片大小 */
-    chunkSize?: number;
-    /** 分片重叠 */
-    chunkOverlap?: number;
   };
 
   type KnowledgeBaseVO = {
-    /** 主键 ID */
+    /** 知识库ID */
     id?: number;
-    /** 用户 ID */
-    userId?: number;
     /** 知识库名称 */
     name?: string;
     /** 知识库描述 */
     description?: string;
-    /** 状态 */
-    status?: number;
-    /** 文档总数 */
+    /** 文档数量 */
     documentCount?: number;
-    /** 分片总数 */
-    chunkCount?: number;
-    /** 向量相似度模式 */
-    similarityMode?: string;
-    /** 分片策略 */
-    chunkStrategy?: string;
-    /** 分片大小 */
-    chunkSize?: number;
-    /** 分片重叠 */
-    chunkOverlap?: number;
-    /** 创建时间 */
-    createTime?: string;
     userVO?: UserVO;
-  };
-
-  type KnowledgeDocumentEditRequest = {
-    /** 主键 ID */
-    id?: number;
-    /** 原始文件名 */
-    originalName?: string;
-  };
-
-  type KnowledgeDocumentQueryRequest = {
-    /** 当前页号 */
-    current?: number;
-    /** 页面大小 */
-    pageSize?: number;
-    /** 排序字段 */
-    sortField?: string;
-    /** 排序顺序（默认升序） */
-    sortOrder?: string;
-    /** 知识库 id */
-    knowledgeBaseId?: number;
-    /** 原始文件名 */
-    originalName?: string;
-    /** 解析状态 */
-    parseStatus?: number;
-  };
-
-  type KnowledgeDocumentUpdateRequest = {
-    /** 主键 ID */
-    id?: number;
-    /** 知识库 ID */
-    knowledgeBaseId?: number;
-    /** 原始文件名 */
-    originalName?: string;
-    /** 解析状态 */
-    parseStatus?: number;
-    /** 错误信息 */
-    errorMsg?: string;
-    /** 文档标签 */
-    tags?: string;
-    /** 是否包含代码 */
-    hasCode?: boolean;
-  };
-
-  type KnowledgeDocumentVO = {
-    /** 主键 ID */
-    id?: number;
-    /** 知识库 ID */
-    knowledgeBaseId?: number;
-    /** 原始文件名 */
-    originalName?: string;
-    /** 解析状态 (0-待解析, 1-解析中, 2-解析成功, 3-解析失败等) */
-    parseStatus?: number;
-    /** 解析状态文案 */
-    parseStatusText?: string;
-    /** 错误信息 */
-    errorMsg?: string;
-    /** 文件大小 (字节) */
-    sizeBytes?: number;
-    /** 分片总数 */
-    chunkCount?: number;
-    /** 字符总数 */
-    totalChars?: number;
-    /** 文档标签 */
-    tags?: string;
-    /** 是否包含代码 */
-    hasCode?: boolean;
     /** 创建时间 */
     createTime?: string;
-  };
-
-  type KnowledgeRetrievalRequest = {
-    /** 知识库 ID */
-    knowledgeBaseId?: number;
-    /** 查询内容 */
-    query?: string;
-    /** 检索数量 */
-    topK?: number;
+    /** 更新时间 */
+    updateTime?: string;
   };
 
   type OrderItem = {
@@ -390,28 +184,14 @@ declare namespace API {
     asc?: boolean;
   };
 
-  type PageAiChatRecordVO = {
-    records?: AiChatRecordVO[];
+  type PageDocumentVO = {
+    records?: DocumentVO[];
     total?: number;
     size?: number;
     current?: number;
     orders?: OrderItem[];
-    optimizeCountSql?: PageAiChatRecordVO;
-    searchCount?: PageAiChatRecordVO;
-    optimizeJoinOfCountSql?: boolean;
-    maxLimit?: number;
-    countId?: string;
-    pages?: number;
-  };
-
-  type PageDocumentChunk = {
-    records?: DocumentChunk[];
-    total?: number;
-    size?: number;
-    current?: number;
-    orders?: OrderItem[];
-    optimizeCountSql?: PageDocumentChunk;
-    searchCount?: PageDocumentChunk;
+    optimizeCountSql?: PageDocumentVO;
+    searchCount?: PageDocumentVO;
     optimizeJoinOfCountSql?: boolean;
     maxLimit?: number;
     countId?: string;
@@ -432,46 +212,82 @@ declare namespace API {
     pages?: number;
   };
 
-  type PageKnowledgeDocumentVO = {
-    records?: KnowledgeDocumentVO[];
+  type PageRAGHistoryVO = {
+    records?: RAGHistoryVO[];
     total?: number;
     size?: number;
     current?: number;
     orders?: OrderItem[];
-    optimizeCountSql?: PageKnowledgeDocumentVO;
-    searchCount?: PageKnowledgeDocumentVO;
+    optimizeCountSql?: PageRAGHistoryVO;
+    searchCount?: PageRAGHistoryVO;
     optimizeJoinOfCountSql?: boolean;
     maxLimit?: number;
     countId?: string;
     pages?: number;
   };
 
-  type RagChatRequest = {
-    /** 知识库 ID */
-    knowledgeBaseId?: number;
-    /** 问题内容 */
+  type RAGAskRequest = {
+    /** 问题 */
     question?: string;
-    /** 会话 ID */
-    sessionId?: string;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
     /** 检索数量 */
     topK?: number;
   };
 
-  type RagChatResponseVO = {
-    /** AI 回答内容 */
+  type RAGHistoryQueryRequest = {
+    /** 当前页号 */
+    current?: number;
+    /** 页面大小 */
+    pageSize?: number;
+    /** 排序字段 */
+    sortField?: string;
+    /** 排序顺序（默认升序） */
+    sortOrder?: string;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+    /** 用户ID */
+    userId?: number;
+  };
+
+  type RAGHistoryVO = {
+    /** 历史ID */
+    id?: number;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+    /** 用户ID */
+    userId?: number;
+    /** 问题 */
+    question?: string;
+    /** 答案 */
     answer?: string;
-    /** 参考资料源 */
-    sources?: ChunkSourceVO[];
+    /** 来源 */
+    sources?: SourceVO[];
+    /** 响应时间(毫秒) */
+    responseTime?: number;
+    /** 创建时间 */
+    createTime?: string;
   };
 
-  type retryIngestParams = {
-    /** 文档 ID */
-    documentId: number;
-  };
-
-  type uploadDocumentParams = {
-    /** 关联的知识库 ID */
-    knowledgeBaseId: number;
+  type SourceVO = {
+    /** 文档ID */
+    documentId?: number;
+    /** 文档名称 */
+    documentName?: string;
+    /** 分片索引 */
+    chunkIndex?: number;
+    /** 分片内容 */
+    content?: string;
+    /** 相似度得分 */
+    score?: number;
+    /** 来源类型 */
+    sourceType?: string;
+    /** 版本 */
+    version?: string;
+    /** 业务标签 */
+    bizTag?: string;
+    /** 命中原因 */
+    matchReason?: string;
   };
 
   type UserVO = {

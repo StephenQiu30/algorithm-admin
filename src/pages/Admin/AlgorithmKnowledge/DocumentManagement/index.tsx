@@ -4,22 +4,14 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useParams, history } from '@umijs/max';
 import {
   deleteDocument,
-  listDocumentVoByPage as listKnowledgeDocumentVoByPage,
-  retryIngest,
-} from '@/services/ai/knowledgeDocumentController';
+  listDocumentVoByPage,
+} from '@/services/ai/documentController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
 import UploadDocumentModal from '../KnowledgeBaseList/components/UploadDocumentModal';
-import UpdateDocumentModal from '../KnowledgeBaseList/components/UpdateDocumentModal';
-import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
-import DocumentPreviewDrawer from '../KnowledgeBaseList/components/DocumentPreviewDrawer';
 import { DocumentParseStatusEnum, DocumentParseStatusEnumMap } from '@/enums/DocumentParseStatusEnum';
 import {
   CloudUploadOutlined,
   DeleteOutlined,
-  EditOutlined,
-  FileSearchOutlined,
-  ProfileOutlined,
-  ReloadOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -31,13 +23,11 @@ const DocumentManagement: React.FC = () => {
   const knowledgeBaseId = Number(id);
   const actionRef = useRef<ActionType>();
   const [uploadModalVisible, setUploadModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [chunkDrawerVisible, setChunkDrawerVisible] = useState<boolean>(false);
-  const [previewDrawerVisible, setPreviewDrawerVisible] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<API.KnowledgeDocumentVO>();
+  const [currentRow, setCurrentRow] = useState<API.DocumentVO>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
   const [shouldPoll, setShouldPoll] = useState<boolean>(false);
+
 
   /**
    * 获取知识库详情
@@ -66,27 +56,6 @@ const DocumentManagement: React.FC = () => {
       if (timer) clearInterval(timer);
     };
   }, [shouldPoll]);
-
-  /**
-   * 重试文档解析
-   * @param documentId
-   */
-  const handleRetry = async (documentId: number) => {
-    const hide = message.loading('正在重新提交解析请求...');
-    try {
-      const res = await retryIngest({ documentId });
-      if (res.code === 0) {
-        message.success('已重新提交解析请求');
-        actionRef.current?.reload();
-      } else {
-        message.error(`重试失败: ${res.message}`);
-      }
-    } catch (error: any) {
-      message.error(`重试报错: ${error.message}`);
-    } finally {
-      hide();
-    }
-  };
 
   /**
    * 删除文档
@@ -135,7 +104,7 @@ const DocumentManagement: React.FC = () => {
   /**
    * 表格列配置
    */
-  const columns: ProColumns<API.KnowledgeDocumentVO>[] = [
+  const columns: ProColumns<API.DocumentVO>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -145,7 +114,7 @@ const DocumentManagement: React.FC = () => {
     },
     {
       title: '文件名',
-      dataIndex: 'originalName',
+      dataIndex: 'name',
       valueType: 'text',
       ellipsis: true,
       copyable: true,
@@ -153,36 +122,42 @@ const DocumentManagement: React.FC = () => {
     },
     {
       title: '文件大小',
-      dataIndex: 'sizeBytes',
+      dataIndex: 'fileSize',
       valueType: 'text',
       hideInSearch: true,
       width: 100,
       render: (_, record) => {
-        if (!record.sizeBytes) return '0 B';
+        if (!record.fileSize) return '0 B';
         const k = 1024;
         const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(record.sizeBytes) / Math.log(k));
-        return parseFloat((record.sizeBytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        const i = Math.floor(Math.log(record.fileSize) / Math.log(k));
+        return parseFloat((record.fileSize / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
       },
     },
     {
+      title: '分片数',
+      dataIndex: 'chunkCount',
+      valueType: 'digit',
+      hideInSearch: true,
+      width: 80,
+    },
+    {
       title: '解析状态',
-      dataIndex: 'parseStatus',
+      dataIndex: 'status',
       valueType: 'select',
       valueEnum: DocumentParseStatusEnumMap,
       width: 100,
       render: (status: any, record) => {
-        const statusValue = Number(status);
-        const config = DocumentParseStatusEnumMap[statusValue as keyof typeof DocumentParseStatusEnumMap] || {
+        const config = DocumentParseStatusEnumMap[status as keyof typeof DocumentParseStatusEnumMap] || {
           text: '未知',
           status: 'default',
         };
         return (
           <Space direction="vertical" size={0}>
             <Badge status={config.status.toLowerCase() as any} text={config.text} />
-            {statusValue === DocumentParseStatusEnum.FAILED && record.errorMsg && (
+            {Number(status) === DocumentParseStatusEnum.FAILED && record.errorMessage && (
               <Typography.Text type="danger" style={{ fontSize: 12 }}>
-                {record.errorMsg}
+                {record.errorMessage}
               </Typography.Text>
             )}
           </Space>
@@ -190,8 +165,25 @@ const DocumentManagement: React.FC = () => {
       },
     },
     {
+      title: '发布者',
+      dataIndex: 'userVO',
+      valueType: 'text',
+      hideInSearch: true,
+      width: 120,
+      render: (_, record) => (
+        <Typography.Text>{record.userVO?.userName || '-'}</Typography.Text>
+      ),
+    },
+    {
       title: '创建时间',
-      dataIndex: 'createTime',
+      dataIndex: 'uploadTime',
+      valueType: 'dateTime',
+      hideInSearch: true,
+      width: 150,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'uploadTime',
       valueType: 'dateTime',
       hideInSearch: true,
       width: 150,
@@ -199,44 +191,9 @@ const DocumentManagement: React.FC = () => {
     {
       title: '操作',
       valueType: 'option',
-      width: 320,
+      width: 120,
       render: (_, record) => (
         <Space size="middle" wrap>
-          <Typography.Link
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            onClick={() => {
-              setCurrentRow(record);
-              setUpdateModalVisible(true);
-            }}
-          >
-            <EditOutlined /> 编辑
-          </Typography.Link>
-          {record.parseStatus === DocumentParseStatusEnum.FAILED && (
-            <Typography.Link
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-              onClick={() => handleRetry(record.id as any)}
-            >
-              <ReloadOutlined /> 重试
-            </Typography.Link>
-          )}
-          <Typography.Link
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            onClick={() => {
-              setCurrentRow(record);
-              setChunkDrawerVisible(true);
-            }}
-          >
-            <ProfileOutlined /> 查看分片
-          </Typography.Link>
-          <Typography.Link
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            onClick={() => {
-              setCurrentRow(record);
-              setPreviewDrawerVisible(true);
-            }}
-          >
-            <FileSearchOutlined /> 预览内容
-          </Typography.Link>
           <Popconfirm
             title="确定删除此文档及关联分片吗？"
             description="删除后将无法恢复。"
@@ -263,14 +220,11 @@ const DocumentManagement: React.FC = () => {
         onBack: () => history.back(),
       }}
     >
-      <ProTable<API.KnowledgeDocumentVO, API.KnowledgeDocumentQueryRequest>
+      <ProTable<API.DocumentVO, API.DocumentQueryRequest>
         headerTitle="文档列表"
         actionRef={actionRef}
         rowKey="id"
         size="middle"
-        cardProps={{
-          bodyStyle: { padding: '16px 24px' },
-        }}
         search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
@@ -321,16 +275,16 @@ const DocumentManagement: React.FC = () => {
         }}
         request={async (params) => {
           if (!knowledgeBaseId) return { success: false };
-          const { data, code } = await listKnowledgeDocumentVoByPage({
+          const { data, code } = await listDocumentVoByPage({
             ...params,
             knowledgeBaseId: knowledgeBaseId as any,
-          } as API.KnowledgeDocumentQueryRequest);
+          } as API.DocumentQueryRequest);
 
           // 检查是否有正在处理中的文档
           const hasProcessing = data?.records?.some(
             (r) =>
-              r.parseStatus === DocumentParseStatusEnum.PENDING ||
-              r.parseStatus === DocumentParseStatusEnum.PROCESSING,
+              Number(r.status) === DocumentParseStatusEnum.PENDING ||
+              Number(r.status) === DocumentParseStatusEnum.PROCESSING,
           );
           setShouldPoll(!!hasProcessing);
 
@@ -352,41 +306,9 @@ const DocumentManagement: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-
-      <UpdateDocumentModal
-        visible={updateModalVisible}
-        oldData={currentRow}
-        onCancel={() => {
-          setUpdateModalVisible(false);
-          setCurrentRow(undefined);
-        }}
-        onSubmit={() => {
-          setUpdateModalVisible(false);
-          setCurrentRow(undefined);
-          actionRef.current?.reload();
-        }}
-      />
-
-      <DocumentChunkDrawer
-        visible={chunkDrawerVisible}
-        documentId={currentRow?.id as any}
-        onClose={() => {
-          setChunkDrawerVisible(false);
-          setCurrentRow(undefined);
-        }}
-      />
-
-      <DocumentPreviewDrawer
-        visible={previewDrawerVisible}
-        documentId={currentRow?.id as any}
-        fileName={currentRow?.originalName}
-        onClose={() => {
-          setPreviewDrawerVisible(false);
-          setCurrentRow(undefined);
-        }}
-      />
     </PageContainer>
   );
 };
+
 
 export default DocumentManagement;

@@ -3,12 +3,10 @@ import React from 'react';
 import {
   ModalForm,
   ProForm,
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { updateKnowledgeBase } from '@/services/ai/knowledgeBaseController';
-import { KnowledgeBaseStatusEnumMap } from '@/enums/KnowledgeBaseStatusEnum';
 
 interface Props {
   oldData?: API.KnowledgeBaseVO;
@@ -79,14 +77,6 @@ const UpdateKnowledgeModal: React.FC<Props> = (props) => {
         name="description"
         label="描述"
         placeholder="请输入描述"
-      />
-      <ProFormSelect
-        name="status"
-        label="状态"
-        options={Object.keys(KnowledgeBaseStatusEnumMap).map((key) => ({
-          label: KnowledgeBaseStatusEnumMap[key as unknown as keyof typeof KnowledgeBaseStatusEnumMap].text,
-          value: Number(key),
-        }))}
       />
     </ModalForm>
   );

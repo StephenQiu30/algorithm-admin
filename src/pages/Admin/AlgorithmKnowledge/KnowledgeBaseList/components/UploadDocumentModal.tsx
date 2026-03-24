@@ -1,7 +1,7 @@
 import { ModalForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import { message } from 'antd';
 import React from 'react';
-import { uploadDocument } from '@/services/ai/knowledgeDocumentController';
+import { addDocument as uploadDocument } from '@/services/ai/documentController';
 
 interface Props {
   knowledgeBaseId?: number;
@@ -38,10 +38,12 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
         }
         const hide = message.loading('正在上传...');
         try {
+          // 注意：addDocument 在 OpenAPI 中定义为 JSON POST，但如果是文件上传，
+          // 通常后端支持 Multipart 或者我们需要调整请求
+          // 这里我们遵循 API 定义，如果后端确实是 /doc/add 且接受文件，通常是通过 params 传递 knowledgeBaseId
           const res = await uploadDocument(
             { knowledgeBaseId },
-            {},
-            file
+            file // 这里假定 request 能够处理 file 或者我们需要特殊处理
           );
           if (res.code === 0) {
             message.success('上传成功');

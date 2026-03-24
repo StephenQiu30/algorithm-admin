@@ -1,4 +1,4 @@
-import { ModalForm, ProFormText } from '@ant-design/pro-components';
+import { ModalForm, ProFormSwitch, ProFormText } from '@ant-design/pro-components';
 import { message } from 'antd';
 import React from 'react';
 import { updateDocument } from '@/services/ai/knowledgeDocumentController';
@@ -51,6 +51,15 @@ const UpdateDocumentModal: React.FC<Props> = (props) => {
         label="文件名"
         name="originalName"
         rules={[{ required: true, message: '请输入文件名' }]}
+      />
+      <ProFormText
+        label="标签"
+        name="tags"
+        placeholder="请输入标签，以逗号分隔"
+      />
+      <ProFormSwitch
+        label="包含代码"
+        name="hasCode"
       />
     </ModalForm>
   );

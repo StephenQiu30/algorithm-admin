@@ -73,7 +73,6 @@ const CommentList: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
-      hideInTable: true,
       copyable: true,
       ellipsis: true,
       width: 140,
@@ -85,9 +84,10 @@ const CommentList: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '发布者',
+      title: '发布者 ID',
       dataIndex: 'userId',
       valueType: 'text',
+      copyable: true,
       render: (_, record) => (
         <Space>
           {record.userVO?.userAvatar && <Avatar src={record.userVO.userAvatar} size="small" />}
@@ -96,7 +96,7 @@ const CommentList: React.FC = () => {
       ),
     },
     {
-      title: '帖子ID',
+      title: '帖子 ID',
       dataIndex: 'postId',
       valueType: 'text',
       copyable: true,
@@ -110,6 +110,7 @@ const CommentList: React.FC = () => {
       hideInForm: true,
       width: 160,
       sorter: true,
+      hideInSearch: true,
     },
     {
       title: '操作',

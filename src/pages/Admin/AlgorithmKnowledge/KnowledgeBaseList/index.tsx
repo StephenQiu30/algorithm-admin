@@ -3,13 +3,11 @@ import { Button, message, Popconfirm, Space, Switch, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateKnowledgeModal from './components/CreateKnowledgeModal';
 import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
-import KnowledgeRetrievalModal from './components/KnowledgeRetrievalModal';
 import {
   DeleteOutlined,
   EditOutlined,
   FileTextOutlined,
   PlusOutlined,
-  SearchOutlined,
 } from '@ant-design/icons';
 import { history } from '@umijs/max';
 import {
@@ -17,7 +15,7 @@ import {
   listMyKnowledgeBaseVoByPage,
   updateKnowledgeBase,
 } from '@/services/ai/knowledgeBaseController';
-import { KnowledgeBaseStatusEnumMap } from '@/enums/KnowledgeBaseStatusEnum';
+
 
 /**
  * 算法知识管理 (AI 知识库)
@@ -29,7 +27,6 @@ const AlgorithmKnowledgeList: React.FC = () => {
   // Modal 状态管理
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [retrievalModalVisible, setRetrievalModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.KnowledgeBaseVO>();
 
   /**
@@ -81,38 +78,13 @@ const AlgorithmKnowledgeList: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      valueType: 'select',
-      valueEnum: KnowledgeBaseStatusEnumMap,
-      width: 100,
-      render: (dom, record) => {
-        return (
-          <Switch
-            checked={record.status === 0}
-            onChange={async (checked) => {
-              const hide = message.loading('正在更新状态...');
-              try {
-                const res = await updateKnowledgeBase({
-                  id: record.id,
-                  status: checked ? 0 : 1,
-                });
-                if (res.code === 0) {
-                  message.success('状态更新成功');
-                  actionRef.current?.reload();
-                } else {
-                  message.error(`状态更新失败: ${res.message}`);
-                }
-              } catch (error: any) {
-                message.error(`状态更新报错: ${error.message}`);
-              } finally {
-                hide();
-              }
-            }}
-          />
-        );
-      },
+      title: '文档数',
+      dataIndex: 'documentCount',
+      valueType: 'digit',
+      hideInSearch: true,
+      width: 80,
     },
+
     {
       title: '创建时间',
       dataIndex: 'createTime',
@@ -125,7 +97,7 @@ const AlgorithmKnowledgeList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 320,
+      width: 240,
       render: (_, record) => (
         <Space size="middle" wrap>
           <Typography.Link
@@ -136,16 +108,6 @@ const AlgorithmKnowledgeList: React.FC = () => {
             }}
           >
             <FileTextOutlined /> 管理文档
-          </Typography.Link>
-          <Typography.Link
-            key="test"
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            onClick={() => {
-              setCurrentRow(record);
-              setRetrievalModalVisible(true);
-            }}
-          >
-            <SearchOutlined /> 知识检索
           </Typography.Link>
           <Typography.Link
             key="update"
@@ -188,9 +150,6 @@ const AlgorithmKnowledgeList: React.FC = () => {
         actionRef={actionRef}
         rowKey="id"
         size="middle"
-        cardProps={{
-          bodyStyle: { padding: '16px 24px' },
-        }}
         search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
@@ -248,14 +207,7 @@ const AlgorithmKnowledgeList: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-      <KnowledgeRetrievalModal
-        visible={retrievalModalVisible}
-        knowledgeBaseId={currentRow?.id as any}
-        onCancel={() => {
-          setRetrievalModalVisible(false);
-          setCurrentRow(undefined);
-        }}
-      />
+
     </>
   );
 };

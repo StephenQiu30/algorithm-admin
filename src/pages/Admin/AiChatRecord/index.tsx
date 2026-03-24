@@ -1,41 +1,19 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { message, Popconfirm, Space, Typography } from 'antd';
+import { message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef } from 'react';
-import { deleteAiChatRecord, listAiChatRecordVoByPage } from '@/services/ai/aiChatRecordController';
+import { listHistoryByPage } from '@/services/ai/ragController';
 
 /**
- * AI 对话记录管理
+ * AI 对话记录管理 (RAG 历史)
  * @constructor
  */
 const AiChatRecordList: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
   /**
-   * 删除节点
-   * @param row
-   */
-  const handleDelete = async (row: API.AiChatRecordVO) => {
-    if (!row?.id) return;
-    const hide = message.loading('正在删除');
-    try {
-      const res = await deleteAiChatRecord({ id: row.id as any });
-      if (res.code === 0) {
-        message.success('删除成功');
-        actionRef.current?.reload();
-      } else {
-        message.error(`删除失败: ${res.message}`);
-      }
-    } catch (error: any) {
-      message.error(`删除报错: ${error.message}`);
-    } finally {
-      hide();
-    }
-  };
-
-  /**
    * 表格列定义
    */
-  const columns: ProColumns<API.AiChatRecordVO>[] = [
+  const columns: ProColumns<API.RAGHistoryVO>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -46,23 +24,37 @@ const AiChatRecordList: React.FC = () => {
       width: 120,
     },
     {
-      title: '用户ID',
+      title: '用户 ID',
       dataIndex: 'userId',
       valueType: 'text',
       copyable: true,
       width: 120,
     },
     {
-      title: '对话内容',
-      dataIndex: 'message',
+      title: '知识库 ID',
+      dataIndex: 'knowledgeBaseId',
+      valueType: 'text',
+      copyable: true,
+      width: 120,
+    },
+    {
+      title: '问题',
+      dataIndex: 'question',
       valueType: 'textarea',
       ellipsis: true,
     },
     {
-      title: 'AI 响应',
-      dataIndex: 'response',
+      title: '回答',
+      dataIndex: 'answer',
       valueType: 'textarea',
       ellipsis: true,
+    },
+    {
+      title: '响应时间',
+      dataIndex: 'responseTime',
+      width: 100,
+      hideInSearch: true,
+      render: (time) => <Tag color="blue">{time}ms</Tag>,
     },
     {
       title: '创建时间',
@@ -76,25 +68,19 @@ const AiChatRecordList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 100,
+      width: 80,
       render: (_, record) => (
         <Space size="middle">
-          <Popconfirm
-            title="确定删除？"
-            description="删除后将无法恢复？"
-            onConfirm={() => handleDelete(record)}
-          >
-            <Typography.Link key="delete" type="danger">
-              删除
-            </Typography.Link>
-          </Popconfirm>
+          <Typography.Link key="view" onClick={() => message.info('详情功能开发中')}>
+            详情
+          </Typography.Link>
         </Space>
       ),
     },
   ];
 
   return (
-    <ProTable<API.AiChatRecordVO, API.AiChatRecordQueryRequest>
+    <ProTable<API.RAGHistoryVO, API.RAGHistoryQueryRequest>
       headerTitle="AI 对话记录"
       actionRef={actionRef}
       rowKey="id"
@@ -103,12 +89,12 @@ const AiChatRecordList: React.FC = () => {
         const sortField = Object.keys(sort)?.[0] || 'createTime';
         const sortOrder = sort?.[sortField] ?? 'descend';
 
-        const { data, code } = await listAiChatRecordVoByPage({
+        const { data, code } = await listHistoryByPage({
           ...params,
           ...filter,
           sortField,
           sortOrder,
-        } as API.AiChatRecordQueryRequest);
+        } as API.RAGHistoryQueryRequest);
 
         return {
           success: code === 0,
