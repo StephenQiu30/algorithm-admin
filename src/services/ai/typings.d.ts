@@ -4,6 +4,14 @@ declare namespace API {
     knowledgeBaseId: number;
   };
 
+  type BaseResponseBatchRecallVO = {
+    /** 状态码 */
+    code?: number;
+    data?: BatchRecallVO;
+    /** 消息 */
+    message?: string;
+  };
+
   type BaseResponseBoolean = {
     /** 状态码 */
     code?: number;
@@ -85,6 +93,29 @@ declare namespace API {
     data?: PageRAGHistoryVO;
     /** 消息 */
     message?: string;
+  };
+
+  type BaseResponseRecallAnalysisVO = {
+    /** 状态码 */
+    code?: number;
+    data?: RecallAnalysisVO;
+    /** 消息 */
+    message?: string;
+  };
+
+  type BatchRecallRequest = {
+    config?: RecallAnalysisRequest;
+    /** 测试项列表 */
+    items?: RecallTestItem[];
+  };
+
+  type BatchRecallVO = {
+    /** 总命中率 (Hit Rate) */
+    overallHitRate?: number;
+    /** 平均召回率 (Mean Recall) */
+    meanRecall?: number;
+    /** 测试结果详情 */
+    itemResults?: RecallItemResultVO[];
   };
 
   type ChunkQueryRequest = {
@@ -364,6 +395,73 @@ declare namespace API {
     responseTime?: number;
     /** 创建时间 */
     createTime?: string;
+  };
+
+  type RecallAnalysisRequest = {
+    /** 问题/查询内容 */
+    question?: string;
+    /** 知识库ID */
+    knowledgeBaseId?: number;
+    /** 最大召回数量 */
+    topK?: number;
+    /** 相似度阈值 */
+    similarityThreshold?: number;
+    /** 是否启用重排 */
+    enableRerank?: boolean;
+  };
+
+  type RecallAnalysisVO = {
+    /** 查询内容 */
+    question?: string;
+    /** 向量检索结果 */
+    vectorHits?: RetrievalHitVO[];
+    /** 关键词检索结果 */
+    keywordHits?: RetrievalHitVO[];
+    /** 混合检索融合结果 */
+    fusedHits?: RetrievalHitVO[];
+    /** 最终重排结果 */
+    finalResults?: RetrievalHitVO[];
+    /** 检索耗时（毫秒） */
+    costMs?: number;
+  };
+
+  type RecallItemResultVO = {
+    /** 问题 */
+    question?: string;
+    /** 是否命中（至少命中一个期望分片） */
+    isHit?: boolean;
+    /** 召回率（期望分片被找回的比例） */
+    recall?: number;
+    /** 实际召回的分片内容列表 */
+    retrievedChunks?: RetrievalHitVO[];
+  };
+
+  type RecallTestItem = {
+    /** 问题 */
+    question?: string;
+    /** 期望召回的分片ID列表（空则仅用于查看召回结果） */
+    expectedChunkIds?: string[];
+  };
+
+  type RetrievalHitVO = {
+    /** 分片ID */
+    id?: string;
+    /** 文档名称 */
+    documentName?: string;
+    /** 分片索引 */
+    chunkIndex?: number;
+    /** 分片内容 */
+    content?: string;
+    /** 向量分数（相似度） */
+    vectorScore?: number;
+    /** 关键词分数（ES Score） */
+    keywordScore?: number;
+    /** 融合分数（RRF/Rerank） */
+    fusionScore?: number;
+    /** 最终评分 */
+    score?: number;
+    /** 命中原因 */
+    matchReason?: string;
   };
 
   type SourceVO = {

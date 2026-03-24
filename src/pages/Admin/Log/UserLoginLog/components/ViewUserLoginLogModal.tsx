@@ -1,6 +1,6 @@
-import { Modal, Button } from 'antd';
-import React, { useState } from 'react';
-import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { ModalForm, ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { Button } from 'antd';
+import React from 'react';
 import { LoginStatusEnumMap } from '@/enums/LoginStatusEnum';
 
 interface Props {
@@ -10,11 +10,10 @@ interface Props {
 }
 
 /**
- * 用户登录日志详情 Modal
+ * 用户登录日志详情
  */
 const ViewUserLoginLogModal: React.FC<Props> = (props) => {
   const { record, children, columns } = props;
-  const [visible, setVisible] = useState(false);
 
   const defaultColumns: ProDescriptionsItemProps<API.UserLoginLogVO>[] = [
     { title: '日志ID', dataIndex: 'id' },
@@ -39,30 +38,27 @@ const ViewUserLoginLogModal: React.FC<Props> = (props) => {
   ];
 
   return (
-    <>
-      {children &&
-        React.cloneElement(children, {
-          onClick: () => setVisible(true),
-        })}
-      <Modal
-        title="登录日志详情"
-        open={visible}
-        onCancel={() => setVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setVisible(false)}>
+    <ModalForm
+      title="登录日志详情"
+      trigger={children}
+      submitter={{
+        render: (_, doms) => [
+          <Button key="close" onClick={() => (doms[0] as any).props.onCancel?.()}>
             关闭
           </Button>,
-        ]}
-        width={600}
-        destroyOnClose
-      >
-        <ProDescriptions<API.UserLoginLogVO>
-          column={1}
-          dataSource={record}
-          columns={columns || defaultColumns}
-        />
-      </Modal>
-    </>
+        ],
+      }}
+      width={600}
+      modalProps={{
+        destroyOnClose: true,
+      }}
+    >
+      <ProDescriptions<API.UserLoginLogVO>
+        column={1}
+        dataSource={record}
+        columns={columns || defaultColumns}
+      />
+    </ModalForm>
   );
 };
 

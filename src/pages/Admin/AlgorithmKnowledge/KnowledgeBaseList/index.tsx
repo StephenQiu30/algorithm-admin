@@ -3,6 +3,7 @@ import {
   EditOutlined,
   FileTextOutlined,
   PlusOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
@@ -11,7 +12,6 @@ import React, { useRef, useState } from 'react';
 import {
   deleteKnowledgeBase,
   listMyKnowledgeBaseVoByPage,
-  updateKnowledgeBase,
 } from '@/services/ai/knowledgeBaseController';
 import CreateKnowledgeModal from './components/CreateKnowledgeModal';
 import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
@@ -135,6 +135,15 @@ const AlgorithmKnowledgeList: React.FC = () => {
             }}
           >
             <FileTextOutlined /> 管理文档
+          </Typography.Link>
+          <Typography.Link
+            key="analysis"
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            onClick={() => {
+              history.push(`/admin/algorithm/knowledge/recall-analysis/${record.id}`);
+            }}
+          >
+            <SearchOutlined /> 召回分析
           </Typography.Link>
           <Typography.Link
             key="update"

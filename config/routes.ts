@@ -29,6 +29,13 @@ export default [
     access: 'canAdmin',
   },
   {
+    name: '召回分析',
+    path: '/admin/algorithm/knowledge/recall-analysis/:id',
+    component: './Admin/AlgorithmKnowledge/RecallAnalysis',
+    hideInMenu: true,
+    access: 'canAdmin',
+  },
+  {
     name: 'AI 对话记录',
     path: '/admin/ai/record',
     component: './Admin/Rag',
