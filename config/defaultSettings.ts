@@ -17,7 +17,7 @@ const Settings: ProLayoutProps & {
   colorWeak: false,
   title: '面向排序算法的RAG增强交互式系统',
   pwa: true,
-  logo: 'https://butterfly-1318299170.cos.ap-shanghai.myqcloud.com/logo/stephen/logo.svg',
+  logo: '/logo.svg',
   iconfontUrl: '',
   token: {
     // 参见ts声明，demo 见文档，通过token 修改样式
