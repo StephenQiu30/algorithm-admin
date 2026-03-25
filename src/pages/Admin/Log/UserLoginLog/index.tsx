@@ -1,9 +1,8 @@
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
+import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
+import { Button, message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { listLogByPage1 } from '@/services/log/userLoginLogController';
-import { deleteUserLoginLog } from '@/services/log/userLoginLogController';
+import { listLogByPage1, deleteUserLoginLog } from '@/services/log/userLoginLogController';
 import { LoginStatusEnumMap } from '@/enums/LoginStatusEnum';
 import ViewUserLoginLogModal from './components/ViewUserLoginLogModal';
 
@@ -12,23 +11,20 @@ import ViewUserLoginLogModal from './components/ViewUserLoginLogModal';
  */
 const UserLoginLog: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UserLoginLogVO[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   /**
    * 删除日志
-   * @param record
+   * @param id
    */
-  const handleDelete = async (record: API.UserLoginLogVO) => {
+  const handleDelete = async (id: any) => {
     const hide = message.loading('正在删除');
-    if (!record?.id) return true;
     try {
-      await deleteUserLoginLog({ id: record.id as any });
+      await deleteUserLoginLog({ id: id as any });
       message.success('删除成功');
       actionRef.current?.reload();
-      return true;
     } catch (error: any) {
       message.error(`删除失败: ${error.message}`);
-      return false;
     } finally {
       hide();
     }
@@ -36,54 +32,58 @@ const UserLoginLog: React.FC = () => {
 
   /**
    * 批量删除日志
-   * @param selectedRows
+   * @param ids
    */
-  const handleBatchDelete = async (selectedRows: API.UserLoginLogVO[]) => {
-    const hide = message.loading('正在删除');
-    if (!selectedRows?.length) return true;
+  const handleBatchDelete = async (ids: React.Key[]) => {
+    const hide = message.loading('正在批量删除');
     try {
-      await Promise.all(selectedRows.map((row) => deleteUserLoginLog({ id: row.id as any })));
+      await Promise.all(ids.map((id) => deleteUserLoginLog({ id: id as any })));
       message.success('批量删除成功');
+      setSelectedRowKeys([]);
       actionRef.current?.reloadAndRest?.();
-      setSelectedRows([]);
-      return true;
     } catch (error: any) {
       message.error(`批量删除失败: ${error.message}`);
-      return false;
     } finally {
       hide();
     }
   };
 
   const columns: ProColumns<API.UserLoginLogVO>[] = [
-    { title: '用户ID', dataIndex: 'userId', width: 120, copyable: true, hideInTable: true },
-    { title: '用户账号', dataIndex: 'account', width: 120, copyable: true },
+    {
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'indexBorder',
+      width: 48,
+    },
+    {
+      title: '用户账号',
+      dataIndex: 'account',
+      width: 120,
+      copyable: true,
+      ellipsis: true,
+    },
     {
       title: 'IP地址',
       dataIndex: 'clientIp',
-      width: 120,
+      width: 140,
     },
-    { title: '地点', dataIndex: 'location', width: 120, hideInSearch: true },
-    { title: 'User-Agent', dataIndex: 'userAgent', ellipsis: true, hideInSearch: true },
-    { title: '登录类型', dataIndex: 'loginType', width: 100 },
-    { title: '失败原因', dataIndex: 'failReason', width: 120, ellipsis: true, hideInSearch: true },
+    {
+      title: '地点',
+      dataIndex: 'location',
+      width: 120,
+      hideInSearch: true,
+    },
     {
       title: '状态',
       dataIndex: 'status',
       width: 100,
       valueEnum: LoginStatusEnumMap,
-      render: (status) => {
-        const s = status as string;
-        if (s === 'SUCCESS') return <Badge status="success" text="成功" />;
-        if (s === 'FAILED') return <Badge status="error" text="失败" />;
-        return <Badge status="processing" text={s} />;
-      },
     },
     {
       title: '登录时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
-      width: 160,
+      width: 180,
       sorter: true,
       hideInSearch: true,
     },
@@ -96,22 +96,18 @@ const UserLoginLog: React.FC = () => {
       render: (_, record) => (
         <Space size="middle">
           <ViewUserLoginLogModal record={record}>
-            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Typography.Link key="view">
               <EyeOutlined /> 详情
             </Typography.Link>
           </ViewUserLoginLogModal>
           <Popconfirm
             title="确定删除此登录日志吗？"
             description="删除后将无法恢复。"
-            onConfirm={() => handleDelete(record)}
+            onConfirm={() => handleDelete(record.id)}
             okText="确定"
             cancelText="取消"
           >
-            <Typography.Link
-              key="delete"
-              type="danger"
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            >
+            <Typography.Link key="delete" type="danger">
               <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
@@ -121,12 +117,20 @@ const UserLoginLog: React.FC = () => {
   ];
 
   return (
-    <>
-      <ProTable<API.UserLoginLogVO>
-        headerTitle="登录日志"
+    <PageContainer
+      header={{
+        title: '登录日志',
+        breadcrumb: {},
+      }}
+    >
+      <ProTable<API.UserLoginLogVO, API.UserLoginLogQueryRequest>
+        headerTitle="日志列表"
         actionRef={actionRef}
         rowKey="id"
-        search={{ labelWidth: 100 }}
+        search={{
+          labelWidth: 'auto',
+          defaultCollapsed: false,
+        }}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
@@ -136,7 +140,7 @@ const UserLoginLog: React.FC = () => {
             ...filter,
             sortField,
             sortOrder,
-          });
+          } as API.UserLoginLogQueryRequest);
 
           return {
             success: code === 0,
@@ -146,30 +150,36 @@ const UserLoginLog: React.FC = () => {
         }}
         columns={columns}
         rowSelection={{
-          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
         }}
-        scroll={{ x: 1100 }}
+        tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
+          return (
+            <Space size={16}>
+              <Popconfirm
+                title="确定批量删除？"
+                onConfirm={async () => {
+                  await handleBatchDelete(selectedRowKeys);
+                  onCleanSelected();
+                }}
+              >
+                <Button danger type="primary" size="small">
+                  批量删除
+                </Button>
+              </Popconfirm>
+              <Button size="small" onClick={onCleanSelected}>
+                取消选择
+              </Button>
+            </Space>
+          );
+        }}
+        scroll={{ x: 'max-content' }}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+        }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项
-            </div>
-          }
-        >
-          <Popconfirm
-            title="确定批量删除？"
-            description="删除后将无法恢复？"
-            onConfirm={() => handleBatchDelete(selectedRowsState)}
-          >
-            <Button danger type="primary">
-              批量删除
-            </Button>
-          </Popconfirm>
-        </FooterToolbar>
-      )}
-    </>
+    </PageContainer>
   );
 };
 

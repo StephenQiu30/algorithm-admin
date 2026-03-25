@@ -1,4 +1,4 @@
-import { Modal, Tag, Button } from 'antd';
+import { Modal, Tag, Button, Typography } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { OperationStatusEnumMap } from '@/enums/OperationStatusEnum';
@@ -6,35 +6,39 @@ import { OperationStatusEnumMap } from '@/enums/OperationStatusEnum';
 interface Props {
   record: API.OperationLogVO;
   children?: React.ReactElement;
-  columns?: ProDescriptionsItemProps<API.OperationLogVO>[];
 }
 
 /**
  * 操作日志详情 Modal
  */
 const ViewOperationLogModal: React.FC<Props> = (props) => {
-  const { record, children, columns } = props;
+  const { record, children } = props;
   const [visible, setVisible] = useState(false);
 
-  const defaultColumns: ProDescriptionsItemProps<API.OperationLogVO>[] = [
-    { title: '日志ID', dataIndex: 'id' },
-    { title: '操作人ID', dataIndex: 'operatorId' },
-    { title: '操作人名称', dataIndex: 'operatorName' },
+  const columns: ProDescriptionsItemProps<API.OperationLogVO>[] = [
+    { title: '操作人', dataIndex: 'operatorName' },
     { title: '操作模块', dataIndex: 'module' },
-    { title: '操作类型', dataIndex: 'action' },
+    { title: '操作内容', dataIndex: 'action' },
     {
-      title: 'HTTP方法',
+      title: '请求方式',
       dataIndex: 'method',
-      render: (text) => <Tag color="blue">{text}</Tag>,
+      render: (text) => text && <Tag color="processing">{text as string}</Tag>,
     },
     { title: '请求路径', dataIndex: 'path', span: 2 },
     {
       title: '请求参数',
       dataIndex: 'requestParams',
       span: 2,
-      render: (text) => <pre style={{ maxHeight: 200, overflow: 'auto' }}>{text || '-'}</pre>,
+      render: (text) => (
+        <Typography.Paragraph
+          ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
+          style={{ background: '#f5f5f5', padding: '8px', borderRadius: '4px', margin: 0 }}
+        >
+          {text as string || '-'}
+        </Typography.Paragraph>
+      ),
     },
-    { title: '响应状态码', dataIndex: 'responseStatus' },
+    { title: '状态码', dataIndex: 'responseStatus' },
     {
       title: '操作状态',
       dataIndex: 'success',
@@ -42,14 +46,16 @@ const ViewOperationLogModal: React.FC<Props> = (props) => {
     },
     { title: '客户端IP', dataIndex: 'clientIp' },
     { title: '归属地', dataIndex: 'location' },
-    { title: '创建时间', dataIndex: 'createTime', span: 1, valueType: 'dateTime' },
+    { title: '操作时间', dataIndex: 'createTime', valueType: 'dateTime' },
     {
       title: '错误信息',
       dataIndex: 'errorMessage',
       span: 2,
       hideInDescriptions: !record?.errorMessage,
       render: (text) => (
-        <pre style={{ color: 'red', maxHeight: 200, overflow: 'auto' }}>{text}</pre>
+        <div style={{ color: '#ff4d4f', background: '#fff2f0', padding: '8px', borderRadius: '4px', border: '1px solid #ffccc7' }}>
+          {text as string}
+        </div>
       ),
     },
   ];
@@ -69,13 +75,14 @@ const ViewOperationLogModal: React.FC<Props> = (props) => {
             关闭
           </Button>,
         ]}
-        width={800}
+        width={700}
         destroyOnClose
       >
         <ProDescriptions<API.OperationLogVO>
           column={2}
           dataSource={record}
-          columns={columns || defaultColumns}
+          columns={columns}
+          labelStyle={{ fontWeight: 'bold' }}
         />
       </Modal>
     </>

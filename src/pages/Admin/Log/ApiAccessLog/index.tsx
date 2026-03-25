@@ -1,9 +1,8 @@
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { listLogByPage2 } from '@/services/log/apiAccessLogController';
-import { deleteApiAccessLog } from '@/services/log/apiAccessLogController';
+import { listLogByPage2, deleteApiAccessLog } from '@/services/log/apiAccessLogController';
 import { ApiAccessStatusEnumMap } from '@/enums/ApiAccessStatusEnum';
 import ViewApiAccessLogModal from './components/ViewApiAccessLogModal';
 
@@ -12,23 +11,20 @@ import ViewApiAccessLogModal from './components/ViewApiAccessLogModal';
  */
 const ApiAccessLog: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [selectedRowsState, setSelectedRows] = useState<API.ApiAccessLogVO[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   /**
    * 删除日志
-   * @param record
+   * @param id
    */
-  const handleDelete = async (record: API.ApiAccessLogVO) => {
+  const handleDelete = async (id: any) => {
     const hide = message.loading('正在删除');
-    if (!record?.id) return true;
     try {
-      await deleteApiAccessLog({ id: record.id as any });
+      await deleteApiAccessLog({ id: id as any });
       message.success('删除成功');
       actionRef.current?.reload();
-      return true;
     } catch (error: any) {
       message.error(`删除失败: ${error.message}`);
-      return false;
     } finally {
       hide();
     }
@@ -36,33 +32,40 @@ const ApiAccessLog: React.FC = () => {
 
   /**
    * 批量删除日志
-   * @param selectedRows
+   * @param ids
    */
-  const handleBatchDelete = async (selectedRows: API.ApiAccessLogVO[]) => {
-    const hide = message.loading('正在删除');
-    if (!selectedRows?.length) return true;
+  const handleBatchDelete = async (ids: React.Key[]) => {
+    const hide = message.loading('正在批量删除');
     try {
-      await Promise.all(selectedRows.map((row) => deleteApiAccessLog({ id: row.id as any })));
+      await Promise.all(ids.map((id) => deleteApiAccessLog({ id: id as any })));
       message.success('批量删除成功');
+      setSelectedRowKeys([]);
       actionRef.current?.reloadAndRest?.();
-      setSelectedRows([]);
-      return true;
     } catch (error: any) {
       message.error(`批量删除失败: ${error.message}`);
-      return false;
     } finally {
       hide();
     }
   };
 
   const columns: ProColumns<API.ApiAccessLogVO>[] = [
-    { title: '链路追踪ID', dataIndex: 'traceId', width: 150, copyable: true, ellipsis: true },
-    { title: '用户ID', dataIndex: 'userId', width: 120, copyable: true },
+    {
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'indexBorder',
+      width: 48,
+    },
+    {
+      title: '请求路径',
+      dataIndex: 'path',
+      ellipsis: true,
+      minWidth: 200,
+    },
     {
       title: '请求方式',
       dataIndex: 'method',
       width: 100,
-      render: (_, record) => {
+      render: (method) => {
         const colors: Record<string, string> = {
           GET: 'blue',
           POST: 'green',
@@ -70,13 +73,12 @@ const ApiAccessLog: React.FC = () => {
           DELETE: 'red',
         };
         return (
-          <Tag color={colors[record.method!] || 'default'} style={{ fontWeight: 'bold' }}>
-            {record.method}
+          <Tag color={colors[method as string] || 'default'}>
+            {method as string}
           </Tag>
         );
       },
     },
-    { title: '请求路径', dataIndex: 'path', ellipsis: true, minWidth: 200 },
     {
       title: '响应状态',
       dataIndex: 'status',
@@ -103,23 +105,11 @@ const ApiAccessLog: React.FC = () => {
         return <Tag color={color}>{l}ms</Tag>;
       },
     },
-    { title: 'IP地址', dataIndex: 'clientIp', width: 120 },
-    {
-      title: '请求大小',
-      dataIndex: 'requestSize',
-      width: 100,
-      hideInSearch: true,
-      render: (size) => {
-        const s = Number(size);
-        if (!s) return '0 B';
-        return (s / 1024).toFixed(2) + ' KB';
-      },
-    },
     {
       title: '时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
-      width: 160,
+      width: 180,
       sorter: true,
       hideInSearch: true,
     },
@@ -132,22 +122,18 @@ const ApiAccessLog: React.FC = () => {
       render: (_, record) => (
         <Space size="middle">
           <ViewApiAccessLogModal record={record}>
-            <Typography.Link key="view" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Typography.Link key="view">
               <EyeOutlined /> 详情
             </Typography.Link>
           </ViewApiAccessLogModal>
           <Popconfirm
             title="确定删除此日志吗？"
             description="删除后将无法恢复。"
-            onConfirm={() => handleDelete(record)}
+            onConfirm={() => handleDelete(record.id)}
             okText="确定"
             cancelText="取消"
           >
-            <Typography.Link
-              key="delete"
-              type="danger"
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            >
+            <Typography.Link key="delete" type="danger">
               <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
@@ -157,12 +143,20 @@ const ApiAccessLog: React.FC = () => {
   ];
 
   return (
-    <>
-      <ProTable<API.ApiAccessLogVO>
-        headerTitle="API 访问日志"
+    <PageContainer
+      header={{
+        title: 'API 访问日志',
+        breadcrumb: {},
+      }}
+    >
+      <ProTable<API.ApiAccessLogVO, API.ApiAccessLogQueryRequest>
+        headerTitle="访问记录"
         actionRef={actionRef}
         rowKey="id"
-        search={{ labelWidth: 100 }}
+        search={{
+          labelWidth: 'auto',
+          defaultCollapsed: false,
+        }}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
@@ -172,7 +166,7 @@ const ApiAccessLog: React.FC = () => {
             ...filter,
             sortField,
             sortOrder,
-          });
+          } as API.ApiAccessLogQueryRequest);
 
           return {
             success: code === 0,
@@ -182,30 +176,36 @@ const ApiAccessLog: React.FC = () => {
         }}
         columns={columns}
         rowSelection={{
-          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
         }}
-        scroll={{ x: 1200 }}
+        tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
+          return (
+            <Space size={16}>
+              <Popconfirm
+                title="确定批量删除？"
+                onConfirm={async () => {
+                  await handleBatchDelete(selectedRowKeys);
+                  onCleanSelected();
+                }}
+              >
+                <Button danger type="primary" size="small">
+                  批量删除
+                </Button>
+              </Popconfirm>
+              <Button size="small" onClick={onCleanSelected}>
+                取消选择
+              </Button>
+            </Space>
+          );
+        }}
+        scroll={{ x: 'max-content' }}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+        }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项
-            </div>
-          }
-        >
-          <Popconfirm
-            title="确定批量删除？"
-            description="删除后将无法恢复？"
-            onConfirm={() => handleBatchDelete(selectedRowsState)}
-          >
-            <Button danger type="primary">
-              批量删除
-            </Button>
-          </Popconfirm>
-        </FooterToolbar>
-      )}
-    </>
+    </PageContainer>
   );
 };
 

@@ -53,7 +53,7 @@ const ViewUserModal: React.FC<Props> = (props) => {
     { title: '最后登录 IP', dataIndex: 'lastLoginIp' },
     { title: '最后登录时间', dataIndex: 'lastLoginTime', valueType: 'dateTime' },
     { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
-    { title: '更新时间', dataIndex: 'updateTime', valueType: 'dateTime' },
+    { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
   ];
 
   return (

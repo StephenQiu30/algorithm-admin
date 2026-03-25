@@ -41,7 +41,7 @@ const ViewCommentModal: React.FC<Props> = (props) => {
       render: (text) => <div style={{ whiteSpace: 'pre-wrap' }}>{text || '-'}</div>,
     },
     { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
-    { title: '更新时间', dataIndex: 'updateTime', valueType: 'dateTime' },
+    { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
   ];
 
   return (

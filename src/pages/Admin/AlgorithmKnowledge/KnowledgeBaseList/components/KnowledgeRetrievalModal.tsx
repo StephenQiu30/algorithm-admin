@@ -1,6 +1,5 @@
-import { ProList, ProCard, ModalForm, ProFormText, ProFormDigit } from '@ant-design/pro-components';
+import { ProList, ProCard, ModalForm } from '@ant-design/pro-components';
 import {
-  Badge,
   Empty,
   Input,
   InputNumber,
@@ -8,11 +7,13 @@ import {
   Space,
   Tag,
   Typography,
+  Radio,
+  Switch,
 } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
-import { search, diagnoseSearch } from '@/services/ai/knowledgeBaseController';
-import { Radio, Switch } from 'antd';
+import { searchChunks } from '@/services/ai/chunkController';
+import { analyzeRecall } from '@/services/ai/ragController';
 import { VectorSimilarityModeEnum } from '@/enums/VectorSimilarityModeEnum';
 
 interface Props {
@@ -23,19 +24,17 @@ interface Props {
 
 /**
  * 知识检索弹窗
- * @param props
- * @constructor
  */
 const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
   const { knowledgeBaseId, visible, onCancel } = props;
   const [isDiagnose, setIsDiagnose] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('rrf');
+  const [activeTab, setActiveTab] = useState<string>('vector');
   const [loading, setLoading] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
   const [topK, setTopK] = useState<number>(5);
   const [similarityMode, setSimilarityMode] = useState<string>(VectorSimilarityModeEnum.KNN);
-  const [results, setResults] = useState<API.ChunkSourceVO[]>([]);
-  const [diagnoseResults, setDiagnoseResults] = useState<Record<string, API.ChunkSourceVO[]>>({});
+  const [results, setResults] = useState<API.SourceVO[] | API.RetrievalHitVO[]>([]);
+  const [diagnoseResults, setDiagnoseResults] = useState<API.RecallAnalysisVO>();
 
   /**
    * 执行检索
@@ -49,28 +48,25 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
     setLoading(true);
     try {
       if (isDiagnose) {
-        const res = await diagnoseSearch({
+        const res = await analyzeRecall({
           knowledgeBaseId: knowledgeBaseId as any,
-          query: value,
+          question: value,
           topK,
-          similarityMode,
         });
         if (res.code === 0) {
-          setDiagnoseResults(res.data || {});
+          setDiagnoseResults(res.data);
           // 默认选中第一个有结果的 tab
-          const keys = Object.keys(res.data || {});
-          if (keys.length > 0 && !keys.includes(activeTab)) {
-            setActiveTab(keys[0]);
-          }
+          if (res.data?.vectorHits?.length) setActiveTab('vector');
+          else if (res.data?.keywordHits?.length) setActiveTab('keyword');
+          else if (res.data?.fusedHits?.length) setActiveTab('fused');
         } else {
           message.error(`诊断失败: ${res.message}`);
         }
       } else {
-        const res = await search({
+        const res = await searchChunks({
           knowledgeBaseId: knowledgeBaseId as any,
           query: value,
           topK,
-          similarityMode,
         });
         if (res.code === 0) {
           setResults(res.data || []);
@@ -88,11 +84,11 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
   /**
    * 渲染结果列表
    */
-  const renderResultList = (dataSource: API.ChunkSourceVO[]) => (
-    <ProList<API.ChunkSourceVO>
+  const renderResultList = (dataSource: any[]) => (
+    <ProList<any>
       loading={loading}
       dataSource={dataSource}
-      rowKey="chunkId"
+      rowKey={(item, index) => `${item.id || item.documentId}-${index}`}
       ghost
       metas={{
         title: {
@@ -103,7 +99,7 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
                 <Typography.Text strong>{item.documentName}</Typography.Text>
               </Space>
               <Tag color="cyan">
-                匹配度: {((item.score || 0) * 100).toFixed(2)}%
+                得分: {Number(item.score || item.vectorScore || 0).toFixed(4)}
               </Tag>
             </Space>
           ),
@@ -130,12 +126,13 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
       }}
       pagination={{
         pageSize: 5,
+        size: 'small',
       }}
       locale={{
         emptyText: (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="输入检索内容，精准定位知识库片段"
+            description="无检索结果"
             style={{ margin: '40px 0' }}
           />
         ),
@@ -167,7 +164,7 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
                 检索内容
               </div>
               <Input.Search
-                placeholder="输入问题，例如：什么是冒泡排序？"
+                placeholder="输入问题，进行知识检索"
                 enterButton="开始检索"
                 size="large"
                 loading={loading}
@@ -178,7 +175,7 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
             </div>
             <div style={{ width: 120 }}>
               <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginBottom: 8 }}>
-                Top K (1-20)
+                召回数量
               </div>
               <InputNumber
                 min={1}
@@ -189,20 +186,22 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
                 style={{ width: '100%' }}
               />
             </div>
-            <div>
-              <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginBottom: 8 }}>
-                相似度模式
+            {isDiagnose && (
+              <div>
+                <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginBottom: 8 }}>
+                  相似度模式
+                </div>
+                <Radio.Group
+                  value={similarityMode}
+                  onChange={(e) => setSimilarityMode(e.target.value)}
+                  buttonStyle="solid"
+                  size="large"
+                >
+                  <Radio.Button value={VectorSimilarityModeEnum.KNN}>kNN</Radio.Button>
+                  <Radio.Button value={VectorSimilarityModeEnum.HYBRID}>Hybrid</Radio.Button>
+                </Radio.Group>
               </div>
-              <Radio.Group
-                value={similarityMode}
-                onChange={(e) => setSimilarityMode(e.target.value)}
-                buttonStyle="solid"
-                size="large"
-              >
-                <Radio.Button value={VectorSimilarityModeEnum.KNN}>kNN</Radio.Button>
-                <Radio.Button value={VectorSimilarityModeEnum.HYBRID}>Hybrid</Radio.Button>
-              </Radio.Group>
-            </div>
+            )}
             <div style={{ width: 100 }}>
               <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginBottom: 8 }}>
                 诊断模式
@@ -211,9 +210,8 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
                 checked={isDiagnose}
                 onChange={(checked) => {
                   setIsDiagnose(checked);
-                  // 切换模式时清空结果
                   setResults([]);
-                  setDiagnoseResults({});
+                  setDiagnoseResults(undefined);
                 }}
                 checkedChildren="开启"
                 unCheckedChildren="关闭"
@@ -229,19 +227,19 @@ const KnowledgeRetrievalModal: React.FC<Props> = (props) => {
               onChange: (key) => setActiveTab(key),
               items: [
                 {
-                  label: 'RRF 综合排序',
-                  key: 'rrf',
-                  children: renderResultList(diagnoseResults['rrf'] || []),
+                  label: '向量检索',
+                  key: 'vector',
+                  children: renderResultList(diagnoseResults?.vectorHits || []),
                 },
                 {
-                  label: 'kNN 向量检索',
-                  key: 'knn',
-                  children: renderResultList(diagnoseResults['knn'] || []),
+                  label: '关键词检索',
+                  key: 'keyword',
+                  children: renderResultList(diagnoseResults?.keywordHits || []),
                 },
                 {
-                  label: 'BM25 关键词检索',
-                  key: 'bm25',
-                  children: renderResultList(diagnoseResults['bm25'] || []),
+                  label: '综合分析',
+                  key: 'fused',
+                  children: renderResultList(diagnoseResults?.finalResults || []),
                 },
               ],
             }}

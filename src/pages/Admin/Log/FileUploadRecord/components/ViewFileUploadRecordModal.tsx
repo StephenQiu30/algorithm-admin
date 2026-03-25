@@ -1,6 +1,6 @@
-import { ModalForm, ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import { Button, Image } from 'antd';
-import React from 'react';
+import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { Button, Image, Modal, Tag, Typography } from 'antd';
+import React, { useState } from 'react';
 import { FileUploadStatusEnumMap } from '@/enums/FileUploadStatusEnum';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
  */
 const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
   const { record, children, columns } = props;
+  const [visible, setVisible] = useState(false);
 
   const defaultColumns: ProDescriptionsItemProps<API.FileUploadRecordVO>[] = [
     { title: '记录ID', dataIndex: 'id' },
@@ -25,6 +26,7 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
       dataIndex: 'fileSize',
       render: (size) => {
         const s = Number(size);
+        if (isNaN(s)) return '-';
         if (s < 1024) return `${s} B`;
         if (s < 1024 * 1024) return `${(s / 1024).toFixed(2)} KB`;
         return `${(s / (1024 * 1024)).toFixed(2)} MB`;
@@ -41,7 +43,7 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
       span: 2,
       render: (url) =>
         url ? (
-          <a href={url as string} target="_blank" rel="noreferrer">
+          <a href={url as string} target="_blank" rel="noreferrer" style={{ wordBreak: 'break-all' }}>
             {url as string}
           </a>
         ) : (
@@ -54,7 +56,7 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
       span: 2,
       hideInDescriptions:
         !record?.url || !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(record.fileSuffix || ''),
-      render: (url) => <Image src={url as string} width={200} />,
+      render: (url) => <Image src={url as string} width={200} style={{ borderRadius: '4px' }} />,
     },
     { title: '文件MD5', dataIndex: 'md5', span: 2 },
     { title: '客户端IP', dataIndex: 'clientIp' },
@@ -70,33 +72,39 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
       span: 2,
       hideInDescriptions: !record?.errorMessage,
       render: (text) => (
-        <pre style={{ color: 'red', maxHeight: 200, overflow: 'auto' }}>{text}</pre>
+        <div style={{ color: '#ff4d4f', background: '#fff2f0', padding: '8px', borderRadius: '4px', border: '1px solid #ffccc7' }}>
+          {text as string}
+        </div>
       ),
     },
   ];
 
   return (
-    <ModalForm
-      title="文件上传记录详情"
-      trigger={children}
-      submitter={{
-        render: (_, doms) => [
-          <Button key="close" onClick={() => (doms[0] as any).props.onCancel?.()}>
+    <>
+      {children &&
+        React.cloneElement(children, {
+          onClick: () => setVisible(true),
+        })}
+      <Modal
+        title="文件上传记录详情"
+        open={visible}
+        onCancel={() => setVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setVisible(false)}>
             关闭
           </Button>,
-        ],
-      }}
-      width={800}
-      modalProps={{
-        destroyOnClose: true,
-      }}
-    >
-      <ProDescriptions<API.FileUploadRecordVO>
-        column={2}
-        dataSource={record}
-        columns={columns || defaultColumns}
-      />
-    </ModalForm>
+        ]}
+        width={800}
+        destroyOnClose
+      >
+        <ProDescriptions<API.FileUploadRecordVO>
+          column={2}
+          dataSource={record}
+          columns={columns || defaultColumns}
+          labelStyle={{ fontWeight: 'bold' }}
+        />
+      </Modal>
+    </>
   );
 };
 

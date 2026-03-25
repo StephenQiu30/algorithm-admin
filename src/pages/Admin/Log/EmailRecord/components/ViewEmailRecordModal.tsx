@@ -38,7 +38,7 @@ const ViewEmailRecordModal: React.FC<Props> = (props) => {
     { title: '发送渠道', dataIndex: 'provider' },
     { title: '发送时间', dataIndex: 'sendTime', valueType: 'dateTime' },
     { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
-    { title: '更新时间', dataIndex: 'updateTime', valueType: 'dateTime' },
+    { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
     {
       title: '邮件内容',
       dataIndex: 'content',

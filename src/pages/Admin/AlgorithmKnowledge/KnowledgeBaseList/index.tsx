@@ -5,9 +5,9 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
-import { Button, message, Popconfirm, Space, Typography, Avatar, Badge } from 'antd';
+import { Button, message, Popconfirm, Space, Typography, Avatar, Badge, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
   deleteKnowledgeBase,
@@ -15,7 +15,6 @@ import {
 } from '@/services/ai/knowledgeBaseController';
 import CreateKnowledgeModal from './components/CreateKnowledgeModal';
 import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
-
 
 /**
  * 算法知识管理 (AI 知识库)
@@ -56,15 +55,10 @@ const AlgorithmKnowledgeList: React.FC = () => {
    */
   const columns: ProColumns<API.KnowledgeBaseVO>[] = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      valueType: 'text',
-      hideInForm: true,
-      hideInTable: true,
-      hideInSearch: true,
-      copyable: true,
-      ellipsis: true,
-      width: 60,
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'indexBorder',
+      width: 48,
     },
     {
       title: '知识库名称',
@@ -72,12 +66,16 @@ const AlgorithmKnowledgeList: React.FC = () => {
       valueType: 'text',
       ellipsis: true,
       copyable: true,
+      formItemProps: {
+        rules: [{ required: true, message: '知识库名称为必填项' }],
+      },
     },
     {
       title: '描述',
       dataIndex: 'description',
       valueType: 'textarea',
       ellipsis: true,
+      hideInSearch: true,
     },
     {
       title: '创建者',
@@ -95,59 +93,53 @@ const AlgorithmKnowledgeList: React.FC = () => {
       ),
     },
     {
-      title: '文档数',
+      title: '文档数量',
       dataIndex: 'documentCount',
       valueType: 'digit',
       hideInSearch: true,
-      hideInTable: true,
       sorter: true,
       align: 'center',
       width: 100,
       render: (count) => (
-        <Badge
-          count={count}
-          showZero
-          color={Number(count) > 0 ? '#1677ff' : '#d9d9d9'}
-        />
+        <Tag color={Number(count) > 0 ? 'blue' : 'default'} style={{ borderRadius: '10px', padding: '0 10px' }}>
+          {count}
+        </Tag>
       ),
     },
-
     {
       title: '创建时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
       hideInForm: true,
       sorter: true,
-      width: 150,
+      width: 180,
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 240,
+      width: 280,
+      fixed: 'right',
       render: (_, record) => (
-        <Space size="middle" wrap>
+        <Space size="middle">
           <Typography.Link
             key="manage"
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               history.push(`/admin/algorithm/knowledge/document/${record.id}`);
             }}
           >
-            <FileTextOutlined /> 管理文档
+            <FileTextOutlined /> 管理
           </Typography.Link>
           <Typography.Link
             key="analysis"
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               history.push(`/admin/algorithm/knowledge/recall-analysis/${record.id}`);
             }}
           >
-            <SearchOutlined /> 召回分析
+            <SearchOutlined /> 召回
           </Typography.Link>
           <Typography.Link
             key="update"
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
             onClick={() => {
               setCurrentRow(record);
               setUpdateModalVisible(true);
@@ -162,11 +154,7 @@ const AlgorithmKnowledgeList: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Typography.Link
-              key="delete"
-              type="danger"
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            >
+            <Typography.Link key="delete" type="danger">
               <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
@@ -176,21 +164,19 @@ const AlgorithmKnowledgeList: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: '算法知识管理',
+        breadcrumb: {},
+      }}
+    >
       <ProTable<API.KnowledgeBaseVO, API.KnowledgeBaseQueryRequest>
-        headerTitle={
-          <Space>
-            <FileTextOutlined /> 知识库列表
-          </Space>
-        }
+        headerTitle="知识库列表"
         actionRef={actionRef}
         rowKey="id"
-        size="middle"
         search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
-          searchText: '查询',
-          resetText: '重置',
         }}
         toolBarRender={() => [
           <Button
@@ -221,6 +207,10 @@ const AlgorithmKnowledgeList: React.FC = () => {
         }}
         columns={columns}
         scroll={{ x: 'max-content' }}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+        }}
       />
       <CreateKnowledgeModal
         visible={createModalVisible}
@@ -243,8 +233,7 @@ const AlgorithmKnowledgeList: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-
-    </>
+    </PageContainer>
   );
 };
 
