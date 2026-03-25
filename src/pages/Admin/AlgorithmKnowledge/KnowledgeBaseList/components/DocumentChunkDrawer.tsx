@@ -2,6 +2,32 @@ import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Drawer, Tag, Typography, Tooltip, Space } from 'antd';
 import React, { useRef, useState } from 'react';
 import { listChunkVoByPage, searchChunks } from '@/services/ai/chunkController';
+import { createStyles } from 'antd-style';
+
+const useStyles = createStyles(({ token }) => ({
+  chunkCard: {
+    padding: '16px',
+    background: '#f8f9fb',
+    border: '1px solid #eef0f2',
+    borderRadius: '12px',
+    position: 'relative',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      borderColor: token.colorPrimary,
+      background: '#fff',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+    },
+  },
+  chunkIndex: {
+    fontSize: '11px',
+    fontWeight: 600,
+    color: token.colorTextSecondary,
+    background: '#f0f2f5',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    border: 'none',
+  }
+}));
 
 interface Props {
   documentId?: any;
@@ -14,6 +40,7 @@ interface Props {
  */
 const DocumentChunkDrawer: React.FC<Props> = (props) => {
   const { documentId, visible, onClose } = props;
+  const { styles } = useStyles();
   const actionRef = useRef<ActionType>();
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
@@ -23,38 +50,39 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
   const renderScore = (score: any) => {
     if (score === undefined || score === null) return '-';
     
-    // 强制转换为数字以防后端返回字符串
     const numScore = Number(score);
     if (isNaN(numScore)) return score;
 
-    const isSmall = numScore < 0.1;
-    const tag = (
-      <Tag 
-        color={isSmall ? 'purple' : 'orange'} 
-        style={{ margin: 0, borderRadius: '4px' }}
-      >
-        {isSmall ? '融合' : '分数'}: {numScore.toFixed(4)}
-      </Tag>
-    );
-
-    return isSmall ? (
-      <Tooltip title="分值通常代表该结果是通过 RRF (Reciprocal Rank Fusion) 算法计算出的融合排名分，分值越小越靠前。">
-        {tag}
+    const isRRF = numScore < 0.1;
+    return (
+      <Tooltip title={isRRF ? "RRF (Reciprocal Rank Fusion) 融合排名分，值越小越靠前" : "检索相似度得分"}>
+        <Tag 
+          color={isRRF ? 'purple' : 'orange'} 
+          style={{ 
+            margin: 0, 
+            borderRadius: '4px', 
+            fontWeight: 600,
+            border: 'none',
+            padding: '0 8px'
+          }}
+        >
+          {isRRF ? 'RRF' : 'Score'}: {numScore.toFixed(4)}
+        </Tag>
       </Tooltip>
-    ) : tag;
+    );
   };
 
   const columns: ProColumns<API.ChunkVO>[] = [
     {
-      title: '分片索引',
+      title: '排序',
       dataIndex: 'chunkIndex',
-      width: 100,
+      width: 90,
       align: 'center',
       hideInSearch: true,
       render: (text) => (
-        <Tag color="processing" style={{ border: 'none', borderRadius: '4px' }}>
+        <span className={styles.chunkIndex}>
           #{text}
-        </Tag>
+        </span>
       ),
     },
     {
@@ -67,9 +95,9 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       },
     },
     {
-      title: '检索得分',
+      title: '相关度分',
       dataIndex: 'score',
-      width: 120,
+      width: 140,
       align: 'center',
       hideInSearch: true,
       hideInTable: !isSearching,
@@ -81,23 +109,14 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       width: 80,
       align: 'center',
       hideInSearch: true,
-      render: (count) => <Typography.Text type="secondary">{count}</Typography.Text>,
+      render: (count) => <Typography.Text type="secondary" style={{ fontSize: '13px' }}>{count}</Typography.Text>,
     },
     {
       title: '分片内容',
       dataIndex: 'content',
       hideInSearch: true,
       render: (text) => (
-        <div style={{ 
-          padding: '16px', 
-          background: '#f8f9fb', 
-          border: '1px solid #eef0f2',
-          borderRadius: '8px',
-          position: 'relative',
-          transition: 'all 0.3s'
-        }}
-        className="chunk-content-wrapper"
-        >
+        <div className={styles.chunkCard}>
           <Typography.Paragraph 
             ellipsis={{ rows: 3, expandable: true, symbol: '展开全文' }} 
             style={{ 
@@ -117,19 +136,19 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
               position: 'absolute', 
               right: 12, 
               top: 16,
-              color: 'rgba(0, 0, 0, 0.45)' 
+              color: 'rgba(0, 0, 0, 0.25)' 
             }} 
           />
         </div>
       ),
     },
     {
-      title: '创建时间',
+      title: '保存日期',
       dataIndex: 'createTime',
       valueType: 'dateTime',
-      width: 180,
+      width: 170,
       hideInSearch: true,
-      render: (dom) => <Typography.Text type="secondary" style={{ fontSize: '13px' }}>{dom}</Typography.Text>,
+      render: (dom) => <Typography.Text type="secondary" style={{ fontSize: '12px' }}>{dom}</Typography.Text>,
     },
   ];
 
@@ -200,13 +219,6 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
         }}
         ghost
       />
-      <style>{`
-        .chunk-content-wrapper:hover {
-          border-color: #1677ff !important;
-          background: #fff !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-      `}</style>
     </Drawer>
   );
 };

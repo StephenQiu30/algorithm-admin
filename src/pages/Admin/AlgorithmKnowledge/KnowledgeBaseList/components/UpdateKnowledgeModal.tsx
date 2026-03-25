@@ -69,14 +69,14 @@ const UpdateKnowledgeModal: React.FC<Props> = (props) => {
     >
       <ProFormText
         name="name"
-        label="知识库名称"
+        label="知识库名称 (Name)"
         rules={[{ required: true, message: '请输入知识库名称' }]}
-        placeholder="请输入知识库名称"
+        placeholder="例如：高性能计算算法库"
       />
       <ProFormTextArea
         name="description"
-        label="描述"
-        placeholder="请输入描述"
+        label="知识库描述 (Description)"
+        placeholder="简要描述该知识库的应用领域或包含的文档类型"
       />
     </ModalForm>
   );

@@ -76,13 +76,17 @@ const RecallAnalysis: React.FC = () => {
         style={{
           margin: 0,
           borderRadius: '4px',
-          fontWeight: 500,
+          fontWeight: 600,
           border: 'none',
-          padding: '0 6px',
-          fontSize: '12px'
+          padding: '0 8px',
+          fontSize: '12px',
+          height: '24px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)'
         }}
       >
-        <span style={{ opacity: 0.7, fontSize: '10px', marginRight: 4 }}>{label}</span>
+        <span style={{ opacity: 0.8, fontSize: '10px', marginRight: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
         {Number(score).toFixed(4)}
       </Tag>
     );
@@ -106,20 +110,24 @@ const RecallAnalysis: React.FC = () => {
       dataIndex: 'content',
       render: (text) => (
         <div style={{
-          padding: '12px 16px',
-          background: '#fcfcfc',
-          border: '1px solid #f0f2f5',
+          padding: '16px',
+          background: '#f8f9fb',
+          border: '1px solid #eef0f2',
           borderRadius: '8px',
-          position: 'relative'
-        }}>
+          position: 'relative',
+          transition: 'all 0.3s'
+        }}
+          className="recall-chunk-content"
+        >
           <Typography.Paragraph
             ellipsis={{ rows: 3, expandable: true, symbol: '展开全文' }}
             style={{
               margin: 0,
               fontSize: '14px',
-              lineHeight: '1.7',
+              lineHeight: '1.8',
               color: 'rgba(0, 0, 0, 0.85)',
-              paddingRight: '24px'
+              paddingRight: '32px',
+              whiteSpace: 'pre-wrap'
             }}
           >
             {text as string}
@@ -128,8 +136,8 @@ const RecallAnalysis: React.FC = () => {
             copyable={{ text: text as string }}
             style={{
               position: 'absolute',
-              right: 8,
-              top: 12,
+              right: 12,
+              top: 16,
               color: 'rgba(0, 0, 0, 0.25)'
             }}
           />
@@ -137,63 +145,63 @@ const RecallAnalysis: React.FC = () => {
       ),
     },
     {
-      title: '评价指标 (Scores)',
+      title: '评分明细 (Scoring)',
       dataIndex: 'score',
-      width: 180,
+      width: 220,
       render: (_, record) => (
-        <Space direction="vertical" size={4} style={{ display: 'flex' }}>
+        <Space direction="vertical" size={6} style={{ display: 'flex' }}>
           {type === 'final' ? (
             <>
-              {renderScoreTag(record.score, 'FINAL', record.matchReason?.includes('rerank') ? 'magenta' : 'orange', '综合检索最终得分')}
-              <Space size={4} wrap>
-                {renderScoreTag(record.vectorScore, 'VEC', 'cyan')}
-                {renderScoreTag(record.keywordScore, 'KWD', 'geekblue')}
-              </Space>
-              {renderScoreTag(record.fusionScore, 'RRF', 'purple', 'RRF 融合分')}
+              {renderScoreTag(record.score, 'Final', record.matchReason?.includes('rerank') ? '#eb2f96' : '#fa8c16', '最终权重综合评分')}
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {renderScoreTag(record.vectorScore, 'Vec', '#13c2c2')}
+                {renderScoreTag(record.keywordScore, 'Kwd', '#2f54eb')}
+              </div>
+              {renderScoreTag(record.fusionScore, 'RRF', '#722ed1', 'Reciprocal Rank Fusion 融合排名分')}
             </>
           ) : (
             <>
-              {type === 'vector' && renderScoreTag(record.vectorScore, 'VECTOR', 'cyan')}
-              {type === 'keyword' && renderScoreTag(record.keywordScore, 'BM25', 'geekblue')}
-              {type === 'fused' && renderScoreTag(record.fusionScore, 'FUSED', 'purple')}
+              {type === 'vector' && renderScoreTag(record.vectorScore, 'Vector', '#13c2c2')}
+              {type === 'keyword' && renderScoreTag(record.keywordScore, 'BM25', '#2f54eb')}
+              {type === 'fused' && renderScoreTag(record.fusionScore, 'Fused', '#722ed1')}
             </>
           )}
         </Space>
       ),
     },
     {
-      title: '来源元数据',
+      title: '来源文档',
       dataIndex: 'documentName',
-      width: 260,
+      width: 240,
       render: (text, record) => (
-        <Space direction="vertical" size={6} style={{ width: '100%' }}>
+        <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <Tooltip title={text || '未知文档'}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 4,
+              gap: 6,
               maxWidth: '100%',
-              background: '#f5f5f5',
-              padding: '2px 8px',
-              borderRadius: '4px'
+              background: '#f0f5ff',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              border: '1px solid #d6e4ff'
             }}>
-              <FileSearchOutlined style={{ color: '#1677ff', fontSize: 12 }} />
-              <Typography.Text ellipsis style={{ color: 'inherit', fontSize: '12px', flex: 1 }}>
+              <FileSearchOutlined style={{ color: '#2f54eb', fontSize: 13 }} />
+              <Typography.Text ellipsis style={{ color: '#1d39c4', fontSize: '13px', fontWeight: 500, flex: 1 }}>
                 {text || '-'}
               </Typography.Text>
             </div>
           </Tooltip>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11px', color: '#8c8c8c' }}>
-              Chunk #{record.chunkIndex ?? '?'}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Tag color="default" style={{ margin: 0, borderRadius: '4px', fontSize: '11px' }}>
+              Index #{record.chunkIndex ?? '?'}
+            </Tag>
             {record.matchReason && (
               <Tag
-                size="small"
-                color={record.matchReason.includes('vector') ? 'cyan' : record.matchReason.includes('keyword') ? 'blue' : 'processing'}
-                style={{ margin: 0, fontSize: '10px', height: '18px', lineHeight: '16px' }}
+                color={record.matchReason.includes('vector') ? 'cyan' : record.matchReason.includes('keyword') ? 'blue' : 'gold'}
+                style={{ margin: 0, borderRadius: '4px', fontSize: '11px', textTransform: 'uppercase' }}
               >
-                {record.matchReason.toUpperCase()}
+                {record.matchReason}
               </Tag>
             )}
           </div>
@@ -205,8 +213,8 @@ const RecallAnalysis: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: `召回分析：${knowledgeBase?.name || '加载中...'}`,
-        breadcrumb: {},
+        title: '召回分析',
+        subTitle: knowledgeBase?.name,
         onBack: () => history.back(),
         extra: [
           <Button

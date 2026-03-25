@@ -39,41 +39,52 @@ const ViewRagHistoryModal: React.FC<Props> = (props) => {
         column={2}
         dataSource={record}
         columns={[
-          { title: '记录 ID', dataIndex: 'id' },
-          { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
-          { title: '用户 ID', dataIndex: 'userId' },
-          { title: '知识库 ID', dataIndex: 'knowledgeBaseId' },
+          { title: '记录 ID', dataIndex: 'id', copyable: true },
+          { title: '完成时间', dataIndex: 'createTime', valueType: 'dateTime' },
+          { title: '知识库', dataIndex: 'knowledgeBaseId', render: (id) => <Tag color="blue">K-BASE #{id}</Tag> },
           { 
             title: '响应耗时', 
             dataIndex: 'responseTime',
-            render: (v) => <Tag color={Number(v) > 1000 ? 'orange' : 'green'}>{v}ms</Tag>
+            render: (v) => {
+              const t = Number(v);
+              const color = t > 1500 ? (t > 3500 ? '#ff4d4f' : '#faad14') : '#52c41a';
+              return <Typography.Text style={{ color, fontWeight: 700 }}>{v}ms</Typography.Text>;
+            }
           },
         ]}
       />
 
-      <Divider />
+      <Divider style={{ margin: '16px 0' }} />
 
-      <ProDescriptions
-        column={1}
-        dataSource={record}
-        title="问答内容"
-        columns={[
-          { 
-            title: '提问', 
-            dataIndex: 'question',
-          },
-          { 
-            title: '回答', 
-            dataIndex: 'answer',
-            render: (v) => <Typography.Paragraph style={{ marginBottom: 0 }}>{v as string}</Typography.Paragraph>
-          },
-        ]}
-      />
+      <div style={{ marginBottom: 24 }}>
+        <Typography.Title level={5} style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 16, background: '#1677ff', borderRadius: 2 }} />
+          提问 (Question)
+        </Typography.Title>
+        <div style={{ padding: '12px 16px', background: '#f5f5f5', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+          <Typography.Text style={{ lineHeight: '1.8', fontSize: '14px', fontWeight: 500 }}>
+            {record.question}
+          </Typography.Text>
+        </div>
+      </div>
 
-      <Divider />
+      <div style={{ marginBottom: 24 }}>
+        <Typography.Title level={5} style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 16, background: '#52c41a', borderRadius: 2 }} />
+          回答 (Answer)
+        </Typography.Title>
+        <div style={{ padding: '16px', background: '#f6ffed', borderRadius: '12px', border: '1px solid #b7eb8f' }}>
+          <Typography.Paragraph style={{ margin: 0, lineHeight: '1.8', fontSize: '14px', whiteSpace: 'pre-wrap' }}>
+            {record.answer}
+          </Typography.Paragraph>
+        </div>
+      </div>
 
-      <Typography.Title level={5} style={{ marginBottom: 16 }}>
-        引用向量源 ({record.sources?.length || 0})
+      <Divider style={{ margin: '24px 0 16px' }} />
+
+      <Typography.Title level={5} style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>引用向量源 (Sources)</span>
+        <Tag color="processing">{record.sources?.length || 0} 个召回分片</Tag>
       </Typography.Title>
       
       <ProTable<API.RetrievalHitVO>
@@ -83,21 +94,39 @@ const ViewRagHistoryModal: React.FC<Props> = (props) => {
         toolBarRender={false}
         size="small"
         rowKey={(r, i) => `${r.id}-${i}`}
+        bordered
         columns={[
+          {
+            title: '排序',
+            valueType: 'indexBorder',
+            width: 48,
+          },
           {
             title: '得分',
             dataIndex: 'score',
-            width: 80,
-            render: (v) => <Tag color="blue">{Number(v).toFixed(4)}</Tag>
-          },
-          { title: '文档名称', dataIndex: 'documentName', ellipsis: true },
-          { title: '分片', dataIndex: 'chunkIndex', width: 60 },
-          { 
-            title: '召回内容', 
-            dataIndex: 'content',
-            ellipsis: true,
+            width: 100,
             render: (v) => (
-              <Typography.Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '展开' }} style={{ margin: 0 }}>
+              <Tag color="cyan" style={{ margin: 0, fontWeight: 600, border: 'none' }}>
+                SCORE: {Number(v).toFixed(4)}
+              </Tag>
+            )
+          },
+          { 
+            title: '文档名称', 
+            dataIndex: 'documentName', 
+            ellipsis: true, 
+            render: (text) => (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Typography.Text ellipsis style={{ maxWidth: 180, fontSize: '13px' }}>{text as string}</Typography.Text>
+              </div>
+            )
+          },
+          { title: '索引', dataIndex: 'chunkIndex', width: 70, align: 'center', render: (v) => <Tag style={{ margin: 0 }}>#{v}</Tag> },
+          { 
+            title: '召回内容预览', 
+            dataIndex: 'content',
+            render: (v) => (
+              <Typography.Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '详情' }} style={{ margin: 0, fontSize: '12px', color: '#666' }}>
                 {v as string}
               </Typography.Paragraph>
             )

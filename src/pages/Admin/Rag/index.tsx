@@ -1,8 +1,7 @@
-import { EyeOutlined } from '@ant-design/icons';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Space, Tag, Typography } from 'antd';
+import { Space, Tag, Typography, Badge } from 'antd';
 import React, { useRef, useState } from 'react';
-import { listHistoryByPage } from '@/services/ai/ragController';
+import { listRagHistoryVoByPage } from '@/services/ai/ragController';
 import ViewRagHistoryModal from './components/ViewRagHistoryModal';
 
 /**
@@ -19,59 +18,82 @@ const Rag: React.FC = () => {
    */
   const columns: ProColumns<API.RAGHistoryVO>[] = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'index',
-      width: 64,
-    },
-    {
       title: '问题',
       dataIndex: 'question',
       valueType: 'textarea',
-      width: 200,
+      width: 280,
       render: (text) => (
-        <Typography.Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}>
-          {text as string}
-        </Typography.Paragraph>
+        <div style={{ padding: '8px 0' }}>
+          <Typography.Paragraph 
+            ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}
+            style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', fontWeight: 500 }}
+          >
+            {text as string}
+          </Typography.Paragraph>
+        </div>
       ),
     },
     {
       title: '答案',
       dataIndex: 'answer',
       valueType: 'textarea',
-      width: 300,
+      width: 400,
       render: (text) => (
-        <Typography.Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}>
-          {text as string}
-        </Typography.Paragraph>
+        <div style={{ 
+          padding: '12px', 
+          background: '#f8f9fb', 
+          border: '1px solid #eef0f2', 
+          borderRadius: '8px' 
+        }}>
+          <Typography.Paragraph 
+            ellipsis={{ rows: 2, expandable: true, symbol: '展开全文' }}
+            style={{ margin: 0, fontSize: '13px', color: 'rgba(0, 0, 0, 0.65)', lineHeight: '1.7' }}
+          >
+            {text as string}
+          </Typography.Paragraph>
+        </div>
       ),
     },
     {
-      title: '用户 ID',
-      dataIndex: 'userId',
-      valueType: 'text',
-      copyable: true,
-      width: 120,
-    },
-    {
-      title: '知识库 ID',
-      dataIndex: 'knowledgeBaseId',
-      valueType: 'text',
-      copyable: true,
-      width: 120,
-    },
-    {
-      title: '响应时间',
+      title: '响应耗时',
       dataIndex: 'responseTime',
-      width: 100,
+      width: 120,
+      align: 'center',
       hideInSearch: true,
+      sorter: true,
       render: (time) => {
-        const t = time as number;
-        let color = 'green';
-        if (t > 1000) color = 'orange';
-        if (t > 3000) color = 'red';
-        return <Tag color={color}>{t}ms</Tag>;
+        const t = Number(time);
+        let status: any = 'success';
+        let color = '#52c41a';
+        if (t > 1500) {
+          status = 'warning';
+          color = '#faad14';
+        }
+        if (t > 3500) {
+          status = 'error';
+          color = '#ff4d4f';
+        }
+        return (
+          <Space size={4}>
+            <Badge status={status} />
+            <Typography.Text style={{ color, fontWeight: 600, fontSize: '13px' }}>
+              {t}ms
+            </Typography.Text>
+          </Space>
+        );
       },
+    },
+    {
+      title: '引用源',
+      dataIndex: 'sources',
+      width: 100,
+      align: 'center',
+      hideInSearch: true,
+      render: (_, record) => (
+        <Tag color="blue" style={{ borderRadius: '10px', border: 'none', padding: '0 10px' }}>
+          {record.sources?.length || 0} 个
+        </Tag>
+      ),
     },
     {
       title: '创建时间',
@@ -80,23 +102,29 @@ const Rag: React.FC = () => {
       hideInForm: true,
       sorter: true,
       width: 160,
+      render: (dom) => (
+        <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+          {dom}
+        </Typography.Text>
+      ),
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 100,
+      width: 90,
+      fixed: 'right',
       render: (_, record) => (
         <Space size="middle">
           <Typography.Link
             key="view"
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            style={{ fontWeight: 500 }}
             onClick={() => {
               setCurrentRow(record);
               setViewVisible(true);
             }}
           >
-            <EyeOutlined /> 详情
+            详情
           </Typography.Link>
         </Space>
       ),
@@ -106,15 +134,18 @@ const Rag: React.FC = () => {
   return (
     <>
       <ProTable<API.RAGHistoryVO, API.RAGHistoryQueryRequest>
-        headerTitle="RAG 对话记录"
+        headerTitle="AI 对话历史分析"
         actionRef={actionRef}
         rowKey="id"
-        search={{ labelWidth: 100 }}
+        search={{ 
+          labelWidth: 'auto',
+          defaultCollapsed: false,
+        }}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
 
-          const { data, code } = await listHistoryByPage({
+          const { data, code } = await listRagHistoryVoByPage({
             ...params,
             ...filter,
             sortField,
@@ -129,6 +160,12 @@ const Rag: React.FC = () => {
         }}
         columns={columns}
         scroll={{ x: 'max-content' }}
+        options={{
+          density: true,
+          fullScreen: true,
+          reload: true,
+          setting: true,
+        }}
       />
       <ViewRagHistoryModal
         record={currentRow}

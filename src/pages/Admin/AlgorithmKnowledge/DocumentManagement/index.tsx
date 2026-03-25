@@ -135,9 +135,17 @@ const DocumentManagement: React.FC = () => {
       align: 'center',
       width: 100,
       render: (count) => (
-        <Tag color={Number(count) > 0 ? 'processing' : 'default'} style={{ borderRadius: '10px' }}>
-          {count}
-        </Tag>
+        <Badge
+          count={count}
+          showZero
+          color={Number(count) > 0 ? '#1677ff' : '#d9d9d9'}
+          style={{ 
+            backgroundColor: Number(count) > 0 ? '#e6f4ff' : '#f5f5f5', 
+            color: Number(count) > 0 ? '#1677ff' : '#8c8c8c',
+            boxShadow: 'none',
+            border: `1px solid ${Number(count) > 0 ? '#91caff' : '#d9d9d9'}`
+          }}
+        />
       ),
     },
     {
@@ -147,6 +155,10 @@ const DocumentManagement: React.FC = () => {
       valueEnum: DocumentParseStatusEnumMap,
       width: 120,
       sorter: true,
+      render: (_, record) => {
+        const statusInfo = DocumentParseStatusEnumMap[record.status as keyof typeof DocumentParseStatusEnumMap];
+        return <Badge status={statusInfo?.status as any} text={statusInfo?.text} />;
+      }
     },
     {
       title: '上传时间',
@@ -155,6 +167,11 @@ const DocumentManagement: React.FC = () => {
       hideInSearch: true,
       width: 180,
       sorter: true,
+      render: (dom) => (
+        <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+          {dom}
+        </Typography.Text>
+      ),
     },
     {
       title: '操作',
