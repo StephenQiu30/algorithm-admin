@@ -1,5 +1,6 @@
 import { ModalForm, ProFormUploadDragger } from '@ant-design/pro-components';
-import { message } from 'antd';
+import { Alert, message } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
 import React from 'react';
 import { addDocument as uploadDocument } from '@/services/ai/documentController';
 
@@ -20,11 +21,19 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
 
   return (
     <ModalForm
-      title="上传文档"
+      title="上传知识库文档"
       open={visible}
+      width={520}
       modalProps={{
         destroyOnClose: true,
         onCancel: () => onCancel?.(),
+        maskClosable: false,
+      }}
+      submitter={{
+        searchConfig: {
+          submitText: '开始上传',
+          resetText: '关闭',
+        }
       }}
       onFinish={async (values: any) => {
         if (!knowledgeBaseId) {
@@ -36,18 +45,18 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
           message.error('请选择文件');
           return false;
         }
-        const hide = message.loading('正在上传...');
+        const hide = message.loading('正在解析并上传至向量库...', 0);
         try {
-          // 注意：addDocument 在 OpenAPI 中定义为 JSON POST，但如果是文件上传，
-          // 通常后端支持 Multipart 或者我们需要调整请求
-          // 这里我们遵循 API 定义，如果后端确实是 /doc/add 且接受文件，通常是通过 params 传递 knowledgeBaseId
           const res = await uploadDocument(
             { knowledgeBaseId },
             {},
             file
           );
           if (res.code === 0) {
-            message.success('上传成功');
+            message.success({ 
+                content: '文档上传成功，系统正在后台进行自动分片与索引',
+                duration: 4
+            });
             onSubmit?.();
             return true;
           } else {
@@ -61,14 +70,26 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
         return false;
       }}
     >
+      <Alert
+        message="温馨提示"
+        description="分片与索引过程可能耗时，视文档大小而定。完成后可在文档管理中查看解析状态。"
+        type="info"
+        showIcon
+        style={{ marginBottom: 24 }}
+      />
       <ProFormUploadDragger
-        label="文档文件"
+        label="文档文件 (Document File)"
         name="file"
         rules={[{ required: true, message: '请选择文件' }]}
         max={1}
-        description="支持单次上传一个文件，仅限 PDF、Markdown、Text、Word 等格式"
+        icon={<InboxOutlined style={{ color: '#1677ff' }} />}
+        description={
+            <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginTop: 8 }}>
+                支持 PDF, MD, TXT, DOCX 等常见格式。单文件上限建议 20MB。
+            </div>
+        }
         fieldProps={{
-          beforeUpload: () => false, // 阻止自动上传
+          beforeUpload: () => false,
           accept: '.pdf,.md,.txt,.docx,.doc',
         }}
       />

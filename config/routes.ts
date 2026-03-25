@@ -36,6 +36,13 @@ export default [
     access: 'canAdmin',
   },
   {
+    name: '知识检索',
+    path: '/admin/algorithm/knowledge/retrieval/:id',
+    component: './Admin/AlgorithmKnowledge/KnowledgeRetrieval',
+    hideInMenu: true,
+    access: 'canAdmin',
+  },
+  {
     name: 'AI 对话记录',
     path: '/admin/ai/record',
     component: './Admin/Rag',

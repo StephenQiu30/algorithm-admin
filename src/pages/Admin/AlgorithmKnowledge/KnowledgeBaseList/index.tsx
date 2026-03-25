@@ -4,17 +4,21 @@ import {
   FileTextOutlined,
   PlusOutlined,
   SearchOutlined,
+  DownOutlined,
+  ReloadOutlined,
+  BarChartOutlined,
+  DashboardOutlined,
 } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
-import { Button, message, Popconfirm, Space, Typography, Avatar, Badge, Tag } from 'antd';
+import { Button, message, Space, Typography, Avatar, Tag, Dropdown, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
   deleteKnowledgeBase,
   listMyKnowledgeBaseVoByPage,
 } from '@/services/ai/knowledgeBaseController';
-import CreateKnowledgeModal from './components/CreateKnowledgeModal';
-import UpdateKnowledgeModal from './components/UpdateKnowledgeModal';
+import CreateKnowledgeModal from '@/pages/Admin/AlgorithmKnowledge/KnowledgeBaseList/components/CreateKnowledgeModal';
+import UpdateKnowledgeModal from '@/pages/Admin/AlgorithmKnowledge/KnowledgeBaseList/components/UpdateKnowledgeModal';
 
 /**
  * 算法知识管理 (AI 知识库)
@@ -85,10 +89,16 @@ const AlgorithmKnowledgeList: React.FC = () => {
       width: 150,
       render: (_, record) => (
         <Space>
-          <Avatar src={record.userVO?.userAvatar} size="small">
+          <Avatar
+            src={record.userVO?.userAvatar}
+            size="small"
+            style={{ backgroundColor: '#1677ff', verticalAlign: 'middle' }}
+          >
             {record.userVO?.userName?.charAt(0).toUpperCase()}
           </Avatar>
-          <Typography.Text ellipsis>{record.userVO?.userName || '未知'}</Typography.Text>
+          <Typography.Text ellipsis style={{ maxWidth: 100 }}>
+            {record.userVO?.userName || '未知'}
+          </Typography.Text>
         </Space>
       ),
     },
@@ -97,12 +107,13 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'documentCount',
       valueType: 'digit',
       hideInSearch: true,
+      hideInTable: true,
       sorter: true,
       align: 'center',
       width: 100,
       render: (count) => (
-        <Tag color={Number(count) > 0 ? 'blue' : 'default'} style={{ borderRadius: '10px', padding: '0 10px' }}>
-          {count}
+        <Tag color={Number(count) > 0 ? 'processing' : 'default'} style={{ borderRadius: 10, padding: '0 10px' }}>
+          {count || 0}
         </Tag>
       ),
     },
@@ -111,14 +122,20 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'createTime',
       valueType: 'dateTime',
       hideInForm: true,
+      hideInTable: true,
       sorter: true,
       width: 180,
+      render: (dom) => (
+        <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+          {dom}
+        </Typography.Text>
+      ),
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 280,
+      width: 300,
       fixed: 'right',
       render: (_, record) => (
         <Space size="middle">
@@ -131,33 +148,59 @@ const AlgorithmKnowledgeList: React.FC = () => {
             <FileTextOutlined /> 管理
           </Typography.Link>
           <Typography.Link
+            key="retrieval"
+            onClick={() => {
+              history.push(`/admin/algorithm/knowledge/retrieval/${record.id}`);
+            }}
+          >
+            <SearchOutlined /> 检索
+          </Typography.Link>
+          <Typography.Link
             key="analysis"
             onClick={() => {
               history.push(`/admin/algorithm/knowledge/recall-analysis/${record.id}`);
             }}
           >
-            <SearchOutlined /> 召回
+            <BarChartOutlined /> 召回分析
           </Typography.Link>
-          <Typography.Link
-            key="update"
-            onClick={() => {
-              setCurrentRow(record);
-              setUpdateModalVisible(true);
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: 'update',
+                  label: '编辑信息',
+                  icon: <EditOutlined />,
+                  onClick: () => {
+                    setCurrentRow(record);
+                    setUpdateModalVisible(true);
+                  },
+                },
+                {
+                  type: 'divider',
+                },
+                {
+                  key: 'delete',
+                  label: '删除库',
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                  onClick: () => {
+                    Modal.confirm({
+                      title: '确认删除该知识库？',
+                      content: '删除后，关联的文档和分片也将一并删除，该操作不可恢复。',
+                      okText: '确认',
+                      cancelText: '取消',
+                      okButtonProps: { danger: true },
+                      onOk: () => handleDelete(record),
+                    });
+                  },
+                },
+              ],
             }}
           >
-            <EditOutlined /> 编辑
-          </Typography.Link>
-          <Popconfirm
-            title="确定删除此知识库吗？"
-            description="删除后，关联的文档和分片也将一并删除，且无法恢复。"
-            onConfirm={() => handleDelete(record)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Typography.Link key="delete" type="danger">
-              <DeleteOutlined /> 删除
+            <Typography.Link>
+              更多 <DownOutlined />
             </Typography.Link>
-          </Popconfirm>
+          </Dropdown>
         </Space>
       ),
     },
@@ -180,12 +223,20 @@ const AlgorithmKnowledgeList: React.FC = () => {
         }}
         toolBarRender={() => [
           <Button
+            key="refresh"
+            icon={<ReloadOutlined />}
+            onClick={() => actionRef.current?.reload()}
+          >
+            刷新
+          </Button>,
+          <Button
             key="create"
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setCreateModalVisible(true)}
+            style={{ borderRadius: 6 }}
           >
-            新建
+            新建库
           </Button>,
         ]}
         request={async (params, sort, filter) => {
