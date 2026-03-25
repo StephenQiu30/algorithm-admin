@@ -15,7 +15,7 @@ export async function askStream(body: API.RAGAskRequest, options?: { [key: strin
 }
 
 /** 分页获取RAG历史 POST /ai/rag/history/list/page/vo */
-export async function listHistoryByPage(
+export async function listRagHistoryVoByPage(
   body: API.RAGHistoryQueryRequest,
   options?: { [key: string]: any },
 ) {

@@ -17,6 +17,21 @@ export async function getChunkVoById(
   });
 }
 
+/** 分页查询文档分片（管理员） POST /ai/chunk/list/page */
+export async function listChunkByPage(
+  body: API.ChunkQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageDocumentChunk>('/ai/chunk/list/page', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 分页查询文档分片 POST /ai/chunk/list/page/vo */
 export async function listChunkVoByPage(
   body: API.ChunkQueryRequest,
