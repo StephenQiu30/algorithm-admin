@@ -70,6 +70,21 @@ export async function getDocumentVoById(
   });
 }
 
+/** 分页获取文档（管理员） POST /ai/doc/list/page */
+export async function listDocumentByPage(
+  body: API.DocumentQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageDocument>('/ai/doc/list/page', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 分页获取文档 POST /ai/doc/list/page/vo */
 export async function listDocumentVoByPage(
   body: API.DocumentQueryRequest,

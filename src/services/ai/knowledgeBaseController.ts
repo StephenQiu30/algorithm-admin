@@ -62,6 +62,21 @@ export async function getKnowledgeBaseVoById(
   });
 }
 
+/** 分页获取知识库（管理员） POST /ai/kb/list/page */
+export async function listKnowledgeBaseByPage(
+  body: API.KnowledgeBaseQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageKnowledgeBase>('/ai/kb/list/page', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 分页获取知识库 POST /ai/kb/list/page/vo */
 export async function listKnowledgeBaseVoByPage(
   body: API.KnowledgeBaseQueryRequest,
