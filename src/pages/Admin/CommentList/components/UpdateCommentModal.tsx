@@ -52,7 +52,11 @@ const UpdateCommentModal: React.FC<Props> = (props) => {
         },
       }}
     >
-      <ProForm.Item name="content" label="评论内容" rules={[{ required: true, message: '请输入评论内容' }]}>
+      <ProForm.Item
+        name="content"
+        label="评论内容"
+        rules={[{ required: true, message: '请输入评论内容' }]}
+      >
         <MarkdownEditor />
       </ProForm.Item>
     </ModalForm>

@@ -1,4 +1,4 @@
-import { Modal, Button, Typography } from 'antd';
+import { Button, Modal, Typography } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { LoginStatusEnumMap } from '@/enums/LoginStatusEnum';
@@ -40,7 +40,7 @@ const ViewUserLoginLogModal: React.FC<Props> = (props) => {
           ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}
           style={{ background: '#f5f5f5', padding: '8px', borderRadius: '4px', margin: 0 }}
         >
-          {text as string || '-'}
+          {(text as string) || '-'}
         </Typography.Paragraph>
       ),
     },

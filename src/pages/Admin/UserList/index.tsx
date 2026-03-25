@@ -1,20 +1,13 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
 import { deleteUser, listUserByPage } from '@/services/user/userController';
 import { batchUpsertUser } from '@/services/search/searchController';
-import { Avatar, Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SyncOutlined,
-} from '@ant-design/icons';
+import { Avatar, Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, } from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
 import { userRole } from '@/enums/UserRoleEnum';
 import CreateUserModal from '@/pages/Admin/UserList/components/CreateUserModal';
 import UpdateUserModal from '@/pages/Admin/UserList/components/UpdateUserModal';
 import ViewUserModal from '@/pages/Admin/UserList/components/ViewUserModal';
-
 
 /**
  * 用户管理列表
@@ -239,7 +232,6 @@ const UserList: React.FC = () => {
             新建
           </Button>,
         ]}
-
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
@@ -257,8 +249,6 @@ const UserList: React.FC = () => {
             total: Number(data?.total) || 0,
           };
         }}
-
-
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => setSelectedRows(selectedRows),
@@ -289,7 +279,6 @@ const UserList: React.FC = () => {
           </Space>
         </FooterToolbar>
       )}
-
 
       <CreateUserModal
         visible={createModalVisible}

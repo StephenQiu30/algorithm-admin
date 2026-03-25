@@ -1,12 +1,12 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
 import {
+  CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   LikeOutlined,
   PlusOutlined,
   StarOutlined,
-  CheckCircleOutlined,
 } from '@ant-design/icons';
 import { TAG_EMPTY } from '@/constants';
 import { deletePost, listPostByPage } from '@/services/post/postController';
@@ -90,10 +90,13 @@ const PostList: React.FC = () => {
     const hide = message.loading('正在同步到 ES');
     try {
       const res = await batchUpsertPost(
-        selectedRows.map((row) => ({
-          ...row,
-          tags: typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : row.tags,
-        }) as API.PostEsDTO),
+        selectedRows.map(
+          (row) =>
+            ({
+              ...row,
+              tags: typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : row.tags,
+            } as API.PostEsDTO),
+        ),
       );
       if (res.code === 0) {
         message.success('同步到 ES 成功');
@@ -299,7 +302,6 @@ const PostList: React.FC = () => {
             新建
           </Button>,
         ]}
-
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
@@ -307,7 +309,11 @@ const PostList: React.FC = () => {
           const { data, code } = await listPostByPage({
             ...params,
             ...filter,
-            tags: params.tags ? (Array.isArray(params.tags) ? params.tags : [params.tags]) : undefined,
+            tags: params.tags
+              ? Array.isArray(params.tags)
+                ? params.tags
+                : [params.tags]
+              : undefined,
             sortField,
             sortOrder,
           } as API.PostQueryRequest);
@@ -318,8 +324,6 @@ const PostList: React.FC = () => {
             total: Number(data?.total) || 0,
           };
         }}
-
-
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => setSelectedRows(selectedRows),
@@ -353,7 +357,6 @@ const PostList: React.FC = () => {
           </Space>
         </FooterToolbar>
       )}
-
 
       <CreatePostModal
         visible={createModalVisible}

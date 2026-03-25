@@ -32,6 +32,4 @@ const MarkdownEditor: React.FC<Props> = (props) => {
   );
 };
 
-
-
 export default MarkdownEditor;

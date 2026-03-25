@@ -1,20 +1,12 @@
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Typography, Avatar, Tag, Tooltip } from 'antd';
-import React, { useRef, useState, useEffect } from 'react';
-import { useParams, history } from '@umijs/max';
-import {
-  deleteDocument,
-  listDocumentVoByPage,
-} from '@/services/ai/documentController';
+import { Badge, Button, message, Popconfirm, Space, Tooltip, Typography } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { history, useParams } from '@umijs/max';
+import { deleteDocument, listDocumentVoByPage } from '@/services/ai/documentController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
 import UploadDocumentModal from '../KnowledgeBaseList/components/UploadDocumentModal';
 import { DocumentParseStatusEnumMap } from '@/enums/DocumentParseStatusEnum';
-import {
-  CloudUploadOutlined,
-  DeleteOutlined,
-  FileSearchOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
+import { CloudUploadOutlined, DeleteOutlined, FileSearchOutlined, InfoCircleOutlined, } from '@ant-design/icons';
 import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
 
 /**
@@ -139,11 +131,11 @@ const DocumentManagement: React.FC = () => {
           count={count}
           showZero
           color={Number(count) > 0 ? '#1677ff' : '#d9d9d9'}
-          style={{ 
-            backgroundColor: Number(count) > 0 ? '#e6f4ff' : '#f5f5f5', 
+          style={{
+            backgroundColor: Number(count) > 0 ? '#e6f4ff' : '#f5f5f5',
             color: Number(count) > 0 ? '#1677ff' : '#8c8c8c',
             boxShadow: 'none',
-            border: `1px solid ${Number(count) > 0 ? '#91caff' : '#d9d9d9'}`
+            border: `1px solid ${Number(count) > 0 ? '#91caff' : '#d9d9d9'}`,
           }}
         />
       ),
@@ -156,9 +148,10 @@ const DocumentManagement: React.FC = () => {
       width: 120,
       sorter: true,
       render: (_, record) => {
-        const statusInfo = DocumentParseStatusEnumMap[record.status as keyof typeof DocumentParseStatusEnumMap];
+        const statusInfo =
+          DocumentParseStatusEnumMap[record.status as keyof typeof DocumentParseStatusEnumMap];
         return <Badge status={statusInfo?.status as any} text={statusInfo?.text} />;
-      }
+      },
     },
     {
       title: '上传时间',
@@ -213,8 +206,8 @@ const DocumentManagement: React.FC = () => {
         extra: [
           <Tooltip key="tip" title="文档上传后将自动进入异步解析过程，解析完成后可进行召回分析">
             <InfoCircleOutlined style={{ color: 'rgba(0,0,0,0.45)', cursor: 'help' }} />
-          </Tooltip>
-        ]
+          </Tooltip>,
+        ],
       }}
     >
       <ProTable<API.DocumentVO, API.DocumentQueryRequest>
@@ -276,8 +269,8 @@ const DocumentManagement: React.FC = () => {
         columns={columns}
         scroll={{ x: 'max-content' }}
         pagination={{
-            defaultPageSize: 10,
-            showSizeChanger: true,
+          defaultPageSize: 10,
+          showSizeChanger: true,
         }}
       />
 

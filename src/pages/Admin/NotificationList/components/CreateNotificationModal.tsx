@@ -54,7 +54,11 @@ const CreateNotificationModal: React.FC<Props> = (props) => {
         placeholder="请输入跨系统广播的标题"
         rules={[{ required: true, message: '请输入标题' }]}
       />
-      <ProForm.Item name="content" label="通知内容" rules={[{ required: true, message: '请输入内容' }]}>
+      <ProForm.Item
+        name="content"
+        label="通知内容"
+        rules={[{ required: true, message: '请输入内容' }]}
+      >
         <MarkdownEditor />
       </ProForm.Item>
     </ModalForm>

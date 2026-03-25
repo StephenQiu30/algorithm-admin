@@ -1,10 +1,5 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
@@ -73,7 +68,6 @@ const NotificationList: React.FC = () => {
       hide();
     }
   };
-
 
   /**
    * 表格列定义

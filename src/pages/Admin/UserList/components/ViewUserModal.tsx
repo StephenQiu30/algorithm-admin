@@ -1,4 +1,4 @@
-import { Modal, Button, Avatar } from 'antd';
+import { Avatar, Button, Modal } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { userRole } from '@/enums/UserRoleEnum';

@@ -6,7 +6,6 @@
 import Footer from './Footer';
 import { AvatarDropdown, AvatarName } from './RightContent/AvatarDropdown';
 
-
 import { UserCard } from '@/components/ReUser';
 import { ActionTabbar, PostAvatarCard, PostCard, PostTitleCard } from '@/components/RePost';
 import { MarkdownEditor, MarkdownViewer } from './Markdown';
@@ -16,7 +15,6 @@ export {
   AvatarDropdown,
   AvatarName,
   PostCard,
-
   ActionTabbar,
   UserCard,
   PostAvatarCard,

@@ -1,5 +1,5 @@
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import { Button, Image, Modal, Tag, Typography } from 'antd';
+import { Button, Image, Modal } from 'antd';
 import React, { useState } from 'react';
 import { FileUploadStatusEnumMap } from '@/enums/FileUploadStatusEnum';
 
@@ -43,7 +43,12 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
       span: 2,
       render: (url) =>
         url ? (
-          <a href={url as string} target="_blank" rel="noreferrer" style={{ wordBreak: 'break-all' }}>
+          <a
+            href={url as string}
+            target="_blank"
+            rel="noreferrer"
+            style={{ wordBreak: 'break-all' }}
+          >
             {url as string}
           </a>
         ) : (
@@ -72,7 +77,15 @@ const ViewFileUploadRecordModal: React.FC<Props> = (props) => {
       span: 2,
       hideInDescriptions: !record?.errorMessage,
       render: (text) => (
-        <div style={{ color: '#ff4d4f', background: '#fff2f0', padding: '8px', borderRadius: '4px', border: '1px solid #ffccc7' }}>
+        <div
+          style={{
+            color: '#ff4d4f',
+            background: '#fff2f0',
+            padding: '8px',
+            borderRadius: '4px',
+            border: '1px solid #ffccc7',
+          }}
+        >
           {text as string}
         </div>
       ),

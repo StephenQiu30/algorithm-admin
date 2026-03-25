@@ -33,7 +33,7 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
         searchConfig: {
           submitText: '开始上传',
           resetText: '关闭',
-        }
+        },
       }}
       onFinish={async (values: any) => {
         if (!knowledgeBaseId) {
@@ -47,15 +47,11 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
         }
         const hide = message.loading('正在解析并上传至向量库...', 0);
         try {
-          const res = await uploadDocument(
-            { knowledgeBaseId },
-            {},
-            file
-          );
+          const res = await uploadDocument({ knowledgeBaseId }, {}, file);
           if (res.code === 0) {
-            message.success({ 
-                content: '文档上传成功，系统正在后台进行自动分片与索引',
-                duration: 4
+            message.success({
+              content: '文档上传成功，系统正在后台进行自动分片与索引',
+              duration: 4,
             });
             onSubmit?.();
             return true;
@@ -84,9 +80,9 @@ const UploadDocumentModal: React.FC<Props> = (props) => {
         max={1}
         icon={<InboxOutlined style={{ color: '#1677ff' }} />}
         description={
-            <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginTop: 8 }}>
-                支持 PDF, MD, TXT, DOCX 等常见格式。单文件上限建议 20MB。
-            </div>
+          <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginTop: 8 }}>
+            支持 PDF, MD, TXT, DOCX 等常见格式。单文件上限建议 20MB。
+          </div>
         }
         fieldProps={{
           beforeUpload: () => false,

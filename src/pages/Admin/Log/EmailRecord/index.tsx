@@ -82,9 +82,7 @@ const EmailRecord: React.FC = () => {
       dataIndex: 'retryCount',
       width: 60,
       hideInSearch: true,
-      render: (count) => (
-        <Tag color={Number(count) > 0 ? 'warning' : 'default'}>{count}</Tag>
-      ),
+      render: (count) => <Tag color={Number(count) > 0 ? 'warning' : 'default'}>{count}</Tag>,
     },
     { title: '发送渠道', dataIndex: 'provider', width: 100, hideInSearch: true },
     {

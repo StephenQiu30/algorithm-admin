@@ -1,6 +1,6 @@
-import { Modal, Button, Space, Tag } from 'antd';
+import { Button, Modal, Space, Tag } from 'antd';
 import React, { useState } from 'react';
-import { ProDescriptions, ProDescriptionsItemProps, ProCard } from '@ant-design/pro-components';
+import { ProCard, ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { MarkdownViewer } from '@/components';
 import { reviewStatus } from '@/enums/ReviewStatusEnum';
 

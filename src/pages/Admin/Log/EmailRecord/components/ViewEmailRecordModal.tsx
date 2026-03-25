@@ -1,5 +1,5 @@
 import { ModalForm, ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import { Tag, Button } from 'antd';
+import { Button, Tag } from 'antd';
 import React from 'react';
 import { EmailStatusEnumMap } from '@/enums/EmailStatusEnum';
 

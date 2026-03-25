@@ -1,9 +1,4 @@
-import {
-  ModalForm,
-  ProForm,
-  ProFormSelect,
-  ProFormText,
-} from '@ant-design/pro-components';
+import { ModalForm, ProForm, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { MarkdownEditor } from '@/components';
 import React from 'react';
 import { updateNotification } from '@/services/notification/notificationController';
@@ -71,7 +66,11 @@ const UpdateNotificationModal: React.FC<Props> = (props) => {
         placeholder="请输入通知标题"
         rules={[{ required: true, message: '请输入标题' }]}
       />
-      <ProForm.Item name="content" label="通知内容" rules={[{ required: true, message: '请输入内容' }]}>
+      <ProForm.Item
+        name="content"
+        label="通知内容"
+        rules={[{ required: true, message: '请输入内容' }]}
+      >
         <MarkdownEditor />
       </ProForm.Item>
       <ProFormSelect

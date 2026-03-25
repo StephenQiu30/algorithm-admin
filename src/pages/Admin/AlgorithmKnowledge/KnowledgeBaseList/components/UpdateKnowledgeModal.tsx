@@ -1,11 +1,6 @@
 import { message } from 'antd';
 import React from 'react';
-import {
-  ModalForm,
-  ProForm,
-  ProFormText,
-  ProFormTextArea,
-} from '@ant-design/pro-components';
+import { ModalForm, ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { updateKnowledgeBase } from '@/services/ai/knowledgeBaseController';
 
 interface Props {

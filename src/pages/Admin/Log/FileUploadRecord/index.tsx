@@ -1,11 +1,8 @@
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Typography, Image, Tag } from 'antd';
+import { Button, Image, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import {
-  deleteFileUploadRecord,
-  listRecordByPage,
-} from '@/services/log/fileUploadRecordController';
+import { deleteFileUploadRecord, listRecordByPage, } from '@/services/log/fileUploadRecordController';
 import { FileUploadStatusEnumMap } from '@/enums/FileUploadStatusEnum';
 import ViewFileUploadRecordModal from './components/ViewFileUploadRecordModal';
 import { FileUploadBiz } from '@/enums/FileUploadBizEnum';
@@ -69,11 +66,11 @@ const FileUploadRecord: React.FC = () => {
         const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url as string);
         if (isImage) {
           return (
-            <Image 
-              src={url as string} 
-              width={40} 
-              height={40} 
-              style={{ objectFit: 'cover', borderRadius: 4 }} 
+            <Image
+              src={url as string}
+              width={40}
+              height={40}
+              style={{ objectFit: 'cover', borderRadius: 4 }}
               preview={{ mask: <EyeOutlined /> }}
             />
           );
@@ -128,7 +125,12 @@ const FileUploadRecord: React.FC = () => {
       dataIndex: 'fileSuffix',
       width: 80,
       hideInSearch: true,
-      render: (suffix) => suffix && <Tag color="blue" style={{ border: 'none' }}>{suffix as string}</Tag>,
+      render: (suffix) =>
+        suffix && (
+          <Tag color="blue" style={{ border: 'none' }}>
+            {suffix as string}
+          </Tag>
+        ),
     },
     {
       title: '状态',

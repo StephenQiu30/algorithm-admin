@@ -1,5 +1,5 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Drawer, Tag, Typography, Tooltip, Space } from 'antd';
+import { Drawer, Space, Tag, Tooltip, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { listChunkVoByPage, searchChunks } from '@/services/ai/chunkController';
 import { createStyles } from 'antd-style';
@@ -26,7 +26,7 @@ const useStyles = createStyles(({ token }) => ({
     padding: '2px 8px',
     borderRadius: '4px',
     border: 'none',
-  }
+  },
 }));
 
 interface Props {
@@ -49,21 +49,23 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
    */
   const renderScore = (score: any) => {
     if (score === undefined || score === null) return '-';
-    
+
     const numScore = Number(score);
     if (isNaN(numScore)) return score;
 
     const isRRF = numScore < 0.1;
     return (
-      <Tooltip title={isRRF ? "RRF (Reciprocal Rank Fusion) 融合排名分，值越小越靠前" : "检索相似度得分"}>
-        <Tag 
-          color={isRRF ? 'purple' : 'orange'} 
-          style={{ 
-            margin: 0, 
-            borderRadius: '4px', 
+      <Tooltip
+        title={isRRF ? 'RRF (Reciprocal Rank Fusion) 融合排名分，值越小越靠前' : '检索相似度得分'}
+      >
+        <Tag
+          color={isRRF ? 'purple' : 'orange'}
+          style={{
+            margin: 0,
+            borderRadius: '4px',
             fontWeight: 600,
             border: 'none',
-            padding: '0 8px'
+            padding: '0 8px',
           }}
         >
           {isRRF ? 'RRF' : 'Score'}: {numScore.toFixed(4)}
@@ -79,11 +81,7 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       width: 90,
       align: 'center',
       hideInSearch: true,
-      render: (text) => (
-        <span className={styles.chunkIndex}>
-          #{text}
-        </span>
-      ),
+      render: (text) => <span className={styles.chunkIndex}>#{text}</span>,
     },
     {
       title: '内容检索',
@@ -109,7 +107,11 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       width: 80,
       align: 'center',
       hideInSearch: true,
-      render: (count) => <Typography.Text type="secondary" style={{ fontSize: '13px' }}>{count}</Typography.Text>,
+      render: (count) => (
+        <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+          {count}
+        </Typography.Text>
+      ),
     },
     {
       title: '分片内容',
@@ -117,27 +119,27 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       hideInSearch: true,
       render: (text) => (
         <div className={styles.chunkCard}>
-          <Typography.Paragraph 
-            ellipsis={{ rows: 3, expandable: true, symbol: '展开全文' }} 
-            style={{ 
+          <Typography.Paragraph
+            ellipsis={{ rows: 3, expandable: true, symbol: '展开全文' }}
+            style={{
               margin: 0,
               fontSize: '14px',
               lineHeight: '1.8',
               paddingRight: '32px',
               color: 'rgba(0, 0, 0, 0.85)',
-              whiteSpace: 'pre-wrap'
+              whiteSpace: 'pre-wrap',
             }}
           >
             {text as string}
           </Typography.Paragraph>
-          <Typography.Link 
-            copyable={{ text: text as string }} 
-            style={{ 
-              position: 'absolute', 
-              right: 12, 
+          <Typography.Link
+            copyable={{ text: text as string }}
+            style={{
+              position: 'absolute',
+              right: 12,
               top: 16,
-              color: 'rgba(0, 0, 0, 0.25)' 
-            }} 
+              color: 'rgba(0, 0, 0, 0.25)',
+            }}
           />
         </div>
       ),
@@ -148,7 +150,11 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
       valueType: 'dateTime',
       width: 170,
       hideInSearch: true,
-      render: (dom) => <Typography.Text type="secondary" style={{ fontSize: '12px' }}>{dom}</Typography.Text>,
+      render: (dom) => (
+        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+          {dom}
+        </Typography.Text>
+      ),
     },
   ];
 
@@ -178,7 +184,7 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
         }}
         request={async (params) => {
           if (!documentId) return { success: false };
-          
+
           const { query } = params;
           if (query) {
             setIsSearching(true);
@@ -193,7 +199,7 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
               total: data?.length || 0,
             };
           }
-          
+
           setIsSearching(false);
           const { data, code } = await listChunkVoByPage({
             ...params,
@@ -207,9 +213,9 @@ const DocumentChunkDrawer: React.FC<Props> = (props) => {
         }}
         columns={columns}
         pagination={{
-            defaultPageSize: 10,
-            showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 个分片`,
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total) => `共 ${total} 个分片`,
         }}
         options={{
           density: true,

@@ -1,5 +1,5 @@
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import { Button, Tag, Modal, Typography } from 'antd';
+import { Button, Modal, Tag, Typography } from 'antd';
 import React, { useState } from 'react';
 
 interface Props {
@@ -17,10 +17,10 @@ const ViewApiAccessLogModal: React.FC<Props> = (props) => {
 
   const defaultColumns: ProDescriptionsItemProps<API.ApiAccessLogVO>[] = [
     { title: '请求接口', dataIndex: 'path', span: 2, copyable: true },
-    { 
-      title: '请求方法', 
-      dataIndex: 'method', 
-      render: (text) => text && <Tag color="processing">{String(text).toUpperCase()}</Tag> 
+    {
+      title: '请求方法',
+      dataIndex: 'method',
+      render: (text) => text && <Tag color="processing">{String(text).toUpperCase()}</Tag>,
     },
     { title: '用户ID', dataIndex: 'userId' },
     {
@@ -32,7 +32,7 @@ const ViewApiAccessLogModal: React.FC<Props> = (props) => {
           ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
           style={{ background: '#f5f5f5', padding: '8px', borderRadius: '4px', margin: 0 }}
         >
-          {text as string || '-'}
+          {(text as string) || '-'}
         </Typography.Paragraph>
       ),
     },
@@ -45,7 +45,7 @@ const ViewApiAccessLogModal: React.FC<Props> = (props) => {
           ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
           style={{ background: '#f5f5f5', padding: '8px', borderRadius: '4px', margin: 0 }}
         >
-          {text as string || '-'}
+          {(text as string) || '-'}
         </Typography.Paragraph>
       ),
     },
@@ -58,7 +58,7 @@ const ViewApiAccessLogModal: React.FC<Props> = (props) => {
           ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
           style={{ background: '#f5f5f5', padding: '8px', borderRadius: '4px', margin: 0 }}
         >
-          {text as string || '-'}
+          {(text as string) || '-'}
         </Typography.Paragraph>
       ),
     },
@@ -66,7 +66,9 @@ const ViewApiAccessLogModal: React.FC<Props> = (props) => {
       title: '响应状态码',
       dataIndex: 'status',
       render: (status) => (
-        <Tag color={Number(status) >= 200 && Number(status) < 300 ? 'success' : 'error'}>{status as string}</Tag>
+        <Tag color={Number(status) >= 200 && Number(status) < 300 ? 'success' : 'error'}>
+          {status as string}
+        </Tag>
       ),
     },
     {

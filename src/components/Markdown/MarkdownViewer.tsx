@@ -22,5 +22,4 @@ const MarkdownViewer: React.FC<Props> = (props) => {
   );
 };
 
-
 export default MarkdownViewer;
