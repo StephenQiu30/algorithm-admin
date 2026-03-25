@@ -6,8 +6,8 @@ import {
   MailOutlined,
   PhoneOutlined,
   ProfileOutlined,
-  UserOutlined,
   SettingOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { userRole, UserRoleEnum } from '@/enums/UserRoleEnum';
 import BasicSettings from './components/BasicSettings';

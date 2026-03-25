@@ -1,4 +1,4 @@
-import { Modal, Tag, Button, Typography } from 'antd';
+import { Button, Modal, Tag, Typography } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { OperationStatusEnumMap } from '@/enums/OperationStatusEnum';
@@ -34,7 +34,7 @@ const ViewOperationLogModal: React.FC<Props> = (props) => {
           ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
           style={{ background: '#f5f5f5', padding: '8px', borderRadius: '4px', margin: 0 }}
         >
-          {text as string || '-'}
+          {(text as string) || '-'}
         </Typography.Paragraph>
       ),
     },
@@ -53,7 +53,15 @@ const ViewOperationLogModal: React.FC<Props> = (props) => {
       span: 2,
       hideInDescriptions: !record?.errorMessage,
       render: (text) => (
-        <div style={{ color: '#ff4d4f', background: '#fff2f0', padding: '8px', borderRadius: '4px', border: '1px solid #ffccc7' }}>
+        <div
+          style={{
+            color: '#ff4d4f',
+            background: '#fff2f0',
+            padding: '8px',
+            borderRadius: '4px',
+            border: '1px solid #ffccc7',
+          }}
+        >
           {text as string}
         </div>
       ),

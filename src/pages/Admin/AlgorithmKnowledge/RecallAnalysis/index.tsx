@@ -1,26 +1,26 @@
 import {
-  FileSearchOutlined,
-  HistoryOutlined,
-  SearchOutlined,
-  InfoCircleOutlined,
-  RocketOutlined,
   DashboardOutlined,
   EyeOutlined,
+  FileSearchOutlined,
+  HistoryOutlined,
+  InfoCircleOutlined,
+  RocketOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  ProColumns,
   ProForm,
   ProFormDigit,
   ProFormSwitch,
   ProFormTextArea,
   ProTable,
-  ProColumns,
   StatisticCard,
 } from '@ant-design/pro-components';
-import { useParams, history } from '@umijs/max';
-import { Badge, message, Space, Tag, Typography, Button, Tooltip, Empty, Alert } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { history, useParams } from '@umijs/max';
+import { Alert, Badge, Button, Empty, message, Space, Tag, Tooltip, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { analyzeRecall } from '@/services/ai/ragController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
 
@@ -67,7 +67,12 @@ const RecallAnalysis: React.FC = () => {
   /**
    * 渲染检索得分
    */
-  const renderScoreTag = (score: number | undefined, label: string, color: string, tooltip?: string) => {
+  const renderScoreTag = (
+    score: number | undefined,
+    label: string,
+    color: string,
+    tooltip?: string,
+  ) => {
     if (score === undefined || score === null || score === 0) return null;
 
     const tag = (
@@ -83,10 +88,20 @@ const RecallAnalysis: React.FC = () => {
           height: '24px',
           display: 'inline-flex',
           alignItems: 'center',
-          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)'
+          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
         }}
       >
-        <span style={{ opacity: 0.8, fontSize: '10px', marginRight: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
+        <span
+          style={{
+            opacity: 0.8,
+            fontSize: '10px',
+            marginRight: 6,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}
+        >
+          {label}
+        </span>
         {Number(score).toFixed(4)}
       </Tag>
     );
@@ -95,10 +110,14 @@ const RecallAnalysis: React.FC = () => {
       <Tooltip title={tooltip} key={label}>
         <span style={{ cursor: 'help' }}>{tag}</span>
       </Tooltip>
-    ) : <span key={label}>{tag}</span>;
+    ) : (
+      <span key={label}>{tag}</span>
+    );
   };
 
-  const getColumns = (type?: 'vector' | 'keyword' | 'fused' | 'final'): ProColumns<API.RetrievalHitVO>[] => [
+  const getColumns = (
+    type?: 'vector' | 'keyword' | 'fused' | 'final',
+  ): ProColumns<API.RetrievalHitVO>[] => [
     {
       title: '排序',
       valueType: 'indexBorder',
@@ -109,14 +128,15 @@ const RecallAnalysis: React.FC = () => {
       title: '分片内容',
       dataIndex: 'content',
       render: (text) => (
-        <div style={{
-          padding: '16px',
-          background: '#f8f9fb',
-          border: '1px solid #eef0f2',
-          borderRadius: '8px',
-          position: 'relative',
-          transition: 'all 0.3s'
-        }}
+        <div
+          style={{
+            padding: '16px',
+            background: '#f8f9fb',
+            border: '1px solid #eef0f2',
+            borderRadius: '8px',
+            position: 'relative',
+            transition: 'all 0.3s',
+          }}
           className="recall-chunk-content"
         >
           <Typography.Paragraph
@@ -127,7 +147,7 @@ const RecallAnalysis: React.FC = () => {
               lineHeight: '1.8',
               color: 'rgba(0, 0, 0, 0.85)',
               paddingRight: '32px',
-              whiteSpace: 'pre-wrap'
+              whiteSpace: 'pre-wrap',
             }}
           >
             {text as string}
@@ -138,7 +158,7 @@ const RecallAnalysis: React.FC = () => {
               position: 'absolute',
               right: 12,
               top: 16,
-              color: 'rgba(0, 0, 0, 0.25)'
+              color: 'rgba(0, 0, 0, 0.25)',
             }}
           />
         </div>
@@ -152,12 +172,22 @@ const RecallAnalysis: React.FC = () => {
         <Space direction="vertical" size={6} style={{ display: 'flex' }}>
           {type === 'final' ? (
             <>
-              {renderScoreTag(record.score, 'Final', record.matchReason?.includes('rerank') ? '#eb2f96' : '#fa8c16', '最终权重综合评分')}
+              {renderScoreTag(
+                record.score,
+                'Final',
+                record.matchReason?.includes('rerank') ? '#eb2f96' : '#fa8c16',
+                '最终权重综合评分',
+              )}
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {renderScoreTag(record.vectorScore, 'Vec', '#13c2c2')}
                 {renderScoreTag(record.keywordScore, 'Kwd', '#2f54eb')}
               </div>
-              {renderScoreTag(record.fusionScore, 'RRF', '#722ed1', 'Reciprocal Rank Fusion 融合排名分')}
+              {renderScoreTag(
+                record.fusionScore,
+                'RRF',
+                '#722ed1',
+                'Reciprocal Rank Fusion 融合排名分',
+              )}
             </>
           ) : (
             <>
@@ -176,18 +206,23 @@ const RecallAnalysis: React.FC = () => {
       render: (text, record) => (
         <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <Tooltip title={text || '未知文档'}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              maxWidth: '100%',
-              background: '#f0f5ff',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              border: '1px solid #d6e4ff'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                maxWidth: '100%',
+                background: '#f0f5ff',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                border: '1px solid #d6e4ff',
+              }}
+            >
               <FileSearchOutlined style={{ color: '#2f54eb', fontSize: 13 }} />
-              <Typography.Text ellipsis style={{ color: '#1d39c4', fontSize: '13px', fontWeight: 500, flex: 1 }}>
+              <Typography.Text
+                ellipsis
+                style={{ color: '#1d39c4', fontSize: '13px', fontWeight: 500, flex: 1 }}
+              >
                 {text || '-'}
               </Typography.Text>
             </div>
@@ -198,8 +233,19 @@ const RecallAnalysis: React.FC = () => {
             </Tag>
             {record.matchReason && (
               <Tag
-                color={record.matchReason.includes('vector') ? 'cyan' : record.matchReason.includes('keyword') ? 'blue' : 'gold'}
-                style={{ margin: 0, borderRadius: '4px', fontSize: '11px', textTransform: 'uppercase' }}
+                color={
+                  record.matchReason.includes('vector')
+                    ? 'cyan'
+                    : record.matchReason.includes('keyword')
+                    ? 'blue'
+                    : 'gold'
+                }
+                style={{
+                  margin: 0,
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                }}
               >
                 {record.matchReason}
               </Tag>
@@ -231,8 +277,8 @@ const RecallAnalysis: React.FC = () => {
             onClick={() => history.push(`/admin/algorithm/knowledge/document/${knowledgeBaseId}`)}
           >
             管理
-          </Button>
-        ]
+          </Button>,
+        ],
       }}
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
@@ -243,7 +289,7 @@ const RecallAnalysis: React.FC = () => {
             layout="inline"
             submitter={{
               render: (_, dom) => <div style={{ marginLeft: 'auto' }}>{dom}</div>,
-              searchConfig: { submitText: '开始深度诊断' }
+              searchConfig: { submitText: '开始深度诊断' },
             }}
           >
             <ProFormTextArea
@@ -253,10 +299,17 @@ const RecallAnalysis: React.FC = () => {
               rules={[{ required: true }]}
               fieldProps={{
                 autoSize: { minRows: 1, maxRows: 3 },
-                style: { width: 400 }
+                style: { width: 400 },
               }}
             />
-            <ProFormDigit name="topK" label="TopK" initialValue={5} min={1} max={50} fieldProps={{ style: { width: 70 } }} />
+            <ProFormDigit
+              name="topK"
+              label="TopK"
+              initialValue={5}
+              min={1}
+              max={50}
+              fieldProps={{ style: { width: 70 } }}
+            />
             <ProFormDigit
               name="similarityThreshold"
               label="阈值"
@@ -275,7 +328,6 @@ const RecallAnalysis: React.FC = () => {
             <ProCard bordered loading />
           ) : analysisResult ? (
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-
               <ProCard.Group bordered>
                 <StatisticCard
                   statistic={{
@@ -340,7 +392,11 @@ const RecallAnalysis: React.FC = () => {
                       label: (
                         <Space>
                           <span>语义召回</span>
-                          <Badge count={analysisResult.vectorHits?.length || 0} color="#13c2c2" style={{ boxShadow: 'none' }} />
+                          <Badge
+                            count={analysisResult.vectorHits?.length || 0}
+                            color="#13c2c2"
+                            style={{ boxShadow: 'none' }}
+                          />
                         </Space>
                       ),
                       key: 'vector',
@@ -360,7 +416,11 @@ const RecallAnalysis: React.FC = () => {
                       label: (
                         <Space>
                           <span>关键词召回</span>
-                          <Badge count={analysisResult.keywordHits?.length || 0} color="#2f54eb" style={{ boxShadow: 'none' }} />
+                          <Badge
+                            count={analysisResult.keywordHits?.length || 0}
+                            color="#2f54eb"
+                            style={{ boxShadow: 'none' }}
+                          />
                         </Space>
                       ),
                       key: 'keyword',
@@ -391,7 +451,9 @@ const RecallAnalysis: React.FC = () => {
                   description={
                     <div style={{ marginTop: 4 }}>
                       原始查询已通过 NLP 优化为：
-                      <Typography.Text code style={{ marginLeft: 8 }}>{analysisResult.rewriteQuery}</Typography.Text>
+                      <Typography.Text code style={{ marginLeft: 8 }}>
+                        {analysisResult.rewriteQuery}
+                      </Typography.Text>
                     </div>
                   }
                   type="info"

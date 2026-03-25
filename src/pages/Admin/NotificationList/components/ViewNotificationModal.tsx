@@ -1,4 +1,4 @@
-import { Modal, Tag, Button, Space, Typography } from 'antd';
+import { Button, Modal, Space, Tag, Typography } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { NotificationTypeEnumMap } from '@/enums/NotificationTypeEnum';

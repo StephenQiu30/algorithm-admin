@@ -1,4 +1,4 @@
-import { Modal, Button, Avatar, Space, Typography } from 'antd';
+import { Avatar, Button, Modal, Space, Typography } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
 

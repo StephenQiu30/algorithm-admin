@@ -2,7 +2,7 @@ import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { listLogByPage, deleteOperationLog } from '@/services/log/operationLogController';
+import { deleteOperationLog, listLogByPage } from '@/services/log/operationLogController';
 import { OperationStatusEnumMap } from '@/enums/OperationStatusEnum';
 import ViewOperationLogModal from './components/ViewOperationLogModal';
 

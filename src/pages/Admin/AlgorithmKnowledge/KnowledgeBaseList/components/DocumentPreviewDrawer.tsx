@@ -26,11 +26,7 @@ const DocumentPreviewDrawer: React.FC<Props> = (props) => {
       destroyOnClose
     >
       <Empty
-        description={
-          <span>
-            文档内容预览功能正在开发中，敬请期待
-          </span>
-        }
+        description={<span>文档内容预览功能正在开发中，敬请期待</span>}
         style={{ marginTop: 100 }}
       />
     </Drawer>

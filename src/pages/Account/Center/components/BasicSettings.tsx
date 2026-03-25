@@ -1,6 +1,6 @@
 import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { Button, message, Upload, Avatar, Row, Col, type UploadProps } from 'antd';
+import { Avatar, Button, Col, message, Row, Upload, type UploadProps } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import React from 'react';
 import { createStyles } from 'antd-style';

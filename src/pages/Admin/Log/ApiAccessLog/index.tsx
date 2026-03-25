@@ -2,7 +2,7 @@ import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { listLogByPage2, deleteApiAccessLog } from '@/services/log/apiAccessLogController';
+import { deleteApiAccessLog, listLogByPage2 } from '@/services/log/apiAccessLogController';
 import { ApiAccessStatusEnumMap } from '@/enums/ApiAccessStatusEnum';
 import ViewApiAccessLogModal from './components/ViewApiAccessLogModal';
 
@@ -72,11 +72,7 @@ const ApiAccessLog: React.FC = () => {
           PUT: 'orange',
           DELETE: 'red',
         };
-        return (
-          <Tag color={colors[method as string] || 'default'}>
-            {method as string}
-          </Tag>
-        );
+        return <Tag color={colors[method as string] || 'default'}>{method as string}</Tag>;
       },
     },
     {

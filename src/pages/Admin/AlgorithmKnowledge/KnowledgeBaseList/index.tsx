@@ -1,22 +1,18 @@
 import {
+  BarChartOutlined,
   DeleteOutlined,
+  DownOutlined,
   EditOutlined,
   FileTextOutlined,
   PlusOutlined,
-  SearchOutlined,
-  DownOutlined,
   ReloadOutlined,
-  BarChartOutlined,
-  DashboardOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
-import { Button, message, Space, Typography, Avatar, Tag, Dropdown, Modal } from 'antd';
+import { Avatar, Button, Dropdown, message, Modal, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import {
-  deleteKnowledgeBase,
-  listMyKnowledgeBaseVoByPage,
-} from '@/services/ai/knowledgeBaseController';
+import { deleteKnowledgeBase, listMyKnowledgeBaseVoByPage, } from '@/services/ai/knowledgeBaseController';
 import CreateKnowledgeModal from '@/pages/Admin/AlgorithmKnowledge/KnowledgeBaseList/components/CreateKnowledgeModal';
 import UpdateKnowledgeModal from '@/pages/Admin/AlgorithmKnowledge/KnowledgeBaseList/components/UpdateKnowledgeModal';
 
@@ -112,7 +108,10 @@ const AlgorithmKnowledgeList: React.FC = () => {
       align: 'center',
       width: 100,
       render: (count) => (
-        <Tag color={Number(count) > 0 ? 'processing' : 'default'} style={{ borderRadius: 10, padding: '0 10px' }}>
+        <Tag
+          color={Number(count) > 0 ? 'processing' : 'default'}
+          style={{ borderRadius: 10, padding: '0 10px' }}
+        >
           {count || 0}
         </Tag>
       ),

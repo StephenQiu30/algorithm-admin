@@ -2,7 +2,7 @@ import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { listLogByPage1, deleteUserLoginLog } from '@/services/log/userLoginLogController';
+import { deleteUserLoginLog, listLogByPage1 } from '@/services/log/userLoginLogController';
 import { LoginStatusEnumMap } from '@/enums/LoginStatusEnum';
 import ViewUserLoginLogModal from './components/ViewUserLoginLogModal';
 

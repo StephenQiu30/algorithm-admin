@@ -1,22 +1,17 @@
 import {
   PageContainer,
-  ProList,
   ProCard,
   ProForm,
-  ProFormTextArea,
   ProFormDigit,
-  ProFormSwitch,
   ProFormRadio,
+  ProFormSwitch,
+  ProFormTextArea,
+  ProList,
 } from '@ant-design/pro-components';
-import { Empty, message, Space, Tag, Typography, Form, Button, Tooltip } from 'antd';
-import {
-  FileTextOutlined,
-  SearchOutlined,
-  RocketOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
-import { useParams, history } from '@umijs/max';
+import { Button, Empty, Form, message, Space, Tag, Tooltip, Typography } from 'antd';
+import { FileTextOutlined, InfoCircleOutlined, RocketOutlined, SearchOutlined, } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { history, useParams } from '@umijs/max';
 import { searchChunks } from '@/services/ai/chunkController';
 import { analyzeRecall } from '@/services/ai/ragController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
@@ -29,7 +24,7 @@ const KnowledgeRetrievalPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const knowledgeBaseId = id as any;
   const [form] = Form.useForm();
-  
+
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isDiagnose, setIsDiagnose] = useState<boolean>(false);
@@ -54,7 +49,7 @@ const KnowledgeRetrievalPage: React.FC = () => {
   const handleSearch = async (values: any) => {
     if (!knowledgeBaseId) return;
     const { query, topK, isDiagnose: diagnoseMode } = values;
-    
+
     setLoading(true);
     try {
       if (diagnoseMode) {
@@ -109,7 +104,9 @@ const KnowledgeRetrievalPage: React.FC = () => {
           fontSize: '11px',
         }}
       >
-        <span style={{ opacity: 0.8, fontSize: '9px', marginRight: 4, textTransform: 'uppercase' }}>{label}</span>
+        <span style={{ opacity: 0.8, fontSize: '9px', marginRight: 4, textTransform: 'uppercase' }}>
+          {label}
+        </span>
         {Number(score).toFixed(4)}
       </Tag>
     );
@@ -127,32 +124,38 @@ const KnowledgeRetrievalPage: React.FC = () => {
       metas={{
         title: {
           render: (_, item) => (
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between', 
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 width: '100%',
                 padding: '12px 16px',
                 background: '#fafafa',
                 borderRadius: '8px 8px 0 0',
                 border: '1px solid #f0f0f0',
-                borderBottom: 'none'
-            }}>
+                borderBottom: 'none',
+              }}
+            >
               <Space>
-                <div style={{ 
-                    width: 28, 
-                    height: 28, 
-                    background: '#e6f4ff', 
-                    borderRadius: '6px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                }}>
-                    <FileTextOutlined style={{ color: '#1677ff', fontSize: 14 }} />
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    background: '#e6f4ff',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <FileTextOutlined style={{ color: '#1677ff', fontSize: 14 }} />
                 </div>
-                <Typography.Text strong style={{ fontSize: '15px' }}>{item.documentName || '未知文档'}</Typography.Text>
+                <Typography.Text strong style={{ fontSize: '15px' }}>
+                  {item.documentName || '未知文档'}
+                </Typography.Text>
                 <Tag color="blue" style={{ borderRadius: '4px', margin: 0, fontSize: '11px' }}>
-                    Index #{item.chunkIndex ?? 0}
+                  Index #{item.chunkIndex ?? 0}
                 </Tag>
               </Space>
               <Space size={4}>
@@ -166,33 +169,35 @@ const KnowledgeRetrievalPage: React.FC = () => {
         },
         description: {
           render: (_, item) => (
-            <div style={{
-              padding: '24px',
-              background: '#fff',
-              border: '1px solid #f0f0f0',
-              borderRadius: '0 0 8px 8px',
-              marginBottom: 20,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
-              position: 'relative'
-            }}>
+            <div
+              style={{
+                padding: '24px',
+                background: '#fff',
+                border: '1px solid #f0f0f0',
+                borderRadius: '0 0 8px 8px',
+                marginBottom: 20,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+                position: 'relative',
+              }}
+            >
               <Typography.Paragraph
                 copyable={{ text: item.content }}
                 ellipsis={{ rows: 6, expandable: true, symbol: '展开全文' }}
-                style={{ 
-                  margin: 0, 
-                  fontSize: '14px', 
-                  lineHeight: '1.8', 
+                style={{
+                  margin: 0,
+                  fontSize: '14px',
+                  lineHeight: '1.8',
                   color: 'rgba(0, 0, 0, 0.85)',
-                  whiteSpace: 'pre-wrap' 
+                  whiteSpace: 'pre-wrap',
                 }}
               >
                 {item.content}
               </Typography.Paragraph>
               {item.matchReason && (
                 <div style={{ marginTop: 16 }}>
-                    <Tag color="orange" style={{ fontSize: '11px', borderRadius: '4px' }}>
-                        召回原因: {item.matchReason}
-                    </Tag>
+                  <Tag color="orange" style={{ fontSize: '11px', borderRadius: '4px' }}>
+                    召回原因: {item.matchReason}
+                  </Tag>
                 </div>
               )}
             </div>
@@ -204,7 +209,12 @@ const KnowledgeRetrievalPage: React.FC = () => {
         showSizeChanger: true,
       }}
       locale={{
-        emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无检索结果，请尝试调整检索词或 TopK" />,
+        emptyText: (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="暂无检索结果，请尝试调整检索词或 TopK"
+          />
+        ),
       }}
     />
   );
@@ -216,14 +226,16 @@ const KnowledgeRetrievalPage: React.FC = () => {
         subTitle: knowledgeBase?.name,
         onBack: () => history.back(),
         extra: [
-            <Button 
-                key="analysis" 
-                type="default" 
-                onClick={() => history.push(`/admin/algorithm/knowledge/recall-analysis/${knowledgeBaseId}`)}
-            >
-                召回诊断
-            </Button>
-        ]
+          <Button
+            key="analysis"
+            type="default"
+            onClick={() =>
+              history.push(`/admin/algorithm/knowledge/recall-analysis/${knowledgeBaseId}`)
+            }
+          >
+            召回诊断
+          </Button>,
+        ],
       }}
     >
       <ProCard ghost direction="column" gutter={[0, 24]}>
@@ -236,13 +248,13 @@ const KnowledgeRetrievalPage: React.FC = () => {
             submitter={{
               render: (_, dom) => <div style={{ marginLeft: 'auto' }}>{dom}</div>,
               searchConfig: { submitText: '执行检索' },
-              submitButtonProps: { 
-                icon: <SearchOutlined />, 
+              submitButtonProps: {
+                icon: <SearchOutlined />,
                 loading,
               },
               resetButtonProps: {
-                style: { marginLeft: 8 }
-              }
+                style: { marginLeft: 8 },
+              },
             }}
           >
             <ProFormTextArea
@@ -250,8 +262,8 @@ const KnowledgeRetrievalPage: React.FC = () => {
               label="检索内容"
               placeholder="输入问题或关键词..."
               rules={[{ required: true }]}
-              fieldProps={{ 
-                autoSize: { minRows: 1, maxRows: 4 }, 
+              fieldProps={{
+                autoSize: { minRows: 1, maxRows: 4 },
                 style: { width: 450 },
               }}
             />
@@ -271,7 +283,7 @@ const KnowledgeRetrievalPage: React.FC = () => {
                   setIsDiagnose(checked);
                   setResults([]);
                   setDiagnoseResults(undefined);
-                }
+                },
               }}
             />
             {isDiagnose && (
@@ -312,30 +324,36 @@ const KnowledgeRetrievalPage: React.FC = () => {
                 items: [
                   {
                     label: (
-                        <Space>
-                            向量召回
-                            <Tag style={{ borderRadius: 10 }}>{diagnoseResults?.vectorHits?.length || 0}</Tag>
-                        </Space>
+                      <Space>
+                        向量召回
+                        <Tag style={{ borderRadius: 10 }}>
+                          {diagnoseResults?.vectorHits?.length || 0}
+                        </Tag>
+                      </Space>
                     ),
                     key: 'vector',
                     children: renderResultList(diagnoseResults?.vectorHits || []),
                   },
                   {
                     label: (
-                        <Space>
-                            关键词召回
-                            <Tag style={{ borderRadius: 10 }}>{diagnoseResults?.keywordHits?.length || 0}</Tag>
-                        </Space>
+                      <Space>
+                        关键词召回
+                        <Tag style={{ borderRadius: 10 }}>
+                          {diagnoseResults?.keywordHits?.length || 0}
+                        </Tag>
+                      </Space>
                     ),
                     key: 'keyword',
                     children: renderResultList(diagnoseResults?.keywordHits || []),
                   },
                   {
                     label: (
-                        <Space>
-                            全链路融合
-                            <Tag color="orange" style={{ borderRadius: 10 }}>{diagnoseResults?.finalResults?.length || 0}</Tag>
-                        </Space>
+                      <Space>
+                        全链路融合
+                        <Tag color="orange" style={{ borderRadius: 10 }}>
+                          {diagnoseResults?.finalResults?.length || 0}
+                        </Tag>
+                      </Space>
                     ),
                     key: 'fused',
                     children: renderResultList(diagnoseResults?.finalResults || []),

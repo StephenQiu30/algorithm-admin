@@ -1,10 +1,6 @@
 import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-} from '@ant-design/icons';
-import { Avatar, Button, message, Popconfirm, Space, Typography, Tag } from 'antd';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { Avatar, Button, message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deletePostComment, listPostCommentByPage } from '@/services/post/postCommentController';
 import UpdateCommentModal from '@/pages/Admin/CommentList/components/UpdateCommentModal';

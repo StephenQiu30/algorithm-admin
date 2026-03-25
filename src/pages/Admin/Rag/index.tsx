@@ -1,5 +1,5 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Space, Tag, Typography, Badge } from 'antd';
+import { Badge, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { listRagHistoryVoByPage } from '@/services/ai/ragController';
 import ViewRagHistoryModal from './components/ViewRagHistoryModal';
@@ -24,7 +24,7 @@ const Rag: React.FC = () => {
       width: 280,
       render: (text) => (
         <div style={{ padding: '8px 0' }}>
-          <Typography.Paragraph 
+          <Typography.Paragraph
             ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}
             style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', fontWeight: 500 }}
           >
@@ -39,13 +39,15 @@ const Rag: React.FC = () => {
       valueType: 'textarea',
       width: 400,
       render: (text) => (
-        <div style={{ 
-          padding: '12px', 
-          background: '#f8f9fb', 
-          border: '1px solid #eef0f2', 
-          borderRadius: '8px' 
-        }}>
-          <Typography.Paragraph 
+        <div
+          style={{
+            padding: '12px',
+            background: '#f8f9fb',
+            border: '1px solid #eef0f2',
+            borderRadius: '8px',
+          }}
+        >
+          <Typography.Paragraph
             ellipsis={{ rows: 2, expandable: true, symbol: '展开全文' }}
             style={{ margin: 0, fontSize: '13px', color: 'rgba(0, 0, 0, 0.65)', lineHeight: '1.7' }}
           >
@@ -137,7 +139,7 @@ const Rag: React.FC = () => {
         headerTitle="AI 对话历史分析"
         actionRef={actionRef}
         rowKey="id"
-        search={{ 
+        search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
         }}
@@ -180,4 +182,3 @@ const Rag: React.FC = () => {
 };
 
 export default Rag;
-
