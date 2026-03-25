@@ -1,5 +1,5 @@
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Typography, Avatar } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Typography, Avatar, Tag, Tooltip } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
 import { useParams, history } from '@umijs/max';
 import {
@@ -8,13 +8,26 @@ import {
 } from '@/services/ai/documentController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
 import UploadDocumentModal from '../KnowledgeBaseList/components/UploadDocumentModal';
-import { DocumentParseStatusEnum, DocumentParseStatusEnumMap } from '@/enums/DocumentParseStatusEnum';
+import { DocumentParseStatusEnumMap } from '@/enums/DocumentParseStatusEnum';
 import {
   CloudUploadOutlined,
   DeleteOutlined,
   FileSearchOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
+
+/**
+ * 格式化文件大小
+ * @param size
+ */
+const formatFileSize = (size?: number) => {
+  if (!size) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(size) / Math.log(k));
+  return `${parseFloat((size / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
 
 /**
  * 文档管理页面
@@ -30,7 +43,6 @@ const DocumentManagement: React.FC = () => {
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
   const [chunkDrawerVisible, setChunkDrawerVisible] = useState<boolean>(false);
 
-
   /**
    * 获取知识库详情
    */
@@ -43,7 +55,6 @@ const DocumentManagement: React.FC = () => {
       });
     }
   }, [knowledgeBaseId]);
-
 
   /**
    * 删除文档
@@ -94,12 +105,10 @@ const DocumentManagement: React.FC = () => {
    */
   const columns: ProColumns<API.DocumentVO>[] = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      valueType: 'text',
-      hideInSearch: true,
-      hideInTable: true,
-      width: 60,
+      title: '序号',
+      dataIndex: 'index',
+      valueType: 'indexBorder',
+      width: 48,
     },
     {
       title: '文件名',
@@ -115,16 +124,10 @@ const DocumentManagement: React.FC = () => {
       valueType: 'text',
       hideInSearch: true,
       width: 100,
-      render: (_, record) => {
-        if (!record.fileSize) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(record.fileSize) / Math.log(k));
-        return parseFloat((record.fileSize / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-      },
+      render: (_, record) => formatFileSize(record.fileSize),
     },
     {
-      title: '分片数',
+      title: '分片数量',
       dataIndex: 'chunkCount',
       valueType: 'digit',
       hideInSearch: true,
@@ -132,11 +135,9 @@ const DocumentManagement: React.FC = () => {
       align: 'center',
       width: 100,
       render: (count) => (
-        <Badge
-          count={count}
-          showZero
-          color={Number(count) > 0 ? '#1677ff' : '#d9d9d9'}
-        />
+        <Tag color={Number(count) > 0 ? 'processing' : 'default'} style={{ borderRadius: '10px' }}>
+          {count}
+        </Tag>
       ),
     },
     {
@@ -148,48 +149,25 @@ const DocumentManagement: React.FC = () => {
       sorter: true,
     },
     {
-      title: '上传者',
-      dataIndex: 'userVO',
-      valueType: 'text',
-      hideInSearch: true,
-      width: 150,
-      render: (_, record) => (
-        <Space>
-          <Avatar src={record.userVO?.userAvatar} size="small">
-            {record.userVO?.userName?.charAt(0).toUpperCase()}
-          </Avatar>
-          <Typography.Text ellipsis>{record.userVO?.userName || '未知'}</Typography.Text>
-        </Space>
-      ),
-    },
-    {
       title: '上传时间',
       dataIndex: 'uploadTime',
       valueType: 'dateTime',
       hideInSearch: true,
-      width: 160,
-      sorter: true,
-    },
-    {
-      title: '完成时间',
-      dataIndex: 'processEndTime',
-      valueType: 'dateTime',
-      hideInSearch: true,
-      width: 160,
+      width: 180,
       sorter: true,
     },
     {
       title: '操作',
       valueType: 'option',
       width: 180,
+      fixed: 'right',
       render: (_, record) => (
-        <Space size="middle" wrap>
+        <Space size="middle">
           <Typography.Link
             onClick={() => {
               setCurrentRow(record);
               setChunkDrawerVisible(true);
             }}
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
           >
             <FileSearchOutlined /> 分片
           </Typography.Link>
@@ -200,10 +178,7 @@ const DocumentManagement: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Typography.Link
-              type="danger"
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-            >
+            <Typography.Link type="danger">
               <DeleteOutlined /> 删除
             </Typography.Link>
           </Popconfirm>
@@ -215,28 +190,23 @@ const DocumentManagement: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: `文档管理 - ${knowledgeBase?.name || '加载中...'}`,
+        title: `文档管理`,
+        subTitle: knowledgeBase?.name,
         onBack: () => history.back(),
+        extra: [
+          <Tooltip key="tip" title="文档上传后将自动进入异步解析过程，解析完成后可进行召回分析">
+            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,0.45)', cursor: 'help' }} />
+          </Tooltip>
+        ]
       }}
     >
       <ProTable<API.DocumentVO, API.DocumentQueryRequest>
         headerTitle="文档列表"
         actionRef={actionRef}
         rowKey="id"
-        size="middle"
         search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
-          span: {
-            xs: 24,
-            sm: 12,
-            md: 8,
-            lg: 8,
-            xl: 8,
-            xxl: 6,
-          },
-          searchText: '查询',
-          resetText: '重置',
         }}
         toolBarRender={() => [
           <Button
@@ -249,7 +219,8 @@ const DocumentManagement: React.FC = () => {
           </Button>,
         ]}
         rowSelection={{
-          onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
         }}
         tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
           return (
@@ -261,14 +232,14 @@ const DocumentManagement: React.FC = () => {
                   await handleBatchDelete(selectedRowKeys as number[]);
                   onCleanSelected();
                 }}
-                okText="确定"
-                cancelText="取消"
               >
-                <Button danger icon={<DeleteOutlined />}>
+                <Button danger type="primary" size="small">
                   批量删除
                 </Button>
               </Popconfirm>
-              <Button onClick={onCleanSelected}>取消选择</Button>
+              <Button size="small" onClick={onCleanSelected}>
+                取消选择
+              </Button>
             </Space>
           );
         }}
@@ -279,7 +250,6 @@ const DocumentManagement: React.FC = () => {
             knowledgeBaseId: knowledgeBaseId as any,
           } as API.DocumentQueryRequest);
 
-
           return {
             success: code === 0,
             data: data?.records || [],
@@ -287,6 +257,11 @@ const DocumentManagement: React.FC = () => {
           };
         }}
         columns={columns}
+        scroll={{ x: 'max-content' }}
+        pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+        }}
       />
 
       <UploadDocumentModal
@@ -310,6 +285,5 @@ const DocumentManagement: React.FC = () => {
     </PageContainer>
   );
 };
-
 
 export default DocumentManagement;

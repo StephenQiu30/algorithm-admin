@@ -43,7 +43,7 @@ const ViewPostModal: React.FC<Props> = (props) => {
     },
     { title: '创建人ID', dataIndex: 'userId', copyable: true },
     { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
-    { title: '更新时间', dataIndex: 'updateTime', valueType: 'dateTime' },
+    { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime' },
   ];
 
   return (

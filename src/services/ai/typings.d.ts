@@ -423,6 +423,14 @@ declare namespace API {
     finalResults?: RetrievalHitVO[];
     /** 检索耗时（毫秒） */
     costMs?: number;
+    /** 改写后的查询 */
+    rewriteQuery?: string;
+    /** 最终结果平均相似度 */
+    avgSimilarity?: number;
+    /** 最终结果最高相似度 */
+    maxSimilarity?: number;
+    /** 使用的检索策略 */
+    retrievalStrategy?: string;
   };
 
   type RecallItemResultVO = {
@@ -434,6 +442,10 @@ declare namespace API {
     recall?: number;
     /** 实际召回的分片内容列表 */
     retrievedChunks?: RetrievalHitVO[];
+    /** 平均相似度 */
+    avgSimilarity?: number;
+    /** 最高相似度 */
+    maxSimilarity?: number;
   };
 
   type RecallTestItem = {
@@ -460,6 +472,10 @@ declare namespace API {
     fusionScore?: number;
     /** 最终评分 */
     score?: number;
+    /** 向量 cosine 相似度（0~1） */
+    similarityScore?: number;
+    /** 重排分数 */
+    rerankScore?: number;
     /** 命中原因 */
     matchReason?: string;
   };
@@ -475,6 +491,10 @@ declare namespace API {
     content?: string;
     /** 相似度得分 */
     score?: number;
+    /** 向量 cosine 相似度（0~1） */
+    vectorSimilarity?: number;
+    /** 关键词相关性分数 */
+    keywordRelevance?: number;
     /** 来源类型 */
     sourceType?: string;
     /** 版本 */
