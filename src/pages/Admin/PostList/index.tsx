@@ -1,11 +1,22 @@
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
+import {
+  ActionType,
+  FooterToolbar,
+  PageContainer,
+  ProColumns,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  FileTextOutlined,
+  FireOutlined,
   LikeOutlined,
   PlusOutlined,
+  ReadOutlined,
+  SafetyCertificateOutlined,
   StarOutlined,
 } from '@ant-design/icons';
 import { TAG_EMPTY } from '@/constants';
@@ -34,6 +45,8 @@ const PostList: React.FC = () => {
   const [batchReviewModalVisible, setBatchReviewModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.PostVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.PostVO[]>([]);
+  const [totalPosts, setTotalPosts] = useState<number>(0);
+  const [pendingReviews, setPendingReviews] = useState<number>(0);
 
   /**
    * 删除节点
@@ -202,7 +215,7 @@ const PostList: React.FC = () => {
         return (
           <Space wrap size={4}>
             {tags.map((tag) => (
-              <Tag key={tag} color="blue">
+              <Tag key={tag} color="processing" style={{ borderRadius: 4 }}>
                 {tag}
               </Tag>
             ))}
@@ -286,7 +299,38 @@ const PostList: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: '帖子管理',
+        breadcrumb: {},
+      }}
+    >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '文章总量',
+            value: totalPosts,
+            icon: <ReadOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '审核统计',
+            value: pendingReviews,
+            suffix: '待审',
+            valueStyle: { color: pendingReviews > 0 ? '#cf1322' : 'inherit' },
+            icon: <SafetyCertificateOutlined style={{ color: '#faad14' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '活跃热度',
+            value: '活跃',
+            status: 'success',
+            icon: <FireOutlined style={{ color: '#eb2f96' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.PostVO, API.PostQueryRequest>
         headerTitle="帖子管理"
         actionRef={actionRef}
@@ -317,6 +361,13 @@ const PostList: React.FC = () => {
             sortField,
             sortOrder,
           } as API.PostQueryRequest);
+
+          if (code === 0) {
+            setTotalPosts(Number(data?.total) || 0);
+            // Derive pending reviews from current page as MVP indicator
+            const pending = data?.records?.filter(r => r.reviewStatus === 0).length || 0;
+            setPendingReviews(pending); 
+          }
 
           return {
             success: code === 0,
@@ -405,7 +456,7 @@ const PostList: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-    </>
+    </PageContainer>
   );
 };
 

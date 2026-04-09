@@ -1,6 +1,13 @@
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, Image, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import {
+  CheckCircleOutlined,
+  CloudUploadOutlined,
+  DatabaseOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  FileOutlined,
+} from '@ant-design/icons';
+import { ActionType, PageContainer, ProColumns, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { Badge, Button, Image, message, Popconfirm, Progress, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deleteFileUploadRecord, listRecordByPage, } from '@/services/log/fileUploadRecordController';
 import { FileUploadStatusEnumMap } from '@/enums/FileUploadStatusEnum';
@@ -13,6 +20,9 @@ import { FileUploadBiz } from '@/enums/FileUploadBizEnum';
 const FileUploadRecord: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [totalFiles, setTotalFiles] = useState<number>(0);
+  const [successRate, setSuccessRate] = useState<number>(0);
+  const [totalSize, setTotalSize] = useState<string>('0 B');
 
   /**
    * 删除记录
@@ -182,6 +192,31 @@ const FileUploadRecord: React.FC = () => {
         breadcrumb: {},
       }}
     >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总文件数',
+            value: totalFiles,
+            icon: <FileOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '上传成功率',
+            value: successRate,
+            suffix: '%',
+            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '预估存储',
+            value: totalSize,
+            status: 'processing',
+            icon: <DatabaseOutlined style={{ color: '#722ed1' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.FileUploadRecordVO, API.FileUploadRecordQueryRequest>
         headerTitle="上传历史"
         actionRef={actionRef}
@@ -200,6 +235,22 @@ const FileUploadRecord: React.FC = () => {
             sortField,
             sortOrder,
           } as API.FileUploadRecordQueryRequest);
+
+          if (code === 0) {
+            setTotalFiles(Number(data?.total) || 0);
+            const records = data?.records || [];
+            if (records.length > 0) {
+              const successes = records.filter(r => r.status === 'SUCCESS').length;
+              setSuccessRate(Math.floor((successes / records.length) * 100));
+              
+              const sizeSum = records.reduce((acc, r) => acc + (Number(r.fileSize) || 0), 0);
+              if (sizeSum < 1024 * 1024) {
+                setTotalSize(`${(sizeSum / 1024).toFixed(2)} KB`);
+              } else {
+                setTotalSize(`${(sizeSum / (1024 * 1024)).toFixed(2)} MB`);
+              }
+            }
+          }
 
           return {
             success: code === 0,

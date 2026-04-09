@@ -1,6 +1,20 @@
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
-import { Avatar, Button, message, Popconfirm, Space, Typography } from 'antd';
+import {
+  ActionType,
+  FooterToolbar,
+  PageContainer,
+  ProColumns,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import {
+  CommentOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  MessageOutlined,
+  RiseOutlined,
+} from '@ant-design/icons';
+import { Avatar, Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deletePostComment, listPostCommentByPage } from '@/services/post/postCommentController';
 import UpdateCommentModal from '@/pages/Admin/CommentList/components/UpdateCommentModal';
@@ -17,6 +31,8 @@ const CommentList: React.FC = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.PostCommentVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.PostCommentVO[]>([]);
+  const [totalComment, setTotalComment] = useState<number>(0);
+  const [rootCommentCount, setRootCommentCount] = useState<number>(0);
 
   /**
    * 删除节点
@@ -167,7 +183,36 @@ const CommentList: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: '评论管理',
+        breadcrumb: {},
+      }}
+    >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总评论数',
+            value: totalComment,
+            icon: <CommentOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '根评论数',
+            value: rootCommentCount,
+            icon: <MessageOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '互动状态',
+            value: '活跃',
+            status: 'success',
+            icon: <RiseOutlined style={{ color: '#eb2f96' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.PostCommentVO, any>
         headerTitle="评论管理"
         actionRef={actionRef}
@@ -183,6 +228,12 @@ const CommentList: React.FC = () => {
             sortField,
             sortOrder,
           } as any);
+
+          if (code === 0) {
+            setTotalComment(Number(data?.total) || 0);
+            const roots = data?.records?.filter(c => !c.parentId).length || 0;
+            setRootCommentCount(roots);
+          }
 
           return {
             success: code === 0,
@@ -228,7 +279,7 @@ const CommentList: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-    </>
+    </PageContainer>
   );
 };
 
