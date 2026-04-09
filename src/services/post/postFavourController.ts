@@ -29,7 +29,7 @@ export async function listFavourPostByPage(
   });
 }
 
-/** 此处后端没有提供注释 POST /post/favour/my/list/page */
+/** 获取我收藏的帖子列表 分页获取当前登录用户收藏的帖子列表 POST /post/favour/my/list/page */
 export async function listMyFavourPostByPage(
   body: API.PostQueryRequest,
   options?: { [key: string]: any },

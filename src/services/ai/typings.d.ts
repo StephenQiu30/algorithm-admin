@@ -177,6 +177,8 @@ declare namespace API {
   type ChunkVO = {
     /** 分片ID（ES文档ID） */
     id?: string;
+    /** 稳定分片ID */
+    chunkId?: string;
     /** 文档ID */
     documentId?: number;
     /** 文档名称 */
@@ -185,6 +187,10 @@ declare namespace API {
     knowledgeBaseId?: number;
     /** 分片索引 */
     chunkIndex?: number;
+    /** 章节标题 */
+    sectionTitle?: string;
+    /** 章节路径 */
+    sectionPath?: string;
     /** 分片内容 */
     content?: string;
     /** 字符数 */
@@ -254,10 +260,16 @@ declare namespace API {
     documentId?: number;
     /** 知识库ID */
     knowledgeBaseId?: number;
+    /** 文档名称 */
+    documentName?: string;
     /** 分片索引 */
     chunkIndex?: number;
     /** 分片内容 */
     content?: string;
+    /** 章节标题 */
+    sectionTitle?: string;
+    /** 章节路径 */
+    sectionPath?: string;
     /** 字符数 */
     wordCount?: number;
     /** Token数量 */
@@ -518,6 +530,10 @@ declare namespace API {
     knowledgeBaseId?: number;
     /** 检索数量 */
     topK?: number;
+    /** 会话ID（用于多轮对话记忆） */
+    conversationId?: string;
+    /** 知识库不足时是否允许联网搜索兜底 */
+    enableWebSearchFallback?: boolean;
   };
 
   type RAGHistoryQueryRequest = {
@@ -637,6 +653,12 @@ declare namespace API {
     documentName?: string;
     /** 分片索引 */
     chunkIndex?: number;
+    /** 稳定分片ID */
+    chunkId?: string;
+    /** 章节标题 */
+    sectionTitle?: string;
+    /** 章节路径 */
+    sectionPath?: string;
     /** 分片内容 */
     content?: string;
     /** 向量分数（相似度） */
@@ -655,6 +677,8 @@ declare namespace API {
     matchReason?: string;
   };
 
+  type ServerSentEventRAGStreamEventVO = true;
+
   type SourceVO = {
     /** 文档ID */
     documentId?: number;
@@ -662,6 +686,8 @@ declare namespace API {
     documentName?: string;
     /** 分片索引 */
     chunkIndex?: number;
+    /** 稳定分片ID */
+    chunkId?: string;
     /** 分片内容 */
     content?: string;
     /** 相似度得分 */
@@ -676,6 +702,10 @@ declare namespace API {
     version?: string;
     /** 业务标签 */
     bizTag?: string;
+    /** 章节标题 */
+    sectionTitle?: string;
+    /** 章节路径 */
+    sectionPath?: string;
     /** 命中原因 */
     matchReason?: string;
   };

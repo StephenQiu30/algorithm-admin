@@ -2,7 +2,7 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 创建知识库 POST /ai/kb/add */
+/** 创建知识库 创建新的知识库，用于组织和管理文档 POST /ai/kb/add */
 export async function addKnowledgeBase(
   body: API.KnowledgeBaseAddRequest,
   options?: { [key: string]: any },
@@ -17,7 +17,7 @@ export async function addKnowledgeBase(
   });
 }
 
-/** 删除知识库 POST /ai/kb/delete */
+/** 删除知识库 删除指定知识库，仅本人或管理员可操作 POST /ai/kb/delete */
 export async function deleteKnowledgeBase(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
@@ -47,7 +47,7 @@ export async function editKnowledgeBase(
   });
 }
 
-/** 获取知识库详情 GET /ai/kb/get/vo */
+/** 获取知识库详情 根据ID获取知识库的详细信息 GET /ai/kb/get/vo */
 export async function getKnowledgeBaseVoById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getKnowledgeBaseVOByIdParams,
@@ -77,7 +77,7 @@ export async function listKnowledgeBaseByPage(
   });
 }
 
-/** 分页获取知识库 POST /ai/kb/list/page/vo */
+/** 分页获取知识库 分页获取知识库脱敏信息列表 POST /ai/kb/list/page/vo */
 export async function listKnowledgeBaseVoByPage(
   body: API.KnowledgeBaseQueryRequest,
   options?: { [key: string]: any },

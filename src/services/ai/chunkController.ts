@@ -17,7 +17,7 @@ export async function getChunkVoById(
   });
 }
 
-/** 分页查询文档分片（管理员） POST /ai/chunk/list/page */
+/** 分页查询文档分片（管理员） 获取完整字段的文档分片列表，仅限管理员 POST /ai/chunk/list/page */
 export async function listChunkByPage(
   body: API.ChunkQueryRequest,
   options?: { [key: string]: any },
@@ -47,7 +47,7 @@ export async function listChunkVoByPage(
   });
 }
 
-/** 内容检索分片 POST /ai/chunk/search */
+/** 内容检索分片 基于关键词在指定知识库或文档中搜索相关分片 POST /ai/chunk/search */
 export async function searchChunks(body: API.ChunkSearchRequest, options?: { [key: string]: any }) {
   return request<API.BaseResponseListChunkVO>('/ai/chunk/search', {
     method: 'POST',

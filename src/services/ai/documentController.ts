@@ -2,7 +2,7 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 上传文档 POST /ai/doc/add */
+/** 上传文档 上传文档到指定知识库，系统将自动进行文档解析、分片和向量化处理 POST /ai/doc/add */
 export async function addDocument(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.addDocumentParams,
@@ -85,7 +85,7 @@ export async function listDocumentByPage(
   });
 }
 
-/** 分页获取文档 POST /ai/doc/list/page/vo */
+/** 分页获取文档 分页获取文档脱敏信息列表 POST /ai/doc/list/page/vo */
 export async function listDocumentVoByPage(
   body: API.DocumentQueryRequest,
   options?: { [key: string]: any },
@@ -100,7 +100,7 @@ export async function listDocumentVoByPage(
   });
 }
 
-/** 分页获取我的文档 POST /ai/doc/my/list/page/vo */
+/** 我的文档列表 分页获取当前登录用户上传的文档列表 POST /ai/doc/my/list/page/vo */
 export async function listMyDocumentVoByPage(
   body: API.DocumentQueryRequest,
   options?: { [key: string]: any },
