@@ -1,5 +1,6 @@
 import {
   BarChartOutlined,
+  BookOutlined,
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
@@ -7,8 +8,15 @@ import {
   PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
-import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
+import {
+  ActionType,
+  PageContainer,
+  ProColumns,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
 import { history } from '@umijs/max';
 import { Avatar, Button, Dropdown, message, Modal, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -27,6 +35,8 @@ const AlgorithmKnowledgeList: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.KnowledgeBaseVO>();
+  const [totalKnowledgeBase, setTotalKnowledgeBase] = useState<number>(0);
+  const [totalDocuments, setTotalDocuments] = useState<number>(0);
 
   /**
    * 删除知识库
@@ -103,14 +113,13 @@ const AlgorithmKnowledgeList: React.FC = () => {
       dataIndex: 'documentCount',
       valueType: 'digit',
       hideInSearch: true,
-      hideInTable: true,
       sorter: true,
       align: 'center',
       width: 100,
       render: (count) => (
         <Tag
           color={Number(count) > 0 ? 'processing' : 'default'}
-          style={{ borderRadius: 10, padding: '0 10px' }}
+          style={{ borderRadius: 6, padding: '2px 12px', fontWeight: 500 }}
         >
           {count || 0}
         </Tag>
@@ -212,6 +221,30 @@ const AlgorithmKnowledgeList: React.FC = () => {
         breadcrumb: {},
       }}
     >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '全部知识库',
+            value: totalKnowledgeBase,
+            icon: <BookOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '关联文档总数',
+            value: totalDocuments,
+            icon: <FileTextOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '活跃状态',
+            value: '良好',
+            status: 'success',
+            icon: <ThunderboltOutlined style={{ color: '#faad14' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.KnowledgeBaseVO, API.KnowledgeBaseQueryRequest>
         headerTitle="知识库列表"
         actionRef={actionRef}
@@ -248,6 +281,12 @@ const AlgorithmKnowledgeList: React.FC = () => {
             sortField,
             sortOrder,
           } as API.KnowledgeBaseQueryRequest);
+
+          if (code === 0) {
+            setTotalKnowledgeBase(Number(data?.total) || 0);
+            const docsCount = data?.records?.reduce((acc, curr) => acc + (curr.documentCount || 0), 0) || 0;
+            setTotalDocuments(docsCount); // This is just for current page, but gives a sense of density
+          }
 
           return {
             success: code === 0,

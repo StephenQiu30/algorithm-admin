@@ -1,6 +1,12 @@
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
+import { ActionType, FooterToolbar, PageContainer, ProColumns, ProTable, StatisticCard } from '@ant-design/pro-components';
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import {
+  CheckCircleOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  RiseOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
 import { deleteEmailRecord, listRecordByPage1 } from '@/services/log/emailRecordController';
 import { EmailStatusEnumMap } from '@/enums/EmailStatusEnum';
@@ -11,7 +17,10 @@ import ViewEmailRecordModal from './components/ViewEmailRecordModal';
  */
 const EmailRecord: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [currentRow, setCurrentRow] = useState<API.EmailRecordVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.EmailRecordVO[]>([]);
+  const [totalEmails, setTotalEmails] = useState<number>(0);
+  const [successCount, setSuccessCount] = useState<number>(0);
 
   /**
    * 删除记录
@@ -127,7 +136,38 @@ const EmailRecord: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: '邮件投递记录',
+        breadcrumb: {},
+      }}
+    >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总发送量',
+            value: totalEmails,
+            icon: <SendOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '发送成功',
+            value: successCount,
+            valueStyle: { color: '#52c41a' },
+            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '成功率',
+            value: totalEmails > 0 ? Math.floor((successCount / totalEmails) * 100) : 100,
+            suffix: '%',
+            status: totalEmails > 0 && successCount / totalEmails > 0.9 ? 'success' : 'warning',
+            icon: <RiseOutlined style={{ color: '#eb2f96' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.EmailRecordVO>
         headerTitle="邮件记录"
         actionRef={actionRef}
@@ -143,6 +183,13 @@ const EmailRecord: React.FC = () => {
             sortField,
             sortOrder,
           });
+
+          if (code === 0) {
+            setTotalEmails(Number(data?.total) || 0);
+            const records = data?.records || [];
+            const successes = records.filter(r => r.status === 'SUCCESS').length;
+            setSuccessCount(successes);
+          }
 
           return {
             success: code === 0,
@@ -175,7 +222,7 @@ const EmailRecord: React.FC = () => {
           </Popconfirm>
         </FooterToolbar>
       )}
-    </>
+    </PageContainer>
   );
 };
 

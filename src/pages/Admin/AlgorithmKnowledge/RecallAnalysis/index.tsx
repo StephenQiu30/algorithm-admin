@@ -19,7 +19,7 @@ import {
   StatisticCard,
 } from '@ant-design/pro-components';
 import { history, useParams } from '@umijs/max';
-import { Alert, Badge, Button, Empty, message, Space, Tag, Tooltip, Typography } from 'antd';
+import { Alert, Badge, Button, Empty, message, Progress, Space, Tag, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { analyzeRecall } from '@/services/ai/ragController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
@@ -67,7 +67,7 @@ const RecallAnalysis: React.FC = () => {
   /**
    * 渲染检索得分
    */
-  const renderScoreTag = (
+  const renderScoreProgress = (
     score: number | undefined,
     label: string,
     color: string,
@@ -75,43 +75,32 @@ const RecallAnalysis: React.FC = () => {
   ) => {
     if (score === undefined || score === null || score === 0) return null;
 
-    const tag = (
-      <Tag
-        color={color}
-        style={{
-          margin: 0,
-          borderRadius: '4px',
-          fontWeight: 600,
-          border: 'none',
-          padding: '0 8px',
-          fontSize: '12px',
-          height: '24px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
-        }}
-      >
-        <span
-          style={{
-            opacity: 0.8,
-            fontSize: '10px',
-            marginRight: 6,
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}
-        >
-          {label}
-        </span>
-        {Number(score).toFixed(4)}
-      </Tag>
+    const content = (
+      <div style={{ width: '100%', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <Typography.Text type="secondary" style={{ fontSize: 10, textTransform: 'uppercase' }}>
+            {label}
+          </Typography.Text>
+          <Typography.Text strong style={{ fontSize: 12, color }}>
+            {Number(score).toFixed(4)}
+          </Typography.Text>
+        </div>
+        <Progress
+          percent={Number(score) * 100}
+          size={[100, 6]}
+          showInfo={false}
+          strokeColor={color}
+          trailColor="#f0f0f0"
+        />
+      </div>
     );
 
     return tooltip ? (
       <Tooltip title={tooltip} key={label}>
-        <span style={{ cursor: 'help' }}>{tag}</span>
+        {content}
       </Tooltip>
     ) : (
-      <span key={label}>{tag}</span>
+      <div key={label}>{content}</div>
     );
   };
 
@@ -165,38 +154,25 @@ const RecallAnalysis: React.FC = () => {
       ),
     },
     {
-      title: '评分明细 (Scoring)',
+      title: '权重与相似度 (Weight & Similarity)',
       dataIndex: 'score',
-      width: 220,
+      width: 200,
       render: (_, record) => (
-        <Space direction="vertical" size={6} style={{ display: 'flex' }}>
+        <div style={{ width: '100%' }}>
           {type === 'final' ? (
             <>
-              {renderScoreTag(
-                record.score,
-                'Final',
-                record.matchReason?.includes('rerank') ? '#eb2f96' : '#fa8c16',
-                '最终权重综合评分',
-              )}
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                {renderScoreTag(record.vectorScore, 'Vec', '#13c2c2')}
-                {renderScoreTag(record.keywordScore, 'Kwd', '#2f54eb')}
-              </div>
-              {renderScoreTag(
-                record.fusionScore,
-                'RRF',
-                '#722ed1',
-                'Reciprocal Rank Fusion 融合排名分',
-              )}
+              {renderScoreProgress(record.score, 'Final', '#fa8c16', '最终权重综合评分')}
+              {renderScoreProgress(record.similarityScore, 'Cosine', '#13c2c2', '向量余弦相似度')}
+              {renderScoreProgress(record.fusionScore, 'RRF', '#722ed1', 'RR 融合分')}
             </>
           ) : (
             <>
-              {type === 'vector' && renderScoreTag(record.vectorScore, 'Vector', '#13c2c2')}
-              {type === 'keyword' && renderScoreTag(record.keywordScore, 'BM25', '#2f54eb')}
-              {type === 'fused' && renderScoreTag(record.fusionScore, 'Fused', '#722ed1')}
+              {type === 'vector' && renderScoreProgress(record.vectorScore, 'Vector', '#13c2c2', '向量检索分')}
+              {type === 'keyword' && renderScoreProgress(record.keywordScore, 'BM25', '#2f54eb', 'ES 关键词关联分')}
+              {type === 'fused' && renderScoreProgress(record.fusionScore, 'Fused', '#722ed1', '融合排名')}
             </>
           )}
-        </Space>
+        </div>
       ),
     },
     {
@@ -328,31 +304,51 @@ const RecallAnalysis: React.FC = () => {
             <ProCard bordered loading />
           ) : analysisResult ? (
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <ProCard.Group bordered>
+              <ProCard.Group bordered direction="row">
                 <StatisticCard
                   statistic={{
                     title: '诊断耗时',
                     value: analysisResult.costMs || 0,
                     suffix: 'ms',
-                    icon: <RocketOutlined style={{ color: '#1890ff' }} />,
+                    icon: <RocketOutlined style={{ color: '#1677ff' }} />,
                   }}
                 />
                 <Divider type="vertical" />
                 <StatisticCard
                   statistic={{
-                    title: 'Avg Similarity',
+                    title: '平均召回相似度',
                     value: (analysisResult.avgSimilarity || 0) * 100,
                     precision: 2,
                     suffix: '%',
                     icon: <DashboardOutlined style={{ color: '#52c41a' }} />,
                   }}
+                  chart={
+                    <Progress
+                      percent={(analysisResult.avgSimilarity || 0) * 100}
+                      type="dashboard"
+                      size={40}
+                      gapDegree={120}
+                      strokeColor="#52c41a"
+                    />
+                  }
+                  chartPlacement="left"
                 />
                 <Divider type="vertical" />
                 <StatisticCard
                   statistic={{
-                    title: '召回总数',
+                    title: '最高相似度',
+                    value: (analysisResult.maxSimilarity || 0) * 100,
+                    precision: 2,
+                    suffix: '%',
+                    icon: <InfoCircleOutlined style={{ color: '#1890ff' }} />,
+                  }}
+                />
+                <Divider type="vertical" />
+                <StatisticCard
+                  statistic={{
+                    title: '最终命中',
                     value: analysisResult.finalResults?.length || 0,
-                    suffix: 'Chunks',
+                    suffix: '分片',
                     icon: <FileSearchOutlined style={{ color: '#722ed1' }} />,
                   }}
                 />

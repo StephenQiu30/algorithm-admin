@@ -8,7 +8,7 @@ import {
   ProFormTextArea,
   ProList,
 } from '@ant-design/pro-components';
-import { Button, Empty, Form, message, Space, Tag, Tooltip, Typography } from 'antd';
+import { Badge, Button, Empty, Form, message, Space, Tag, Tooltip, Typography } from 'antd';
 import { FileTextOutlined, InfoCircleOutlined, RocketOutlined, SearchOutlined, } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { history, useParams } from '@umijs/max';
@@ -115,109 +115,128 @@ const KnowledgeRetrievalPage: React.FC = () => {
   /**
    * 渲染结果列表
    */
-  const renderResultList = (dataSource: any[]) => (
-    <ProList<any>
-      loading={loading}
-      dataSource={dataSource}
-      itemLayout="vertical"
-      rowKey={(item, index) => `${item.id || item.documentId}-${index}`}
-      metas={{
-        title: {
-          render: (_, item) => (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                padding: '12px 16px',
-                background: '#fafafa',
-                borderRadius: '8px 8px 0 0',
-                border: '1px solid #f0f0f0',
-                borderBottom: 'none',
-              }}
-            >
-              <Space>
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    background: '#e6f4ff',
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <FileTextOutlined style={{ color: '#1677ff', fontSize: 14 }} />
-                </div>
-                <Typography.Text strong style={{ fontSize: '15px' }}>
-                  {item.documentName || '未知文档'}
-                </Typography.Text>
-                <Tag color="blue" style={{ borderRadius: '4px', margin: 0, fontSize: '11px' }}>
-                  Index #{item.chunkIndex ?? 0}
-                </Tag>
-              </Space>
-              <Space size={4}>
-                {renderScoreTag(item.score, 'Final', '#fa8c16')}
-                {renderScoreTag(item.vectorScore, 'Vec', '#13c2c2')}
-                {renderScoreTag(item.keywordScore, 'BM25', '#2f54eb')}
-                {renderScoreTag(item.fusionScore, 'RRF', '#722ed1')}
-              </Space>
-            </div>
-          ),
-        },
-        description: {
-          render: (_, item) => (
-            <div
-              style={{
-                padding: '24px',
-                background: '#fff',
-                border: '1px solid #f0f0f0',
-                borderRadius: '0 0 8px 8px',
-                marginBottom: 20,
-                boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
-                position: 'relative',
-              }}
-            >
-              <Typography.Paragraph
-                copyable={{ text: item.content }}
-                ellipsis={{ rows: 6, expandable: true, symbol: '展开全文' }}
+  const renderResultList = (dataSource: any[]) => {
+    const query = form.getFieldValue('query');
+    
+    // 简单的搜索词高亮处理
+    const highlightContent = (content: string, keyword: string) => {
+      if (!keyword || !content) return content;
+      const parts = content.split(new RegExp(`(${keyword})`, 'gi'));
+      return parts.map((part, index) => 
+        part.toLowerCase() === keyword.toLowerCase() ? (
+          <mark key={index} style={{ backgroundColor: '#fff566', padding: 0 }}>
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      );
+    };
+
+    return (
+      <ProList<any>
+        loading={loading}
+        dataSource={dataSource}
+        itemLayout="vertical"
+        rowKey={(item, index) => `${item.id || item.documentId}-${index}`}
+        metas={{
+          title: {
+            render: (_, item) => (
+              <div
                 style={{
-                  margin: 0,
-                  fontSize: '14px',
-                  lineHeight: '1.8',
-                  color: 'rgba(0, 0, 0, 0.85)',
-                  whiteSpace: 'pre-wrap',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: '#fafafa',
+                  borderRadius: '8px 8px 0 0',
+                  border: '1px solid #f0f0f0',
+                  borderBottom: 'none',
                 }}
               >
-                {item.content}
-              </Typography.Paragraph>
-              {item.matchReason && (
-                <div style={{ marginTop: 16 }}>
-                  <Tag color="orange" style={{ fontSize: '11px', borderRadius: '4px' }}>
-                    召回原因: {item.matchReason}
+                <Space>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      background: '#e6f4ff',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <FileTextOutlined style={{ color: '#1677ff', fontSize: 14 }} />
+                  </div>
+                  <Typography.Text strong style={{ fontSize: '15px' }}>
+                    {item.documentName || '未知文档'}
+                  </Typography.Text>
+                  <Tag color="blue" style={{ borderRadius: '4px', margin: 0, fontSize: '11px' }}>
+                    Index #{item.chunkIndex ?? 0}
                   </Tag>
-                </div>
-              )}
-            </div>
+                </Space>
+                <Space size={4}>
+                  {renderScoreTag(item.score, 'Final', '#fa8c16')}
+                  {renderScoreTag(item.vectorScore, 'Vec', '#13c2c2')}
+                  {renderScoreTag(item.keywordScore, 'BM25', '#2f54eb')}
+                  {renderScoreTag(item.fusionScore, 'RRF', '#722ed1')}
+                </Space>
+              </div>
+            ),
+          },
+          description: {
+            render: (_, item) => (
+              <div
+                style={{
+                  padding: '24px',
+                  background: '#fff',
+                  border: '1px solid #f0f0f0',
+                  borderRadius: '0 0 8px 8px',
+                  marginBottom: 20,
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+                  position: 'relative',
+                }}
+              >
+                <Typography.Paragraph
+                  copyable={{ text: item.content }}
+                  ellipsis={{ rows: 6, expandable: true, symbol: '展开全文' }}
+                  style={{
+                    margin: 0,
+                    fontSize: '14px',
+                    lineHeight: '1.8',
+                    color: 'rgba(0, 0, 0, 0.85)',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {highlightContent(item.content, query)}
+                </Typography.Paragraph>
+                {item.matchReason && (
+                  <div style={{ marginTop: 16 }}>
+                    <Tag color="orange" style={{ fontSize: '11px', borderRadius: '4px' }}>
+                      召回原因: {item.matchReason}
+                    </Tag>
+                  </div>
+                )}
+              </div>
+            ),
+          },
+        }}
+        pagination={{
+          pageSize: 5,
+          showSizeChanger: true,
+        }}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="暂无检索结果，请尝试调整检索词或 TopK"
+            />
           ),
-        },
-      }}
-      pagination={{
-        pageSize: 5,
-        showSizeChanger: true,
-      }}
-      locale={{
-        emptyText: (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="暂无检索结果，请尝试调整检索词或 TopK"
-          />
-        ),
-      }}
-    />
-  );
+        }}
+      />
+    );
+  };
 
   return (
     <PageContainer
@@ -238,82 +257,96 @@ const KnowledgeRetrievalPage: React.FC = () => {
         ],
       }}
     >
-      <ProCard ghost direction="column" gutter={[0, 24]}>
-        {/* 配置区 */}
-        <ProCard bordered>
+      <ProCard split="vertical" bordered ghost>
+        {/* 左侧配置区 */}
+        <ProCard colSpan="320px">
+          <Typography.Title level={5}>检索配置</Typography.Title>
+          <Typography.Text type="secondary" style={{ fontSize: 12, marginBottom: 24, display: 'block' }}>
+            根据业务需求调整语义召回与关键词召回的平衡。
+          </Typography.Text>
+          
           <ProForm
             form={form}
             onFinish={handleSearch}
-            layout="inline"
+            layout="vertical"
             submitter={{
-              render: (_, dom) => <div style={{ marginLeft: 'auto' }}>{dom}</div>,
-              searchConfig: { submitText: '执行检索' },
+              render: (_, dom) => <div style={{ marginTop: 16 }}>{dom}</div>,
+              searchConfig: { submitText: '执行深度检索' },
               submitButtonProps: {
                 icon: <SearchOutlined />,
                 loading,
+                block: true,
               },
               resetButtonProps: {
-                style: { marginLeft: 8 },
+                style: { display: 'none' },
               },
             }}
           >
             <ProFormTextArea
               name="query"
-              label="检索内容"
+              label={
+                <Space>
+                  检索内容
+                  <Tooltip title="输入您的查询语句或关键词">
+                    <InfoCircleOutlined />
+                  </Tooltip>
+                </Space>
+              }
               placeholder="输入问题或关键词..."
               rules={[{ required: true }]}
               fieldProps={{
-                autoSize: { minRows: 1, maxRows: 4 },
-                style: { width: 450 },
+                autoSize: { minRows: 4, maxRows: 8 },
               }}
             />
-            <ProFormDigit
-              name="topK"
-              label="召回数量"
-              initialValue={5}
-              min={1}
-              max={50}
-              fieldProps={{ style: { width: 80 } }}
-            />
-            <ProFormSwitch
-              name="isDiagnose"
-              label="诊断模式"
-              fieldProps={{
-                onChange: (checked) => {
-                  setIsDiagnose(checked);
-                  setResults([]);
-                  setDiagnoseResults(undefined);
-                },
-              }}
-            />
+            <div style={{ display: 'flex', gap: 16 }}>
+              <ProFormDigit
+                name="topK"
+                label="召回数量"
+                initialValue={5}
+                min={1}
+                max={50}
+                fieldProps={{ style: { width: '100%' } }}
+              />
+              <ProFormSwitch
+                name="isDiagnose"
+                label="对比诊断"
+                fieldProps={{
+                  onChange: (checked) => {
+                    setIsDiagnose(checked);
+                    setResults([]);
+                    setDiagnoseResults(undefined);
+                  },
+                }}
+              />
+            </div>
             {isDiagnose && (
               <ProFormRadio.Group
                 name="similarityMode"
-                label="算法模式"
+                label="检索算法"
                 initialValue={VectorSimilarityModeEnum.KNN}
                 options={[
                   { label: '向量 (kNN)', value: VectorSimilarityModeEnum.KNN },
                   { label: '混合 (Hybrid)', value: VectorSimilarityModeEnum.HYBRID },
                 ]}
                 radioType="button"
+                fieldProps={{
+                  style: { width: '100%' },
+                }}
               />
             )}
           </ProForm>
         </ProCard>
 
-        {/* 结果区 */}
+        {/* 右侧结果区 */}
         <ProCard
           title={
             <Space>
               <RocketOutlined style={{ color: '#fa8c16' }} />
-              <span style={{ fontWeight: 600 }}>检索结果 (Hits)</span>
-              <Tooltip title="基于当前配置召回的最相关知识片段">
-                <InfoCircleOutlined style={{ color: 'rgba(0,0,0,0.45)', marginLeft: 4 }} />
-              </Tooltip>
+              <span style={{ fontWeight: 600 }}>检索结果 (Analysis)</span>
+              {loading && <Tag color="processing">处理中...</Tag>}
             </Space>
           }
-          bordered
-          bodyStyle={{ padding: '0 32px 32px' }}
+          bodyStyle={{ padding: '0 24px 24px' }}
         >
           {isDiagnose ? (
             <ProCard
@@ -325,10 +358,12 @@ const KnowledgeRetrievalPage: React.FC = () => {
                   {
                     label: (
                       <Space>
-                        向量召回
-                        <Tag style={{ borderRadius: 10 }}>
-                          {diagnoseResults?.vectorHits?.length || 0}
-                        </Tag>
+                        语义召回
+                        <Badge
+                          count={diagnoseResults?.vectorHits?.length || 0}
+                          color="#13c2c2"
+                          size="small"
+                        />
                       </Space>
                     ),
                     key: 'vector',
@@ -338,9 +373,11 @@ const KnowledgeRetrievalPage: React.FC = () => {
                     label: (
                       <Space>
                         关键词召回
-                        <Tag style={{ borderRadius: 10 }}>
-                          {diagnoseResults?.keywordHits?.length || 0}
-                        </Tag>
+                        <Badge
+                          count={diagnoseResults?.keywordHits?.length || 0}
+                          color="#2f54eb"
+                          size="small"
+                        />
                       </Space>
                     ),
                     key: 'keyword',
@@ -350,9 +387,11 @@ const KnowledgeRetrievalPage: React.FC = () => {
                     label: (
                       <Space>
                         全链路融合
-                        <Tag color="orange" style={{ borderRadius: 10 }}>
-                          {diagnoseResults?.finalResults?.length || 0}
-                        </Tag>
+                        <Badge
+                          count={diagnoseResults?.finalResults?.length || 0}
+                          color="orange"
+                          size="small"
+                        />
                       </Space>
                     ),
                     key: 'fused',

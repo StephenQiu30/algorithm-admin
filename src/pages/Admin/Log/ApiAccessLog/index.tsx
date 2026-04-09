@@ -1,6 +1,13 @@
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import {
+  CheckCircleOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  RocketOutlined,
+  ThunderboltOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
+import { ActionType, PageContainer, ProColumns, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { Badge, Button, message, Popconfirm, Progress, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deleteApiAccessLog, listLogByPage2 } from '@/services/log/apiAccessLogController';
 import { ApiAccessStatusEnumMap } from '@/enums/ApiAccessStatusEnum';
@@ -12,6 +19,9 @@ import ViewApiAccessLogModal from './components/ViewApiAccessLogModal';
 const ApiAccessLog: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [totalHits, setTotalHits] = useState<number>(0);
+  const [avgLatency, setAvgLatency] = useState<number>(0);
+  const [errorRate, setErrorRate] = useState<number>(0);
 
   /**
    * 删除日志
@@ -145,6 +155,43 @@ const ApiAccessLog: React.FC = () => {
         breadcrumb: {},
       }}
     >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总访问量',
+            value: totalHits,
+            icon: <RocketOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '平均延迟',
+            value: avgLatency,
+            suffix: 'ms',
+            icon: <ThunderboltOutlined style={{ color: '#faad14' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '异常率',
+            value: errorRate,
+            suffix: '%',
+            valueStyle: { color: errorRate > 5 ? '#cf1322' : 'inherit' },
+            icon: <WarningOutlined style={{ color: '#cf1322' }} />,
+          }}
+          chart={
+            <Progress 
+              percent={errorRate} 
+              size={40} 
+              type="dashboard" 
+              strokeColor="#cf1322" 
+              gapDegree={120}
+              showInfo={false}
+            />
+          }
+          chartPlacement="left"
+        />
+      </StatisticCard.Group>
       <ProTable<API.ApiAccessLogVO, API.ApiAccessLogQueryRequest>
         headerTitle="访问记录"
         actionRef={actionRef}
@@ -163,6 +210,18 @@ const ApiAccessLog: React.FC = () => {
             sortField,
             sortOrder,
           } as API.ApiAccessLogQueryRequest);
+
+          if (code === 0) {
+            setTotalHits(Number(data?.total) || 0);
+            const records = data?.records || [];
+            if (records.length > 0) {
+              const latencySum = records.reduce((acc, r) => acc + (Number(r.latencyMs) || 0), 0);
+              setAvgLatency(Math.floor(latencySum / records.length));
+              
+              const errors = records.filter(r => Number(r.status) >= 400).length;
+              setErrorRate(Math.floor((errors / records.length) * 100));
+            }
+          }
 
           return {
             success: code === 0,

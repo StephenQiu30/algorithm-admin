@@ -1,6 +1,13 @@
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Typography } from 'antd';
+import {
+  CarryOutOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  HistoryOutlined,
+  SafetyCertificateOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
+import { ActionType, PageContainer, ProColumns, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deleteUserLoginLog, listLogByPage1 } from '@/services/log/userLoginLogController';
 import { LoginStatusEnumMap } from '@/enums/LoginStatusEnum';
@@ -11,7 +18,10 @@ import ViewUserLoginLogModal from './components/ViewUserLoginLogModal';
  */
 const UserLoginLog: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [currentRow, setCurrentRow] = useState<API.UserLoginLogVO>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [totalLogins, setTotalLogins] = useState<number>(0);
+  const [failureCount, setFailureCount] = useState<number>(0);
 
   /**
    * 删除日志
@@ -78,6 +88,10 @@ const UserLoginLog: React.FC = () => {
       dataIndex: 'status',
       width: 100,
       valueEnum: LoginStatusEnumMap,
+      render: (_, record) => {
+        const statusInfo = LoginStatusEnumMap[record.status as keyof typeof LoginStatusEnumMap];
+        return <Badge status={statusInfo?.status as any} text={statusInfo?.text} />;
+      },
     },
     {
       title: '登录时间',
@@ -123,6 +137,31 @@ const UserLoginLog: React.FC = () => {
         breadcrumb: {},
       }}
     >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总登录次数',
+            value: totalLogins,
+            icon: <HistoryOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '登录异常',
+            value: failureCount,
+            valueStyle: { color: failureCount > 0 ? '#cf1322' : 'inherit' },
+            icon: <WarningOutlined style={{ color: '#cf1322' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '系统安全性',
+            value: '正常',
+            status: failureCount === 0 ? 'success' : 'warning',
+            icon: <SafetyCertificateOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.UserLoginLogVO, API.UserLoginLogQueryRequest>
         headerTitle="日志列表"
         actionRef={actionRef}
@@ -141,6 +180,12 @@ const UserLoginLog: React.FC = () => {
             sortField,
             sortOrder,
           } as API.UserLoginLogQueryRequest);
+
+          if (code === 0) {
+            setTotalLogins(Number(data?.total) || 0);
+            const failures = data?.records?.filter(r => r.status === 2 || r.status === 'failed').length || 0;
+            setFailureCount(failures);
+          }
 
           return {
             success: code === 0,

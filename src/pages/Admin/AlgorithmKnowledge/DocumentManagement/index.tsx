@@ -1,12 +1,18 @@
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Tooltip, Typography } from 'antd';
+import { Badge, Button, message, Popconfirm, Progress, Space, Tooltip, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history, useParams } from '@umijs/max';
 import { deleteDocument, listDocumentVoByPage } from '@/services/ai/documentController';
 import { getKnowledgeBaseVoById } from '@/services/ai/knowledgeBaseController';
 import UploadDocumentModal from '../KnowledgeBaseList/components/UploadDocumentModal';
 import { DocumentParseStatusEnumMap } from '@/enums/DocumentParseStatusEnum';
-import { CloudUploadOutlined, DeleteOutlined, FileSearchOutlined, InfoCircleOutlined, } from '@ant-design/icons';
+import {
+  BulbOutlined,
+  CloudUploadOutlined,
+  DeleteOutlined,
+  FileSearchOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
 import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
 
 /**
@@ -145,11 +151,41 @@ const DocumentManagement: React.FC = () => {
       dataIndex: 'status',
       valueType: 'select',
       valueEnum: DocumentParseStatusEnumMap,
-      width: 120,
+      width: 150,
       sorter: true,
       render: (_, record) => {
-        const statusInfo =
-          DocumentParseStatusEnumMap[record.status as keyof typeof DocumentParseStatusEnumMap];
+        const statusKey = record.status as keyof typeof DocumentParseStatusEnumMap;
+        const statusInfo = DocumentParseStatusEnumMap[statusKey];
+        
+        if (statusKey === 'PROCESSING') {
+          return (
+            <Space direction="vertical" size={0} style={{ width: '100%' }}>
+              <Space size={8}>
+                <Badge status="processing" />
+                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                  解析中...
+                </Typography.Text>
+              </Space>
+              <Progress 
+                percent={45} 
+                size="small" 
+                status="active" 
+                showInfo={false} 
+                strokeWidth={2}
+                style={{ marginTop: 4, width: 80 }}
+              />
+            </Space>
+          );
+        }
+
+        if (statusKey === 'FAILED') {
+          return (
+            <Tooltip title={record.errorMessage || '详情未知'}>
+              <Badge status="error" text="解析失败" style={{ cursor: 'help' }} />
+            </Tooltip>
+          );
+        }
+
         return <Badge status={statusInfo?.status as any} text={statusInfo?.text} />;
       },
     },
@@ -205,7 +241,7 @@ const DocumentManagement: React.FC = () => {
         onBack: () => history.back(),
         extra: [
           <Tooltip key="tip" title="文档上传后将自动进入异步解析过程，解析完成后可进行召回分析">
-            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,0.45)', cursor: 'help' }} />
+            <BulbOutlined style={{ color: '#faad14', cursor: 'help' }} />
           </Tooltip>,
         ],
       }}

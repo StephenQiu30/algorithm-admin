@@ -121,7 +121,7 @@ export default [
 
   {
     name: 'exception',
-    icon: 'warning',
+    icon: 'ExclamationCircleOutlined',
     path: '/exception',
     layout: false,
     routes: [
@@ -131,19 +131,19 @@ export default [
       },
       {
         name: '403',
-        icon: 'smile',
+        icon: 'QuestionCircleOutlined',
         path: '/exception/403',
         component: './Exception/403',
       },
       {
         name: '404',
-        icon: 'smile',
+        icon: 'QuestionCircleOutlined',
         path: '/exception/404',
         component: './Exception/404',
       },
       {
         name: '500',
-        icon: 'smile',
+        icon: 'QuestionCircleOutlined',
         path: '/exception/500',
         component: './Exception/500',
       },

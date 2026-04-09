@@ -1,8 +1,23 @@
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
+import {
+  ActionType,
+  FooterToolbar,
+  PageContainer,
+  ProColumns,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
 import { deleteUser, listUserByPage } from '@/services/user/userController';
 import { batchUpsertUser } from '@/services/search/searchController';
 import { Avatar, Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, } from '@ant-design/icons';
+import {
+  CrownOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  SafetyCertificateOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
 import { userRole } from '@/enums/UserRoleEnum';
 import CreateUserModal from '@/pages/Admin/UserList/components/CreateUserModal';
@@ -21,6 +36,8 @@ const UserList: React.FC = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.User>();
   const [selectedRowsState, setSelectedRows] = useState<API.User[]>([]);
+  const [totalUser, setTotalUser] = useState<number>(0);
+  const [adminCount, setAdminCount] = useState<number>(0);
 
   /**
    * 删除节点
@@ -160,9 +177,9 @@ const UserList: React.FC = () => {
       render: (_, record) => {
         const role = record.userRole;
         if (role === 'admin') {
-          return <Badge status="error" text="管理员" />;
+          return <Badge status="error" text="管理员" style={{ fontWeight: 500 }} />;
         }
-        return <Badge status="default" text="普通用户" />;
+        return <Badge status="processing" text="普通用户" />;
       },
     },
     {
@@ -216,7 +233,37 @@ const UserList: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: '用户管理',
+        breadcrumb: {},
+      }}
+    >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '注册人数',
+            value: totalUser,
+            icon: <UserOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '核心团队',
+            value: adminCount,
+            suffix: '人',
+            icon: <CrownOutlined style={{ color: '#cf1322' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '系统状态',
+            value: '正常',
+            status: 'success',
+            icon: <SafetyCertificateOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.User, API.UserQueryRequest>
         headerTitle="用户管理"
         actionRef={actionRef}
@@ -242,6 +289,12 @@ const UserList: React.FC = () => {
             sortField,
             sortOrder,
           } as API.UserQueryRequest);
+
+          if (code === 0) {
+            setTotalUser(Number(data?.total) || 0);
+            const admins = data?.records?.filter(u => u.userRole === 'admin').length || 0;
+            setAdminCount(admins); // derive from current page
+          }
 
           return {
             success: code === 0,
@@ -302,7 +355,7 @@ const UserList: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-    </>
+    </PageContainer>
   );
 };
 

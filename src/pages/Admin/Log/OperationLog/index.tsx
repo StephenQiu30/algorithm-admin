@@ -1,6 +1,12 @@
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import {
+  CheckCircleOutlined,
+  ControlOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  PlayCircleOutlined,
+} from '@ant-design/icons';
+import { ActionType, PageContainer, ProColumns, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deleteOperationLog, listLogByPage } from '@/services/log/operationLogController';
 import { OperationStatusEnumMap } from '@/enums/OperationStatusEnum';
@@ -12,6 +18,8 @@ import ViewOperationLogModal from './components/ViewOperationLogModal';
 const OperationLog: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [totalOps, setTotalOps] = useState<number>(0);
+  const [successRate, setSuccessRate] = useState<number>(100);
 
   /**
    * 删除日志
@@ -90,6 +98,10 @@ const OperationLog: React.FC = () => {
       dataIndex: 'success',
       width: 100,
       valueEnum: OperationStatusEnumMap,
+      render: (_, record) => {
+        const statusInfo = OperationStatusEnumMap[record.success as keyof typeof OperationStatusEnumMap];
+        return <Badge status={statusInfo?.status as any} text={statusInfo?.text} />;
+      },
     },
     {
       title: '操作时间',
@@ -135,6 +147,31 @@ const OperationLog: React.FC = () => {
         breadcrumb: {},
       }}
     >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总操作数',
+            value: totalOps,
+            icon: <ControlOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '操作成功率',
+            value: successRate,
+            suffix: '%',
+            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '运行状态',
+            value: '正常',
+            status: 'processing',
+            icon: <PlayCircleOutlined style={{ color: '#13c2c2' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.OperationLogVO, API.OperationLogQueryRequest>
         headerTitle="日志列表"
         actionRef={actionRef}
@@ -153,6 +190,15 @@ const OperationLog: React.FC = () => {
             sortField,
             sortOrder,
           } as API.OperationLogQueryRequest);
+
+          if (code === 0) {
+            setTotalOps(Number(data?.total) || 0);
+            const records = data?.records || [];
+            const successCount = records.filter(r => r.success === true || r.success === 1).length;
+            if (records.length > 0) {
+              setSuccessRate(Math.floor((successCount / records.length) * 100));
+            }
+          }
 
           return {
             success: code === 0,

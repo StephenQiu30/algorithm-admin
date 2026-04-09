@@ -1,5 +1,20 @@
-import { ActionType, FooterToolbar, ProColumns, ProTable } from '@ant-design/pro-components';
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  ActionType,
+  FooterToolbar,
+  PageContainer,
+  ProColumns,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import {
+  BellOutlined,
+  CheckCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  NotificationOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
@@ -21,6 +36,8 @@ const NotificationList: React.FC = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<API.Notification>();
   const [selectedRowsState, setSelectedRows] = useState<API.Notification[]>([]);
+  const [totalNotifications, setTotalNotifications] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   /**
    * 删除节点
@@ -123,8 +140,8 @@ const NotificationList: React.FC = () => {
       valueType: 'select',
       valueEnum: NotificationReadStatusEnumMap,
       width: 110,
-      render: (isRead) => {
-        if (isRead === 1) return <Badge status="success" text="已读" />;
+      render: (_, record) => {
+        if (record.isRead === 1) return <Badge status="success" text="已读" />;
         return <Badge status="processing" text="未读" />;
       },
     },
@@ -189,7 +206,37 @@ const NotificationList: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: '通知管理',
+        breadcrumb: {},
+      }}
+    >
+      <StatisticCard.Group direction="row" gutter={16} style={{ marginBottom: 24 }}>
+        <StatisticCard
+          statistic={{
+            title: '总通知数',
+            value: totalNotifications,
+            icon: <NotificationOutlined style={{ color: '#1890ff' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '未读通知',
+            value: unreadCount,
+            valueStyle: { color: unreadCount > 0 ? '#faad14' : 'inherit' },
+            icon: <BellOutlined style={{ color: '#faad14' }} />,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '送达状态',
+            value: '正常',
+            status: 'success',
+            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          }}
+        />
+      </StatisticCard.Group>
       <ProTable<API.Notification, API.NotificationQueryRequest>
         headerTitle="通知管理"
         actionRef={actionRef}
@@ -215,6 +262,12 @@ const NotificationList: React.FC = () => {
             sortField,
             sortOrder,
           } as API.NotificationQueryRequest);
+
+          if (code === 0) {
+            setTotalNotifications(Number(data?.total) || 0);
+            const unread = data?.records?.filter(n => n.isRead === 0).length || 0;
+            setUnreadCount(unread);
+          }
 
           return {
             success: code === 0,
@@ -271,7 +324,7 @@ const NotificationList: React.FC = () => {
           actionRef.current?.reload();
         }}
       />
-    </>
+    </PageContainer>
   );
 };
 
