@@ -14,7 +14,7 @@ export async function doThumb(body: API.PostThumbRequest, options?: { [key: stri
   });
 }
 
-/** 此处后端没有提供注释 POST /post/thumb/list/page */
+/** 获取用户点赞的帖子列表 分页获取指定用户点赞的帖子列表 POST /post/thumb/list/page */
 export async function listThumbPostByPage(
   body: API.PostFavourQueryRequest,
   options?: { [key: string]: any },
