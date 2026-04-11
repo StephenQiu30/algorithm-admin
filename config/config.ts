@@ -166,7 +166,7 @@ export default defineConfig({
     },
     {
       requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:8089/api/v3/api-docs',
+      schemaPath: 'http://localhost:8088/api/v3/api-docs',
       projectName: 'ai',
     },
   ],
