@@ -14,6 +14,7 @@ import {
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
+import { DocumentParseStatusEnum } from '@/enums/DocumentParseStatusEnum';
 
 /**
  * 格式化文件大小
@@ -40,6 +41,7 @@ const DocumentManagement: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
   const [chunkDrawerVisible, setChunkDrawerVisible] = useState<boolean>(false);
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   /**
    * 获取知识库详情
@@ -203,6 +205,28 @@ const DocumentManagement: React.FC = () => {
       ),
     },
     {
+      title: '处理说明',
+      dataIndex: 'errorMessage',
+      hideInSearch: true,
+      minWidth: 220,
+      render: (_, record) => {
+        if (record.status === DocumentParseStatusEnum.FAILED) {
+          return (
+            <Typography.Text type="danger">
+              {record.errorMessage || '解析失败，暂未返回详细原因'}
+            </Typography.Text>
+          );
+        }
+        if (record.status === DocumentParseStatusEnum.TIMEOUT) {
+          return <Typography.Text type="warning">处理超时，建议稍后重新上传或检查原文件。</Typography.Text>;
+        }
+        if (record.status === DocumentParseStatusEnum.PROCESSING) {
+          return <Typography.Text type="secondary">系统正在异步解析中，请稍后刷新查看。</Typography.Text>;
+        }
+        return <Typography.Text type="secondary">状态正常</Typography.Text>;
+      },
+    },
+    {
       title: '操作',
       valueType: 'option',
       width: 180,
@@ -294,6 +318,7 @@ const DocumentManagement: React.FC = () => {
           const { data, code } = await listDocumentVoByPage({
             ...params,
             knowledgeBaseId: knowledgeBaseId as any,
+            status: statusFilter === 'ALL' ? undefined : statusFilter,
           } as API.DocumentQueryRequest);
 
           return {

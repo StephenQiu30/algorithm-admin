@@ -8,6 +8,7 @@ import {
 } from '@ant-design/pro-components';
 import {
   BellOutlined,
+  CheckOutlined,
   CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -18,9 +19,10 @@ import {
 import { Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
+  batchMarkNotificationRead,
   batchDeleteNotification,
   deleteNotification,
-  listNotificationByPage,
+  listNotificationVoByPage,
 } from '@/services/notification/notificationController';
 import UpdateNotificationModal from '@/pages/Admin/NotificationList/components/UpdateNotificationModal';
 import CreateNotificationModal from '@/pages/Admin/NotificationList/components/CreateNotificationModal';
@@ -34,8 +36,8 @@ const NotificationList: React.FC = () => {
   // Modal 状态管理
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<API.Notification>();
-  const [selectedRowsState, setSelectedRows] = useState<API.Notification[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.NotificationVO>();
+  const [selectedRowsState, setSelectedRows] = useState<API.NotificationVO[]>([]);
   const [totalNotifications, setTotalNotifications] = useState<number>(0);
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
@@ -43,7 +45,7 @@ const NotificationList: React.FC = () => {
    * 删除节点
    * @param row
    */
-  const handleDelete = async (row: API.Notification) => {
+  const handleDelete = async (row: API.NotificationVO) => {
     if (!row?.id) return;
     const hide = message.loading('正在删除');
     try {
@@ -65,7 +67,7 @@ const NotificationList: React.FC = () => {
    * 批量删除节点
    * @param selectedRows
    */
-  const handleBatchDelete = async (selectedRows: API.Notification[]) => {
+  const handleBatchDelete = async (selectedRows: API.NotificationVO[]) => {
     if (!selectedRows?.length) return;
     const hide = message.loading('正在删除');
     try {
@@ -89,7 +91,7 @@ const NotificationList: React.FC = () => {
   /**
    * 表格列定义
    */
-  const columns: ProColumns<API.Notification>[] = [
+  const columns: ProColumns<API.NotificationVO>[] = [
     {
       title: '序号',
       dataIndex: 'id',
@@ -107,11 +109,19 @@ const NotificationList: React.FC = () => {
       width: 120,
     },
     {
-      title: '用户 ID',
+      title: '接收对象',
       dataIndex: 'userId',
       valueType: 'text',
-      copyable: true,
-      width: 120,
+      width: 180,
+      render: (_, record) =>
+        record.userVO?.userName ? (
+          <Space>
+            <Typography.Text strong>{record.userVO.userName}</Typography.Text>
+            <Typography.Text type="secondary">#{record.userId}</Typography.Text>
+          </Space>
+        ) : (
+          <Typography.Text copyable>{record.userId}</Typography.Text>
+        ),
     },
     {
       title: '标题',
@@ -153,6 +163,32 @@ const NotificationList: React.FC = () => {
         if (!record.relatedType) return '-';
         return <Tag color="processing">{record.relatedType}</Tag>;
       },
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      valueType: 'select',
+      width: 100,
+      valueEnum: {
+        0: { text: '正常', status: 'Success' },
+        1: { text: '停用', status: 'Default' },
+      },
+      render: (_, record) =>
+        record.status === 1 ? <Badge status="default" text="停用" /> : <Badge status="success" text="正常" />,
+    },
+    {
+      title: '跳转链接',
+      dataIndex: 'contentUrl',
+      hideInSearch: true,
+      width: 180,
+      render: (value) =>
+        value ? (
+          <Typography.Link href={String(value)} target="_blank" rel="noreferrer">
+            查看链接
+          </Typography.Link>
+        ) : (
+          '-'
+        ),
     },
     {
       title: '创建时间',
@@ -237,7 +273,7 @@ const NotificationList: React.FC = () => {
           }}
         />
       </StatisticCard.Group>
-      <ProTable<API.Notification, API.NotificationQueryRequest>
+      <ProTable<API.NotificationVO, API.NotificationQueryRequest>
         headerTitle="通知管理"
         actionRef={actionRef}
         rowKey="id"
@@ -256,7 +292,7 @@ const NotificationList: React.FC = () => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
 
-          const { data, code } = await listNotificationByPage({
+          const { data, code } = await listNotificationVoByPage({
             ...params,
             ...filter,
             sortField,
@@ -290,6 +326,25 @@ const NotificationList: React.FC = () => {
           }
         >
           <Space>
+            <Popconfirm
+              key="batchRead"
+              title="确定批量标记为已读？"
+              onConfirm={async () => {
+                const ids = selectedRowsState.map((row) => row.id!).filter(Boolean);
+                const res = await batchMarkNotificationRead({ ids });
+                if (res.code === 0) {
+                  message.success('批量标记已读成功');
+                  actionRef.current?.reloadAndRest?.();
+                  setSelectedRows([]);
+                } else {
+                  message.error(`批量标记已读失败: ${res.message}`);
+                }
+              }}
+            >
+              <Button type="primary" icon={<CheckOutlined />}>
+                标记已读
+              </Button>
+            </Popconfirm>
             <Popconfirm
               key="batchDelete"
               title="确定批量删除？"

@@ -63,7 +63,6 @@ export default [
     icon: 'NotificationOutlined',
     access: 'canAdmin',
   },
-
   {
     name: '日志管理',
     path: '/admin/log',
