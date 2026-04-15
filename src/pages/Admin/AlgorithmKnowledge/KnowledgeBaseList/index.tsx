@@ -20,7 +20,10 @@ import {
 import { history } from '@umijs/max';
 import { Avatar, Button, Dropdown, message, Modal, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { deleteKnowledgeBase, listMyKnowledgeBaseVoByPage, } from '@/services/ai/knowledgeBaseController';
+import {
+  deleteKnowledgeBase,
+  listKnowledgeBaseVoByPage,
+} from '@/services/ai/knowledgeBaseController';
 import CreateKnowledgeModal from '@/pages/Admin/AlgorithmKnowledge/KnowledgeBaseList/components/CreateKnowledgeModal';
 import UpdateKnowledgeModal from '@/pages/Admin/AlgorithmKnowledge/KnowledgeBaseList/components/UpdateKnowledgeModal';
 
@@ -217,7 +220,7 @@ const AlgorithmKnowledgeList: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: '算法知识管理',
+        title: '知识库管理',
         breadcrumb: {},
       }}
     >
@@ -275,7 +278,7 @@ const AlgorithmKnowledgeList: React.FC = () => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
 
-          const { data, code } = await listMyKnowledgeBaseVoByPage({
+          const { data, code } = await listKnowledgeBaseVoByPage({
             ...params,
             ...filter,
             sortField,

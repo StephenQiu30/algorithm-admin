@@ -1,3 +1,4 @@
+import { history } from '@umijs/max';
 import { Avatar, Button, Modal, Space, Typography } from 'antd';
 import React, { useState } from 'react';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -29,6 +30,15 @@ const ViewCommentModal: React.FC<Props> = (props) => {
       ),
     },
     { title: '帖子ID', dataIndex: 'postId', copyable: true },
+    {
+      title: '继续处理',
+      dataIndex: 'continueAction',
+      render: (_, record) => (
+        <Typography.Link onClick={() => history.push(`/admin/post?postId=${record.postId}`)}>
+          打开帖子管理页
+        </Typography.Link>
+      ),
+    },
     {
       title: '父评论ID',
       dataIndex: 'parentId',

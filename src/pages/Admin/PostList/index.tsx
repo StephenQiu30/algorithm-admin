@@ -6,6 +6,7 @@ import {
   ProTable,
   StatisticCard,
 } from '@ant-design/pro-components';
+import { history, useLocation } from '@umijs/max';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -37,6 +38,8 @@ import React, { useRef, useState } from 'react';
  */
 const PostList: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const location = useLocation();
+  const focusPostId = new URLSearchParams(location.search).get('postId');
 
   // Modal 状态管理
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
@@ -47,6 +50,7 @@ const PostList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<API.PostVO[]>([]);
   const [totalPosts, setTotalPosts] = useState<number>(0);
   const [pendingReviews, setPendingReviews] = useState<number>(0);
+  const [pendingOnly, setPendingOnly] = useState<boolean>(false);
 
   /**
    * 删除节点
@@ -337,6 +341,9 @@ const PostList: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 100 }}
         toolBarRender={() => [
+          <Button key="toggle-review" onClick={() => setPendingOnly((value) => !value)}>
+            {pendingOnly ? '查看全部帖子' : '只看待审核'}
+          </Button>,
           <Button
             key="create"
             type="primary"
@@ -346,6 +353,10 @@ const PostList: React.FC = () => {
             新建
           </Button>,
         ]}
+        params={{
+          id: focusPostId ? Number(focusPostId) : undefined,
+          reviewStatus: focusPostId ? undefined : pendingOnly ? 0 : undefined,
+        }}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0] || 'createTime';
           const sortOrder = sort?.[sortField] ?? 'descend';
@@ -358,6 +369,8 @@ const PostList: React.FC = () => {
                 ? params.tags
                 : [params.tags]
               : undefined,
+            id: params.id,
+            reviewStatus: params.reviewStatus,
             sortField,
             sortOrder,
           } as API.PostQueryRequest);
