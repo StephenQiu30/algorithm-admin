@@ -6,7 +6,9 @@ import {
   ProTable,
   StatisticCard,
 } from '@ant-design/pro-components';
+import { history } from '@umijs/max';
 import {
+  ArrowRightOutlined,
   CommentOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -14,7 +16,7 @@ import {
   MessageOutlined,
   RiseOutlined,
 } from '@ant-design/icons';
-import { Avatar, Badge, Button, message, Popconfirm, Space, Typography } from 'antd';
+import { Avatar, Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deletePostComment, listPostCommentByPage } from '@/services/post/postCommentController';
 import UpdateCommentModal from '@/pages/Admin/CommentList/components/UpdateCommentModal';
@@ -115,12 +117,24 @@ const CommentList: React.FC = () => {
       ),
     },
     {
-      title: '帖子 ID',
+      title: '关联帖子',
       dataIndex: 'postId',
       valueType: 'text',
-      copyable: true,
-      ellipsis: true,
-      width: 120,
+      width: 220,
+      render: (_, record) => (
+        <Space direction="vertical" size={2}>
+          <Space size={6}>
+            <Tag color="processing">帖子 #{record.postId}</Tag>
+            {record.parentId ? <Tag>回复评论</Tag> : <Tag color="success">一级评论</Tag>}
+          </Space>
+          <Typography.Link
+            onClick={() => history.push(`/admin/post?postId=${record.postId}`)}
+            style={{ padding: 0 }}
+          >
+            去帖子页继续处理 <ArrowRightOutlined />
+          </Typography.Link>
+        </Space>
+      ),
     },
     {
       title: '父评论 ID',
