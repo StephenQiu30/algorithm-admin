@@ -194,7 +194,7 @@ const OperationLog: React.FC = () => {
           if (code === 0) {
             setTotalOps(Number(data?.total) || 0);
             const records = data?.records || [];
-            const successCount = records.filter(r => r.success === true || r.success === 1).length;
+            const successCount = records.filter((r) => Number(r.success) === 1).length;
             if (records.length > 0) {
               setSuccessRate(Math.floor((successCount / records.length) * 100));
             }

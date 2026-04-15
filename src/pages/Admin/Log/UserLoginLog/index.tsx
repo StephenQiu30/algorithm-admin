@@ -183,7 +183,11 @@ const UserLoginLog: React.FC = () => {
 
           if (code === 0) {
             setTotalLogins(Number(data?.total) || 0);
-            const failures = data?.records?.filter(r => r.status === 2 || r.status === 'failed').length || 0;
+            const failures =
+              data?.records?.filter((r) => {
+                const status = String(r.status ?? '').toLowerCase();
+                return status === '2' || status === 'failed';
+              }).length || 0;
             setFailureCount(failures);
           }
 

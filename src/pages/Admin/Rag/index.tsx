@@ -1,4 +1,4 @@
-import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Badge, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { listRagHistoryVoByPage } from '@/services/ai/ragController';
@@ -17,6 +17,20 @@ const Rag: React.FC = () => {
    * 表格列定义
    */
   const columns: ProColumns<API.RAGHistoryVO>[] = [
+    {
+      title: '知识库 ID',
+      dataIndex: 'knowledgeBaseId',
+      valueType: 'digit',
+      width: 120,
+      render: (value) => <Tag color="processing">KB #{value}</Tag>,
+    },
+    {
+      title: '用户 ID',
+      dataIndex: 'userId',
+      valueType: 'digit',
+      width: 120,
+      render: (value) => <Typography.Text copyable>{value}</Typography.Text>,
+    },
     {
       title: '问题',
       dataIndex: 'question',
@@ -134,9 +148,14 @@ const Rag: React.FC = () => {
   ];
 
   return (
-    <>
+    <PageContainer
+      header={{
+        title: 'AI 对话记录',
+        breadcrumb: {},
+      }}
+    >
       <ProTable<API.RAGHistoryVO, API.RAGHistoryQueryRequest>
-        headerTitle="AI 对话历史分析"
+        headerTitle="AI 对话记录"
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -177,7 +196,7 @@ const Rag: React.FC = () => {
           setCurrentRow(undefined);
         }}
       />
-    </>
+    </PageContainer>
   );
 };
 
