@@ -17,7 +17,6 @@ import ViewEmailRecordModal from './components/ViewEmailRecordModal';
  */
 const EmailRecord: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.EmailRecordVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.EmailRecordVO[]>([]);
   const [totalEmails, setTotalEmails] = useState<number>(0);
   const [successCount, setSuccessCount] = useState<number>(0);

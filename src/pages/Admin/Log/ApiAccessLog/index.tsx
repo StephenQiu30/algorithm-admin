@@ -1,5 +1,4 @@
 import {
-  CheckCircleOutlined,
   DeleteOutlined,
   EyeOutlined,
   RocketOutlined,

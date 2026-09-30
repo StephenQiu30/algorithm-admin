@@ -1,13 +1,12 @@
 import {
   CheckCircleOutlined,
-  CloudUploadOutlined,
   DatabaseOutlined,
   DeleteOutlined,
   EyeOutlined,
   FileOutlined,
 } from '@ant-design/icons';
 import { ActionType, PageContainer, ProColumns, ProTable, StatisticCard } from '@ant-design/pro-components';
-import { Badge, Button, Image, message, Popconfirm, Progress, Space, Tag, Typography } from 'antd';
+import { Button, Image, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deleteFileUploadRecord, listRecordByPage, } from '@/services/log/fileUploadRecordController';
 import { FileUploadStatusEnumMap } from '@/enums/FileUploadStatusEnum';
@@ -71,7 +70,7 @@ const FileUploadRecord: React.FC = () => {
       dataIndex: 'url',
       width: 80,
       hideInSearch: true,
-      render: (url, record) => {
+      render: (url) => {
         if (!url) return '-';
         const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url as string);
         if (isImage) {

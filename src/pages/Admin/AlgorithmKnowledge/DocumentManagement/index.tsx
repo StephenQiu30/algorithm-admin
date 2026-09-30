@@ -11,7 +11,6 @@ import {
   CloudUploadOutlined,
   DeleteOutlined,
   FileSearchOutlined,
-  InfoCircleOutlined,
 } from '@ant-design/icons';
 import DocumentChunkDrawer from '../KnowledgeBaseList/components/DocumentChunkDrawer';
 import { DocumentParseStatusEnum } from '@/enums/DocumentParseStatusEnum';
@@ -41,7 +40,7 @@ const DocumentManagement: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [knowledgeBase, setKnowledgeBase] = useState<API.KnowledgeBaseVO>();
   const [chunkDrawerVisible, setChunkDrawerVisible] = useState<boolean>(false);
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [statusFilter] = useState<string>('ALL');
 
   /**
    * 获取知识库详情

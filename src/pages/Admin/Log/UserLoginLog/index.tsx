@@ -1,5 +1,4 @@
 import {
-  CarryOutOutlined,
   DeleteOutlined,
   EyeOutlined,
   HistoryOutlined,
@@ -18,7 +17,6 @@ import ViewUserLoginLogModal from './components/ViewUserLoginLogModal';
  */
 const UserLoginLog: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.UserLoginLogVO>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [totalLogins, setTotalLogins] = useState<number>(0);
   const [failureCount, setFailureCount] = useState<number>(0);
