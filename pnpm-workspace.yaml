@@ -1,0 +1,10 @@
+# Build only the native compiler packages used by Umi.
+# https://pnpm.io/settings/build#allowbuilds
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  core-js: false
+  core-js-pure: false
+  es5-ext: false
+  less: false
+  puppeteer-core: false
