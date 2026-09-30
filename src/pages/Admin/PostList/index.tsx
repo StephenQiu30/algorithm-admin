@@ -6,13 +6,12 @@ import {
   ProTable,
   StatisticCard,
 } from '@ant-design/pro-components';
-import { history, useLocation } from '@umijs/max';
+import { useLocation } from '@umijs/max';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
-  FileTextOutlined,
   FireOutlined,
   LikeOutlined,
   PlusOutlined,

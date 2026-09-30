@@ -16,7 +16,7 @@ import {
   MessageOutlined,
   RiseOutlined,
 } from '@ant-design/icons';
-import { Avatar, Badge, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
+import { Avatar, Button, message, Popconfirm, Space, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { deletePostComment, listPostCommentByPage } from '@/services/post/postCommentController';
 import UpdateCommentModal from '@/pages/Admin/CommentList/components/UpdateCommentModal';

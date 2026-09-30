@@ -1,3 +1,4 @@
+import CourseEvaluation from './components/CourseEvaluation';
 import {
   DashboardOutlined,
   EyeOutlined,
@@ -258,6 +259,7 @@ const RecallAnalysis: React.FC = () => {
       }}
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <CourseEvaluation knowledgeBaseId={id || ''} />
         {/* 配置区 */}
         <ProCard bordered>
           <ProForm

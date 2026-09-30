@@ -1,0 +1,18 @@
+name: Admin checks
+on: [push, pull_request]
+jobs:
+  admin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run tsc
+      - run: pnpm run lint:js
+      - run: pnpm run build
